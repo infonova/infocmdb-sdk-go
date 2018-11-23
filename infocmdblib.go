@@ -1,4 +1,4 @@
-package infocmdbGoLib
+package infocmdblibrary
 
 import (
 	"errors"
@@ -20,7 +20,7 @@ type InfoCmdbGoLib struct {
 	WC cmdbWebClient
 }
 
-func NewInfoCmdbGoLib(url string, cred Credentials) (InfoCmdbGoLib, error) {
+func NewCMDB(url string, cred Credentials) (InfoCmdbGoLib, error) {
 	i := InfoCmdbGoLib{}
 	i.WC.apikey = cred.ApiKey
 	if cred.ApiKey == "" && cred.Username == "" {

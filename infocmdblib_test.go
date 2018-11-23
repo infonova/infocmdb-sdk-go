@@ -1,4 +1,4 @@
-package infocmdbGoLib
+package infocmdblibrary
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ var infocmdbCredentials = Credentials{Username: "admin", Password: "admin"}
 
 func ExampleWebservice_Webservice() {
 
-	i, err := NewInfoCmdbGoLib(infocmdbURL, infocmdbCredentials)
+	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
 	if err != nil {
 
 		fmt.Printf("Error: %v\n", err)
@@ -32,7 +32,7 @@ func ExampleWebservice_Webservice() {
 
 func ExampleCmdbWebClient_Login() {
 
-	i, err := NewInfoCmdbGoLib(infocmdbURL, infocmdbCredentials)
+	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		return
@@ -46,7 +46,7 @@ func ExampleCmdbWebClient_Login() {
 
 func ExampleCmdbWebClient_Get() {
 
-	i, err := NewInfoCmdbGoLib(infocmdbURL, infocmdbCredentials)
+	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
 	if err != nil {
 
 		fmt.Printf("Error: %v\n", err)
@@ -70,7 +70,7 @@ func ExampleCmdbWebClient_Get() {
 
 func ExampleCmdbWebClient_Post() {
 
-	i, err := NewInfoCmdbGoLib(infocmdbURL, infocmdbCredentials)
+	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
 	if err != nil {
 
 		fmt.Printf("Error: %v\n", err)
@@ -93,7 +93,7 @@ func ExampleCmdbWebClient_Post() {
 }
 
 func ExampleInfoCmdbGoLib_GetCi() {
-	i, err := NewInfoCmdbGoLib(infocmdbURL, infocmdbCredentials)
+	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
 	if err != nil {
 
 		fmt.Printf("Error: %v\n", err)
@@ -112,7 +112,7 @@ func ExampleInfoCmdbGoLib_GetCi() {
 }
 
 func ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType() {
-	i, err := NewInfoCmdbGoLib(infocmdbURL, infocmdbCredentials)
+	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
 	if err != nil {
 
 		fmt.Printf("Error: %v\n", err)
@@ -131,7 +131,7 @@ func ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType() {
 }
 
 func ExampleInfoCmdbGoLib_Login() {
-	i, err := NewInfoCmdbGoLib(infocmdbURL, infocmdbCredentials)
+	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
 	if err != nil {
 
 		fmt.Printf("Error: %v\n", err)
@@ -144,7 +144,7 @@ func ExampleInfoCmdbGoLib_Login() {
 }
 
 func ExampleInfoCmdbGoLib_GetCiAttributes() {
-	i, err := NewInfoCmdbGoLib(infocmdbURL, infocmdbCredentials)
+	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
 	if err != nil {
 
 		fmt.Printf("Error: %v\n", err)

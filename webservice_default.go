@@ -1,4 +1,4 @@
-package infocmdbGoLib
+package infocmdblibrary
 
 import (
 	"encoding/json"
