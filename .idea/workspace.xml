@@ -24,20 +24,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="712227a9-0fb5-4373-a7a4-3d49aa926961" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/composerJson.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/cmd/webservicecaller/main.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/infocmdbGoLib.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/infocmdblib.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/infocmdblib_test.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webclient.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webservice.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/webservice_default.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmd/exampleWebserviceCaller/main.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/infocmdblib.go" beforeDir="false" afterPath="$PROJECT_DIR$/infocmdblib.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/infocmdblib_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/infocmdblib_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webclient.go" beforeDir="false" afterPath="$PROJECT_DIR$/webclient.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webservice.go" beforeDir="false" afterPath="$PROJECT_DIR$/webservice.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webservice_default.go" beforeDir="false" afterPath="$PROJECT_DIR$/webservice_default.go" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -46,40 +39,76 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="DockManager">
+    <window id="1">
+      <content type="file-editors">
+        <state>
+          <leaf>
+            <file pinned="false" current-in-tab="true">
+              <entry file="file://$PROJECT_DIR$/infocmdblib_test.go">
+                <provider selected="true" editor-type-id="text-editor">
+                  <state relative-caret-position="972">
+                    <caret line="130" column="1" lean-forward="true" selection-start-line="130" selection-start-column="1" selection-end-line="130" selection-end-column="1" />
+                  </state>
+                </provider>
+              </entry>
+            </file>
+            <file pinned="false" current-in-tab="false">
+              <entry file="file://C:/Go/src/net/url/url.go">
+                <provider selected="true" editor-type-id="text-editor">
+                  <state relative-caret-position="270">
+                    <caret line="803" column="5" selection-start-line="803" selection-start-column="5" selection-end-line="803" selection-end-column="5" />
+                  </state>
+                </provider>
+              </entry>
+            </file>
+          </leaf>
+        </state>
+      </content>
+    </window>
+  </component>
   <component name="FUSProjectUsageTrigger">
     <session id="-2097172240">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="1" />
+          <entry key="project.closed" value="2" />
           <entry key="project.open.time.0" value="1" />
-          <entry key="project.open.time.1" value="1" />
-          <entry key="project.opened" value="2" />
+          <entry key="project.open.time.1" value="2" />
+          <entry key="project.opened" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="go" value="11" />
+          <entry key="go" value="15" />
+          <entry key="md" value="2" />
           <entry key="mod" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="DTD" value="1" />
-          <entry key="Go" value="11" />
+          <entry key="Go" value="15" />
+          <entry key="Markdown" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="go" value="3654" />
+          <entry key="go" value="5593" />
+          <entry key="md" value="43" />
+          <entry key="txt" value="53" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Go" value="3654" />
+          <entry key="Go" value="5593" />
+          <entry key="Markdown" value="43" />
+          <entry key="PLAIN_TEXT" value="53" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.go.postfix.template.usages.trigger">
         <counts>
+          <entry key=".len" value="2" />
+          <entry key=".p" value="1" />
           <entry key=".panic" value="1" />
         </counts>
       </usages-collector>
@@ -90,58 +119,26 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/infocmdblib.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="100">
-              <caret line="5" column="1" selection-start-line="5" selection-start-column="1" selection-end-line="5" selection-end-column="1" />
+            <state relative-caret-position="648">
+              <caret line="34" lean-forward="true" selection-start-line="34" selection-end-line="34" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/go.mod">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/webservice.go">
+        <entry file="file://$PROJECT_DIR$/webclient.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="40">
-              <caret line="2" column="11" lean-forward="true" selection-start-line="2" selection-start-column="11" selection-end-line="2" selection-end-column="11" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/cmd/webservicecaller/main.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="380">
-              <caret line="19" column="26" selection-start-line="19" selection-start-column="26" selection-end-line="19" selection-end-column="26" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/infocmdblib_test.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="40">
-              <caret line="2" selection-start-line="2" selection-end-line="2" />
+            <state relative-caret-position="1115">
+              <caret line="104" column="47" selection-start-line="104" selection-start-column="47" selection-end-line="104" selection-end-column="47" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/webclient.go">
+        <entry file="file://$PROJECT_DIR$/webservice.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="680">
-              <caret line="34" column="33" lean-forward="true" selection-start-line="34" selection-start-column="33" selection-end-line="34" selection-end-column="33" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/webservice_default.go">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="14" column="1" lean-forward="true" selection-start-line="14" selection-start-column="1" selection-end-line="14" selection-end-column="1" />
+            <state relative-caret-position="220">
+              <caret line="11" column="36" selection-start-line="11" selection-start-column="36" selection-end-line="11" selection-end-column="36" />
             </state>
           </provider>
         </entry>
@@ -165,17 +162,21 @@
   <component name="GOROOT" path="C:\Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="WARN_ABOUT_CRLF" value="false" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/main_test.go" />
         <option value="$PROJECT_DIR$/main.go" />
-        <option value="$PROJECT_DIR$/webservice.go" />
-        <option value="$PROJECT_DIR$/webclient.go" />
         <option value="$PROJECT_DIR$/cmd/webservicecaller/main.go" />
         <option value="$PROJECT_DIR$/webservice_default.go" />
+        <option value="$PROJECT_DIR$/cmd/exampleWebserviceCaller/main.go" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/webclient.go" />
         <option value="$PROJECT_DIR$/infocmdblib.go" />
+        <option value="$PROJECT_DIR$/infocmdblib_test.go" />
+        <option value="$PROJECT_DIR$/webservice.go" />
       </list>
     </option>
   </component>
@@ -187,7 +188,7 @@
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="2553" />
-    <option name="width" value="1294" />
+    <option name="width" value="1687" />
     <option name="height" value="1447" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -207,14 +208,16 @@
             </path>
             <path>
               <item name="infocmdbGoLib" type="b2602c69:ProjectViewProjectNode" />
-              <item name="infocmdbGoLib" type="462c0819:PsiDirectoryNode" />
-              <item name="cmd" type="462c0819:PsiDirectoryNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
             <path>
               <item name="infocmdbGoLib" type="b2602c69:ProjectViewProjectNode" />
-              <item name="infocmdbGoLib" type="462c0819:PsiDirectoryNode" />
-              <item name="cmd" type="462c0819:PsiDirectoryNode" />
-              <item name="webservicecaller" type="462c0819:PsiDirectoryNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="Go SDK 1.11.2" type="20ee2d1f:SyntheticLibraryElementNode" />
+            </path>
+            <path>
+              <item name="infocmdbGoLib" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Scratches and Consoles" type="1a2a3e82:ScratchProjectViewPane$MyProjectNode" />
             </path>
           </expand>
           <select />
@@ -224,14 +227,17 @@
   </component>
   <component name="PropertiesComponent">
     <property name="DefaultGoTemplateProperty" value="Go File" />
+    <property name="GO_FMT" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.gopath.indexing.explicitly.defined" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/cmd/exampleWebserviceCaller/main.go" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="go.vgo" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\rene.weselowski\Development\GoLang\src\git.appteam.infonova.cloud\AppTeam\infocmdbGoLib\examples" />
       <recent name="C:\Users\rene.weselowski\Development\GoLang\src\git.appteam.infonova.cloud\AppTeam\infocmdbGoLib" />
     </key>
   </component>
@@ -247,19 +253,76 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
-    <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Go Test.ExampleInfoCmdbGoLib_Login in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib">
+    <configuration name="ExampleInfoCmdbGoLib_GetCi in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="infocmdbGoLib" />
       <working_directory value="$PROJECT_DIR$" />
-      <kind value="FILE" />
-      <filePath value="$PROJECT_DIR$/cmd/webservicecaller/main.go" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
       <package value="git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" />
       <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <pattern value="^ExampleInfoCmdbGoLib_GetCi$" />
       <method v="2" />
     </configuration>
+    <configuration name="ExampleInfoCmdbGoLib_GetCiAttributes in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="infocmdbGoLib" />
+      <working_directory value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <pattern value="^ExampleInfoCmdbGoLib_GetCiAttributes$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="infocmdbGoLib" />
+      <working_directory value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <pattern value="^ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="ExampleInfoCmdbGoLib_Login in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="infocmdbGoLib" />
+      <working_directory value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <pattern value="^ExampleInfoCmdbGoLib_Login$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="ExampleWebservice_Webservice in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="infocmdbGoLib" />
+      <working_directory value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <pattern value="^ExampleWebservice_Webservice$" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Go Test.ExampleWebservice_Webservice in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" />
+      <item itemvalue="Go Test.ExampleInfoCmdbGoLib_GetCi in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" />
+      <item itemvalue="Go Test.ExampleInfoCmdbGoLib_GetCiAttributes in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" />
+      <item itemvalue="Go Test.ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" />
+      <item itemvalue="Go Test.ExampleInfoCmdbGoLib_Login in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" />
+    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build main.go" />
+        <item itemvalue="Go Test.ExampleInfoCmdbGoLib_Login in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" />
+        <item itemvalue="Go Test.ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" />
+        <item itemvalue="Go Test.ExampleInfoCmdbGoLib_GetCiAttributes in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" />
+        <item itemvalue="Go Test.ExampleInfoCmdbGoLib_GetCi in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" />
+        <item itemvalue="Go Test.ExampleWebservice_Webservice in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" />
       </list>
     </recent_temporary>
   </component>
@@ -271,23 +334,72 @@
       <option name="presentableId" value="Default" />
       <updated>1542351298805</updated>
       <workItem from="1542351299963" duration="15159000" />
-      <workItem from="1542890896295" duration="1666000" />
+      <workItem from="1542890896295" duration="2733000" />
+      <workItem from="1542952029284" duration="8539000" />
     </task>
+    <task id="LOCAL-00001" summary="Initial working commit">
+      <created>1542892799752</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1542892799752</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Added Install to README">
+      <created>1542894268949</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1542894268949</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
+  <component name="TestHistory">
+    <history-entry file="ExampleWebservice_Webservice_in_git_appteam_infonova_cloud_AppTeam_infocmdbGoLib - 2018.11.23 at 08h 33m 19s.xml">
+      <configuration name="ExampleWebservice_Webservice in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="ExampleWebservice_Webservice_in_git_appteam_infonova_cloud_AppTeam_infocmdbGoLib - 2018.11.23 at 08h 47m 05s.xml">
+      <configuration name="ExampleWebservice_Webservice in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="ExampleWebservice_Webservice_in_git_appteam_infonova_cloud_AppTeam_infocmdbGoLib - 2018.11.23 at 08h 56m 48s.xml">
+      <configuration name="ExampleWebservice_Webservice in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="ExampleInfoCmdbGoLib_GetCi_in_git_appteam_infonova_cloud_AppTeam_infocmdbGoLib - 2018.11.23 at 08h 59m 01s.xml">
+      <configuration name="ExampleInfoCmdbGoLib_GetCi in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="ExampleInfoCmdbGoLib_GetCiAttributes_in_git_appteam_infonova_cloud_AppTeam_infocmdbGoLib - 2018.11.23 at 08h 59m 55s.xml">
+      <configuration name="ExampleInfoCmdbGoLib_GetCiAttributes in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="ExampleInfoCmdbGoLib_GetCiAttributes_in_git_appteam_infonova_cloud_AppTeam_infocmdbGoLib - 2018.11.23 at 09h 00m 25s.xml">
+      <configuration name="ExampleInfoCmdbGoLib_GetCiAttributes in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType_in_git_appteam_infonova_cloud_AppTeam_infocmdbGoLib - 2018.11.23 at 09h 00m 58s.xml">
+      <configuration name="ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="ExampleInfoCmdbGoLib_Login_in_git_appteam_infonova_cloud_AppTeam_infocmdbGoLib - 2018.11.23 at 09h 09m 53s.xml">
+      <configuration name="ExampleInfoCmdbGoLib_Login in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="ExampleInfoCmdbGoLib_Login_in_git_appteam_infonova_cloud_AppTeam_infocmdbGoLib - 2018.11.23 at 09h 10m 26s.xml">
+      <configuration name="ExampleInfoCmdbGoLib_Login in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+    <history-entry file="ExampleInfoCmdbGoLib_Login_in_git_appteam_infonova_cloud_AppTeam_infocmdbGoLib - 2018.11.23 at 09h 10m 44s.xml">
+      <configuration name="ExampleInfoCmdbGoLib_Login in git.appteam.infonova.cloud/AppTeam/infocmdbGoLib" configurationId="GoTestRunConfiguration" />
+    </history-entry>
+  </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="16825000" />
+    <option name="totallyTimeSpent" value="26431000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="2553" y="0" width="1294" height="1447" extended-state="0" />
+    <frame x="2553" y="0" width="1687" height="1447" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.30551052" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.23478796" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32967034" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32952815" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32952815" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -296,7 +408,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="TeamCity" order="10" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.3196347" />
+      <window_info anchor="bottom" id="Terminal" order="11" visible="true" weight="0.3196347" />
       <window_info anchor="bottom" id="Event Log" order="12" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -311,7 +423,22 @@
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Initial working commit" />
+    <MESSAGE value="Added Install to README" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added Install to README" />
+  </component>
+  <component name="VgoProject">
+    <integration-enabled>true</integration-enabled>
+  </component>
   <component name="editorHistoryManager">
+    <entry file="file://C:/Go/src/strconv/itoa.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="299">
+          <caret line="34" column="11" lean-forward="true" selection-start-line="34" selection-start-column="11" selection-end-line="34" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://C:/Go/src/net/url/url.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
@@ -319,48 +446,58 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/cmd/exampleWebserviceCaller/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="820">
+          <caret line="41" column="20" lean-forward="true" selection-start-line="41" selection-start-column="20" selection-end-line="41" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/infocmdblib_test.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="40">
-          <caret line="2" selection-start-line="2" selection-end-line="2" />
+        <state relative-caret-position="972">
+          <caret line="130" column="1" lean-forward="true" selection-start-line="130" selection-start-column="1" selection-end-line="130" selection-end-column="1" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/go.mod">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="80">
+            <caret line="4" column="4" selection-start-line="4" selection-start-column="4" selection-end-line="4" selection-end-column="4" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/infocmdblib.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="100">
-          <caret line="5" column="1" selection-start-line="5" selection-start-column="1" selection-end-line="5" selection-end-column="1" />
+        <state relative-caret-position="648">
+          <caret line="34" lean-forward="true" selection-start-line="34" selection-end-line="34" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/webservice_default.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="14" column="1" lean-forward="true" selection-start-line="14" selection-start-column="1" selection-end-line="14" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/webservice.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="40">
-          <caret line="2" column="11" lean-forward="true" selection-start-line="2" selection-start-column="11" selection-end-line="2" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cmd/webservicecaller/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="380">
-          <caret line="19" column="26" selection-start-line="19" selection-start-column="26" selection-end-line="19" selection-end-column="26" />
+        <state relative-caret-position="620">
+          <caret line="247" selection-start-line="247" selection-end-line="250" selection-end-column="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/webclient.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="680">
-          <caret line="34" column="33" lean-forward="true" selection-start-line="34" selection-start-column="33" selection-end-line="34" selection-end-column="33" />
+        <state relative-caret-position="1115">
+          <caret line="104" column="47" selection-start-line="104" selection-start-column="47" selection-end-line="104" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webservice.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="11" column="36" selection-start-line="11" selection-start-column="36" selection-end-line="11" selection-end-column="36" />
         </state>
       </provider>
     </entry>

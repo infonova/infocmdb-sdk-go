@@ -21,7 +21,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 		"argv1": {strconv.Itoa(ciTypeID)},
 	}
 
-	ret, err := i.WS.client.CallPost("query", "int_getListOfCiIdsOfCiType", params)
+	ret, err := i.WS.client.Post("query", "int_getListOfCiIdsOfCiType", params)
 	if err != nil {
 		log.Println("Error: ", err)
 		return r, err
@@ -200,7 +200,7 @@ func (i *InfoCmdbGoLib) GetCi(ciID int) (GetCi, error) {
 		"argv1": {strconv.Itoa(ciID)},
 	}
 
-	ret, err := i.WS.client.CallPost("query", "int_getCi", params)
+	ret, err := i.WS.client.Post("query", "int_getCi", params)
 	if err != nil {
 		log.Println("Error: ", err)
 		return r, err
@@ -250,7 +250,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 		"argv1": {strconv.Itoa(ciID)},
 	}
 
-	ret, err := i.WS.client.CallPost("query", "int_getCiAttributes", params)
+	ret, err := i.WS.client.Post("query", "int_getCiAttributes", params)
 	if err != nil {
 		log.Println("Error: ", err)
 		return r, err

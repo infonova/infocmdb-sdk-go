@@ -10,22 +10,22 @@ import (
 	"net/url"
 )
 
-type CmdbWebClient struct {
+type cmdbWebClient struct {
 	apikey string
 	url    string
 	//client http.Client
 }
 
-func NewCmdbWebClient() CmdbWebClient {
-	return CmdbWebClient{}
+func NewCmdbWebClient() cmdbWebClient {
+	return cmdbWebClient{}
 }
 
-type jsonLoginReturn struct {
+type ResultLogin struct {
 	Status string `json:"status"`
 	ApiKey string `json:"apikey"`
 }
 
-func (c *CmdbWebClient) Login(url string, username string, password string) error {
+func (c *cmdbWebClient) Login(url string, username string, password string) error {
 	log.Printf("Opening new Webclient connection. (Url: %s, Username: %s)", url, username)
 
 	c.url = url
@@ -45,7 +45,7 @@ func (c *CmdbWebClient) Login(url string, username string, password string) erro
 		return err
 	}
 
-	var loginResult jsonLoginReturn
+	var loginResult ResultLogin
 	err = json.Unmarshal(byteBody, &loginResult)
 	if err != nil {
 		log.Println("Error unmarshaling Json.", err)
@@ -61,19 +61,20 @@ func (c *CmdbWebClient) Login(url string, username string, password string) erro
 	return nil
 }
 
-func (c *CmdbWebClient) LoginWithApiKey(url string, apikey string) error {
+func (c *cmdbWebClient) LoginWithApiKey(url string, apikey string) error {
 	log.Printf("Opening new Webclient connection using Apikey. (Url: %s, ApiKey: %s)", url, apikey)
 	c.url = url
 	c.apikey = apikey
 	return nil
 }
 
-// CallGet the api with a given method and parameters as a GetRequest
-func (c *CmdbWebClient) CallGet(service string, serviceName string, params url.Values) (string, error) {
+// Get the api with a given method and parameters as a GetRequest
+func (c *cmdbWebClient) Get(service string, serviceName string, params url.Values) (string, error) {
 	client := &http.Client{}
 
 	req, err := http.NewRequest("GET",
 		c.url+"/api/adapter/apikey/"+c.apikey+"/"+service+"/"+serviceName+"/method/json", nil)
+
 	if err != nil {
 		log.Print(err)
 		return "", err
@@ -99,8 +100,9 @@ func (c *CmdbWebClient) CallGet(service string, serviceName string, params url.V
 	return string(byteBody), nil
 }
 
-// CallPost the api with a given method and parameters as a GetRequest
-func (c *CmdbWebClient) CallPost(service string, serviceName string, postData url.Values) (string, error) {
+// Post the api with a given method and parameters as a GetRequest
+func (c *cmdbWebClient) Post(service string, serviceName string, postData url.Values) (string, error) {
+	log.Printf("service: %s name: %s post: %v\n", service, serviceName, postData)
 	//client := &http.Client{	}
 	reqURL := c.url + "/api/adapter/" + service + "/" + serviceName + "/method/json"
 	if postData.Get("apikey") == "" {
