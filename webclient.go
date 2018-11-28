@@ -26,7 +26,7 @@ type ResultLogin struct {
 }
 
 func (c *cmdbWebClient) Login(url string, username string, password string) error {
-	log.Debug("Opening new Webclient connection. (Url: %s, Username: %s)", url, username)
+	log.Debugf("Opening new Webclient connection. (Url: %s, Username: %s)", url, username)
 
 	c.url = url
 
@@ -53,7 +53,7 @@ func (c *cmdbWebClient) Login(url string, username string, password string) erro
 	}
 
 	if loginResult.Status != "OK" {
-		log.Error("Login Status not ok. Status: \"%s\"\n", loginResult.Status)
+		log.Errorf("Login Status not ok. Status: \"%s\"\n", loginResult.Status)
 		return errors.New("Login Status not ok.")
 	}
 
@@ -62,7 +62,7 @@ func (c *cmdbWebClient) Login(url string, username string, password string) erro
 }
 
 func (c *cmdbWebClient) LoginWithApiKey(url string, apikey string) error {
-	log.Info("Opening new Webclient connection using Apikey. (Url: %s, ApiKey: %s)", url, apikey)
+	log.Infof("Opening new Webclient connection using Apikey. (Url: %s, ApiKey: %s)", url, apikey)
 	c.url = url
 	c.apikey = apikey
 	return nil
@@ -102,7 +102,7 @@ func (c *cmdbWebClient) Get(service string, serviceName string, params url.Value
 
 // Post the api with a given method and parameters as a GetRequest
 func (c *cmdbWebClient) Post(service string, serviceName string, postData url.Values) (string, error) {
-	log.Debug("service: %s name: %s post: %v\n", service, serviceName, postData)
+	log.Debugf("service: %s name: %s post: %v\n", service, serviceName, postData)
 	//client := &http.Client{	}
 	reqURL := c.url + "/api/adapter/" + service + "/" + serviceName + "/method/json"
 	if postData.Get("apikey") == "" {
