@@ -2,7 +2,7 @@ package infocmdblibrary
 
 import (
 	"encoding/json"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net/url"
 	"strconv"
 )
@@ -23,14 +23,14 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 
 	ret, err := i.WS.client.Post("query", "int_getListOfCiIdsOfCiType", params)
 	if err != nil {
-		log.Println("Error: ", err)
+		log.Error("Error: ", err)
 		return r, err
 	}
 
 	err = json.Unmarshal([]byte(ret), &r)
 	if err != nil {
-		log.Println("Error: ", err)
-		log.Println(ret)
+		log.Error("Error: ", err)
+		log.Error(ret)
 		return r, err
 	}
 
@@ -202,13 +202,13 @@ func (i *InfoCmdbGoLib) GetCi(ciID int) (GetCi, error) {
 
 	ret, err := i.WS.client.Post("query", "int_getCi", params)
 	if err != nil {
-		log.Println("Error: ", err)
+		log.Error("Error: ", err)
 		return r, err
 	}
 
 	err = json.Unmarshal([]byte(ret), &r)
 	if err != nil {
-		log.Println("Error: ", err)
+		log.Error("Error: ", err)
 		return r, err
 	}
 
@@ -252,13 +252,13 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 
 	ret, err := i.WS.client.Post("query", "int_getCiAttributes", params)
 	if err != nil {
-		log.Println("Error: ", err)
+		log.Error("Error: ", err)
 		return r, err
 	}
 
 	err = json.Unmarshal([]byte(ret), &r)
 	if err != nil {
-		log.Println("Error: ", err)
+		log.Error("Error: ", err)
 		return r, err
 	}
 

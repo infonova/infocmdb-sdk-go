@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 )
@@ -26,7 +26,7 @@ type ResultLogin struct {
 }
 
 func (c *cmdbWebClient) Login(url string, username string, password string) error {
-	log.Printf("Opening new Webclient connection. (Url: %s, Username: %s)", url, username)
+	log.Debug("Opening new Webclient connection. (Url: %s, Username: %s)", url, username)
 
 	c.url = url
 
@@ -34,26 +34,26 @@ func (c *cmdbWebClient) Login(url string, username string, password string) erro
 
 	resp, err := http.Get(reqURL)
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 		return err
 	}
 	defer resp.Body.Close()
 
 	byteBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("Error reading response.", err)
+		log.Error("Error reading response.", err)
 		return err
 	}
 
 	var loginResult ResultLogin
 	err = json.Unmarshal(byteBody, &loginResult)
 	if err != nil {
-		log.Println("Error unmarshaling Json.", err)
+		log.Error("Error unmarshaling Json.", err)
 		return err
 	}
 
 	if loginResult.Status != "OK" {
-		log.Printf("Login Status not ok. Status: \"%s\"\n", loginResult.Status)
+		log.Error("Login Status not ok. Status: \"%s\"\n", loginResult.Status)
 		return errors.New("Login Status not ok.")
 	}
 
@@ -62,7 +62,7 @@ func (c *cmdbWebClient) Login(url string, username string, password string) erro
 }
 
 func (c *cmdbWebClient) LoginWithApiKey(url string, apikey string) error {
-	log.Printf("Opening new Webclient connection using Apikey. (Url: %s, ApiKey: %s)", url, apikey)
+	log.Info("Opening new Webclient connection using Apikey. (Url: %s, ApiKey: %s)", url, apikey)
 	c.url = url
 	c.apikey = apikey
 	return nil
@@ -76,7 +76,7 @@ func (c *cmdbWebClient) Get(service string, serviceName string, params url.Value
 		c.url+"/api/adapter/apikey/"+c.apikey+"/"+service+"/"+serviceName+"/method/json", nil)
 
 	if err != nil {
-		log.Print(err)
+		log.Error(err)
 		return "", err
 	}
 	if params.Get("apikey") == "" {
@@ -86,14 +86,14 @@ func (c *cmdbWebClient) Get(service string, serviceName string, params url.Value
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println(err)
+		log.Error(err)
 		return "", err
 	}
 	defer resp.Body.Close()
 
 	byteBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("Error reading response.", err)
+		log.Error("Error reading response.", err)
 		return "", err
 	}
 
@@ -102,24 +102,24 @@ func (c *cmdbWebClient) Get(service string, serviceName string, params url.Value
 
 // Post the api with a given method and parameters as a GetRequest
 func (c *cmdbWebClient) Post(service string, serviceName string, postData url.Values) (string, error) {
-	log.Printf("service: %s name: %s post: %v\n", service, serviceName, postData)
+	log.Debug("service: %s name: %s post: %v\n", service, serviceName, postData)
 	//client := &http.Client{	}
 	reqURL := c.url + "/api/adapter/" + service + "/" + serviceName + "/method/json"
 	if postData.Get("apikey") == "" {
 		postData.Set("apikey", c.apikey)
 	}
-	log.Println(postData)
+	log.Debug(postData)
 	resp, err := http.PostForm(reqURL, postData)
 	//req, err := http.NewRequest("POST", , nil)
 	if err != nil {
-		log.Print(err)
+		log.Error(err)
 		return "", err
 	}
 	defer resp.Body.Close()
 
 	byteBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Println("Error reading response.", err)
+		log.Error("Error reading response.", err)
 		return "", err
 	}
 
