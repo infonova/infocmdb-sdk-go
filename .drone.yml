@@ -5,4 +5,5 @@ pipeline:
   test:
     image: golang
     commands:
-      - go test -mod=vendor .
+      - go get -u ./...
+      - go test .
