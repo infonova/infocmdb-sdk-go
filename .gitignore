@@ -1,5 +1,6 @@
 # --> IDE's
 .idea
+*.iml
 
 # ---> Go
 # Binaries for programs and plugins
