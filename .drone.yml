@@ -6,4 +6,4 @@ pipeline:
     image: golang
     commands:
       - go get -u ./...
-      - go test .
+      - test_mocking=true go test .
