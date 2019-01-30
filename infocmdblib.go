@@ -53,14 +53,7 @@ func (i *InfoCMDB) LoadConfig(config string) (err error) {
 	if err != nil {
 		return err
 	}
-
-	c := Config{}
-	err = yaml.Unmarshal(yamlFile, &c)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return yaml.Unmarshal(yamlFile, &i.Config)
 }
 
 func NewCMDB(url string, cred Credentials) (i InfoCMDB, err error) {

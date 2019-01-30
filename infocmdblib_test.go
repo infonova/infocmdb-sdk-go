@@ -147,12 +147,16 @@ func ExampleWebservice_Webservice() {
 
 func ExampleInfoCmdbGoLib_LoadConfig() {
 	i := InfoCMDB{}
-	err := i.LoadConfig("test.yml")
+	err := i.LoadConfig("./test/test.yml")
 	if err != nil {
-		log.Error(err)
+		fmt.Errorf("%v\n", err)
 		return
 	}
-
+	fmt.Printf("Config: %v\n", i.Config)
+	fmt.Printf("CmdbBasePath: %s\n", i.Config.CmdbBasePath)
+	// Output:
+	// Config: {http://nginx/ testuser testpass /app/ }
+	// CmdbBasePath: /app/
 }
 
 func ExampleCmdbWebClient_Login() {

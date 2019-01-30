@@ -1,0 +1,4 @@
+apiUrl: http://nginx/
+apiUser: testuser
+apiPassword: testpass
+CmdbBasePath: /app/
