@@ -21,11 +21,6 @@ var infocmdbCredentials = Credentials{Username: "admin", Password: "admin"}
 var mocking = false
 
 func init() {
-	log.SetLevel(log.InfoLevel)
-	if os.Getenv("INFOCMDB_WORKFLOW_DEBUGGING") == "true" {
-		log.SetLevel(log.DebugLevel)
-	}
-
 	if os.Getenv("INFOCMDB_WORKFLOW_TEST_MOCKING") == "true" {
 		mocking = true
 		log.Debug("Mocking enabled")
@@ -145,11 +140,25 @@ func ExampleWebservice_Webservice() {
 	// Return: {"status":"OK","data":[{"ciid":"1"},{"ciid":"2"}]}
 }
 
-func ExampleInfoCmdbGoLib_LoadConfig() {
+func ExampleInfoCmdbGoLib_LoadConfigAbsolutePath() {
 	i := InfoCMDB{}
 	err := i.LoadConfig("./test/test.yml")
 	if err != nil {
-		fmt.Errorf("%v\n", err)
+		fmt.Printf("%v\n", err)
+		return
+	}
+	fmt.Printf("Config: %v\n", i.Config)
+	fmt.Printf("CmdbBasePath: %s\n", i.Config.CmdbBasePath)
+	// Output:
+	// Config: {http://nginx/ testuser testpass /app/ }
+	// CmdbBasePath: /app/
+}
+
+func ExampleInfoCmdbGoLib_LoadConfig() {
+	i := InfoCMDB{}
+	err := i.LoadConfig("test.yml")
+	if err != nil {
+		fmt.Printf("%v\n", err)
 		return
 	}
 	fmt.Printf("Config: %v\n", i.Config)

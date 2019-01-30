@@ -4,16 +4,8 @@ import (
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
 	"net/url"
-	"os"
 	"strconv"
 )
-
-func init() {
-	log.SetLevel(log.InfoLevel)
-	if os.Getenv("INFOCMDB_WORKFLOW_DEBUGGING") == "true" {
-		log.SetLevel(log.DebugLevel)
-	}
-}
 
 type ListOfCiIdsOfCiType struct {
 	Status string `json:"status"`
@@ -209,13 +201,13 @@ func (i *InfoCMDB) GetCi(ciID int) (GetCi, error) {
 
 	ret, err := i.WS.client.Post("query", "int_getCi", params)
 	if err != nil {
-		log.Debugf("Error: %v\n", err.Error())
+		log.Debugf("Error: %v", err.Error())
 		return ci, err
 	}
 
 	err = json.Unmarshal([]byte(ret), &ci)
 	if err != nil {
-		log.Errorf("Error: %v\n", err)
+		log.Errorf("Error: %v", err)
 		return ci, err
 	}
 

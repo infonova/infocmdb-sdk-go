@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 )
 
 var (
@@ -28,13 +27,6 @@ func NewCmdbWebClient() CmdbWebClient {
 type ResultLogin struct {
 	Status string `json:"status"`
 	ApiKey string `json:"apikey"`
-}
-
-func init() {
-	log.SetLevel(log.InfoLevel)
-	if os.Getenv("INFOCMDB_WORKFLOW_DEBUGGING") == "true" {
-		log.SetLevel(log.DebugLevel)
-	}
 }
 
 func (c *CmdbWebClient) Login(url string, username string, password string) error {
@@ -78,8 +70,8 @@ func (c *CmdbWebClient) LoginWithApiKey(url string, apikey string) error {
 // Get the api with a given method and parameters as a GetRequest
 func (c *CmdbWebClient) Get(service string, serviceName string, params url.Values) (string, error) {
 	params.Set("apikey", c.ApiKey)
-	log.Debugf("service: %s name: %s post: %v\n", service, serviceName, params)
-	log.Debugf("Data: %v\n", params)
+	log.Debugf("service: %s name: %s post: %v", service, serviceName, params)
+	log.Debugf("Data: %v", params)
 
 	reqURL := c.Url + "/api/adapter/apikey/" + c.ApiKey + "/" + service + "/" + serviceName + "/method/json"
 
@@ -109,8 +101,8 @@ func (c *CmdbWebClient) Get(service string, serviceName string, params url.Value
 // Post the api with a given method and parameters as a GetRequest
 func (c *CmdbWebClient) Post(service string, serviceName string, params url.Values) (string, error) {
 	params.Set("apikey", c.ApiKey)
-	log.Debugf("service: %s name: %s post: %v\n", service, serviceName, params)
-	log.Debugf("Data: %v\n", params)
+	log.Debugf("service: %s name: %s post: %v", service, serviceName, params)
+	log.Debugf("Data: %v", params)
 
 	reqURL := c.Url + "/api/adapter/" + service + "/" + serviceName + "/method/json"
 
