@@ -3,6 +3,7 @@ package infocmdblibrary
 import (
 	"bytes"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -12,7 +13,24 @@ import (
 
 type testing struct{}
 
+var (
+	ErrTestingInfocmdbUrlMissing = "INFOCMDB_WORKFLOW_TEST_URL must be provided or mocking enabled(INFOCMDB_WORKFLOW_TEST_MOCKING=true)"
+)
+
 var infocmdbCredentials = Credentials{Username: "admin", Password: "admin"}
+var mocking = false
+
+func init() {
+	log.SetLevel(log.InfoLevel)
+	if os.Getenv("INFOCMDB_WORKFLOW_DEBUGGING") == "true" {
+		log.SetLevel(log.DebugLevel)
+	}
+
+	if os.Getenv("INFOCMDB_WORKFLOW_TEST_MOCKING") == "true" {
+		mocking = true
+		log.Debug("Mocking enabled")
+	}
+}
 
 func (t *testing) MockServer() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +39,7 @@ func (t *testing) MockServer() *httptest.Server {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		url := "http://infocmdb.local" + r.URL.String()
+		infocmdbUrl := os.Getenv("INFOCMDB_WORKFLOW_TEST_URL") + r.URL.String()
 		mockString := fmt.Sprintf("%s##%s##%s", r.Method, r.URL.String(), string(body))
 		switch mockString {
 		case "GET##/api/login/username/admin/password/admin/timeout/21600/method/json##":
@@ -38,7 +56,7 @@ func (t *testing) MockServer() *httptest.Server {
 			return
 		case "POST##/api/adapter/query/int_getCiAttributes/method/json##apikey=4afbf95c1d072664e35cd61339e152&argv1=1":
 			w.WriteHeader(200)
-			w.Write([]byte(`{"status":"OK","data":[{"ci_id":"1","ci_attribute_id":"1","attribute_id":"1","attribute_name":"general_unique_input","attribute_description":"Unique Input","attribute_type":"input","value":"demo_1","modified_at":"2018-11-16 08:13:21"},{"ci_id":"1","ci_attribute_id":"2","attribute_id":"3","attribute_name":"general_regular_input","attribute_description":"Regular Input","attribute_type":"input","value":"Regular Single Line Text Input","modified_at":"2018-11-16 08:13:21"},{"ci_id":"1","ci_attribute_id":"3","attribute_id":"4","attribute_name":"general_numeric_input","attribute_description":"Numeric Input","attribute_type":"input","value":"42","modified_at":"2018-11-16 08:13:21"},{"ci_id":"1","ci_attribute_id":"4","attribute_id":"5","attribute_name":"general_textarea","attribute_description":"Textarea","attribute_type":"textarea","value":"Multiline Text Input\n\n--> MORE TEXT","modified_at":"2018-11-16 08:13:21"},{"ci_id":"1","ci_attribute_id":"5","attribute_id":"6","attribute_name":"general_textedit","attribute_description":"Editor Area","attribute_type":"textEdit","value":"Multiline Text Input<br \/><br \/>WITH <i>STYLING<\/i> <b>OPTIONS<\/b>!","modified_at":"2018-11-16 08:13:21"},{"ci_id":"1","ci_attribute_id":"6","attribute_id":"7","attribute_name":"general_dropdown_static","attribute_description":"Dropdown (static)","attribute_type":"select","value":"Option 1","modified_at":"2018-11-16 08:13:21"},{"ci_id":"1","ci_attribute_id":"7","attribute_id":"8","attribute_name":"general_checkbox","attribute_description":"Checkbox","attribute_type":"checkbox","value":"Check 3","modified_at":"2018-11-16 08:13:21"},{"ci_id":"1","ci_attribute_id":"8","attribute_id":"9","attribute_name":"general_radio","attribute_description":"Radio","attribute_type":"radio","value":"Radio 2","modified_at":"2018-11-16 08:13:21"},{"ci_id":"1","ci_attribute_id":"9","attribute_id":"10","attribute_name":"general_date","attribute_description":"Date","attribute_type":"date","value":"2019-02-18","modified_at":"2018-11-16 08:13:21"},{"ci_id":"1","ci_attribute_id":"10","attribute_id":"11","attribute_name":"general_datetime","attribute_description":"Datetime","attribute_type":"dateTime","value":"2013-11-01 12:24:10","modified_at":"2018-11-16 08:13:21"},{"ci_id":"1","ci_attribute_id":"11","attribute_id":"12","attribute_name":"general_currency","attribute_description":"Currency","attribute_type":"zahlungsmittel","value":"29,99","modified_at":"2018-11-16 08:13:21"},{"ci_id":"1","ci_attribute_id":"12","attribute_id":"13","attribute_name":"general_password","attribute_description":"Password","attribute_type":"password","value":"secret demo password","modified_at":"2018-11-16 08:13:21"},{"ci_id":"1","ci_attribute_id":"13","attribute_id":"14","attribute_name":"general_hyperlink","attribute_description":"Hyperlink","attribute_type":"link","value":"#todo","modified_at":"2018-11-16 08:13:21"},{"ci_id":"1","ci_attribute_id":"14","attribute_id":"23","attribute_name":"general_dropdown_sql_filled_select","attribute_description":"Dropdown (SQL filled) - Regular Input","attribute_type":"selectQuery","value":"#todo","modified_at":"2018-11-16 08:13:21"},{"ci_id":"1","ci_attribute_id":"15","attribute_id":"25","attribute_name":"general_dropdown_sql_filled_multiselect","attribute_description":"Dropdown (SQL filled) - Multiselect","attribute_type":"selectQuery","value":"#todo","modified_at":"2018-11-16 08:13:21"},{"ci_id":"1","ci_attribute_id":"16","attribute_id":"26","attribute_name":"general_dropdown_sql_filled_multiselect_counter","attribute_description":"Dropdown (SQL filled) - Multiselect Counter","attribute_type":"selectQuery","value":"#todo","modified_at":"2018-11-16 08:13:21"}]}`))
+			w.Write([]byte(`{"status":"OK","data":[{"ci_id":"1","ci_attribute_id":"1","attribute_id":"1","attribute_name":"general_unique_input","attribute_description":"Unique Input","attribute_type":"input","value":"demo_1","modified_at":"2019-01-30 12:16:54"},{"ci_id":"1","ci_attribute_id":"2","attribute_id":"3","attribute_name":"general_regular_input","attribute_description":"Regular Input","attribute_type":"input","value":"Regular Single Line Text Input","modified_at":"2019-01-3012:16:54"},{"ci_id":"1","ci_attribute_id":"3","attribute_id":"4","attribute_name":"general_numeric_input","attribute_description":"Numeric Input","attribute_type":"input","value":"42","modified_at":"2019-01-30 12:16:54"},{"ci_id":"1","ci_attribute_id":"4","attribute_id":"5","attribute_name":"general_textarea","attribute_description":"Textarea","attribute_type":"textarea","value":"Multiline Text Input\n\n--> MORE TEXT","modified_at":"2019-01-30 12:16:54"},{"ci_id":"1","ci_attribute_id":"5","attribute_id":"6","attribute_name":"general_textedit","attribute_description":"Editor Area","attribute_type":"textEdit","value":"Multiline Text Input<br \/><br \/>WITH <i>STYLING<\/i> <b>OPTIONS<\/b>!","modified_at":"2019-01-30 12:16:54"},{"ci_id":"1","ci_attribute_id":"6","attribute_id":"7","attribute_name":"general_dropdown_static","attribute_description":"Dropdown (static)","attribute_type":"select","value":"Option 1","modified_at":"2019-01-30 12:16:54"},{"ci_id":"1","ci_attribute_id":"7","attribute_id":"8","attribute_name":"general_checkbox","attribute_description":"Checkbox","attribute_type":"checkbox","value":"Check 3","modified_at":"2019-01-30 12:16:54"},{"ci_id":"1","ci_attribute_id":"8","attribute_id":"9","attribute_name":"general_radio","attribute_description":"Radio","attribute_type":"radio","value":"Radio 2","modified_at":"2019-01-30 12:16:54"},{"ci_id":"1","ci_attribute_id":"9","attribute_id":"10","attribute_name":"general_date","attribute_description":"Date","attribute_type":"date","value":"2019-02-18","modified_at":"2019-01-30 12:16:54"},{"ci_id":"1","ci_attribute_id":"10","attribute_id":"11","attribute_name":"general_datetime","attribute_description":"Datetime","attribute_type":"dateTime","value":"2013-11-01 12:24:10","modified_at":"2019-01-30 12:16:54"},{"ci_id":"1","ci_attribute_id":"11","attribute_id":"12","attribute_name":"general_currency","attribute_description":"Currency","attribute_type":"zahlungsmittel","value":"29,99","modified_at":"2019-01-30 12:16:54"},{"ci_id":"1","ci_attribute_id":"12","attribute_id":"13","attribute_name":"general_password","attribute_description":"Password","attribute_type":"password","value":"secret demo password","modified_at":"2019-01-30 12:16:54"},{"ci_id":"1","ci_attribute_id":"13","attribute_id":"14","attribute_name":"general_hyperlink","attribute_description":"Hyperlink","attribute_type":"link","value":"#todo","modified_at":"2019-01-30 12:16:54"},{"ci_id":"1","ci_attribute_id":"14","attribute_id":"16","attribute_name":"general_regular_executable","attribute_description":"Executable Script","attribute_type":"executeable","value":null,"modified_at":"2019-01-30 12:16:54"},{"ci_id":"1","ci_attribute_id":"15","attribute_id":"17","attribute_name":"general_event_executable","attribute_description":"Event Executable","attribute_type":"executeable","value":null,"modified_at":"2019-01-30 12:16:54"},{"ci_id":"1","ci_attribute_id":"16","attribute_id":"23","attribute_name":"general_dropdown_sql_filled_select","attribute_description":"Dropdown (SQL filled) - Regular Input","attribute_type":"selectQuery","value":"#todo","modified_at":"2019-01-30 12:16:54"},{"ci_id":"1","ci_attribute_id":"17","attribute_id":"25","attribute_name":"general_dropdown_sql_filled_multiselect","attribute_description":"Dropdown (SQL filled) - Multiselect","attribute_type":"selectQuery","value":"#todo","modified_at":"2019-01-3012:16:54"},{"ci_id":"1","ci_attribute_id":"18","attribute_id":"26","attribute_name":"general_dropdown_sql_filled_multiselect_counter","attribute_description":"Dropdown (SQL filled) - Multiselect Counter","attribute_type":"selectQuery","value":"#todo","modified_at":"2019-01-30 12:16:54"}]}`))
 			return
 		case "GET##/api/adapter/apikey/4afbf95c1d072664e35cd61339e152/query/int_getListOfCiIdsOfCiType/method/json?apikey=4afbf95c1d072664e35cd61339e152&argv1=1##":
 			w.WriteHeader(200)
@@ -54,34 +72,54 @@ func (t *testing) MockServer() *httptest.Server {
 		}
 		// you can reassign the body if you need to parse it as multipart
 		r.Body = ioutil.NopCloser(bytes.NewReader(body))
-		proxyReq, err := http.NewRequest(r.Method, url, bytes.NewReader(body))
-		proxyReq.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+		body, _ = ioutil.ReadAll(r.Body)
+		values, _ := url.ParseQuery(string(body))
 
-		httpClient := http.Client{}
-		resp, err := httpClient.Do(proxyReq)
+		fmt.Printf("Method: %s, Url: %s, Data: %s\n", r.Method, infocmdbUrl, body)
+		fmt.Printf("%v\n", values)
+
+		// req, err := http.NewRequest(r.Method, infocmdbUrl, bytes.NewReader(body))
+		req, err := http.NewRequest(r.Method, infocmdbUrl, bytes.NewBufferString(values.Encode()))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadGateway)
+			return
+		}
+
+		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+		//req.PostForm = values
+
+		httpClient := &http.Client{}
+		resp, err := httpClient.Do(req)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadGateway)
 			return
 		}
 		defer resp.Body.Close()
+
 		w.WriteHeader(resp.StatusCode)
 		respBody, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadGateway)
 			return
 		}
-		fmt.Println(string(respBody))
+		fmt.Printf("Mocking:\n''''''\n%s\n''''''\n", string(respBody))
 		w.Write(respBody)
 	}))
 }
 
 func (t *testing) getUrl() string {
-	if os.Getenv("testing_mocking") == "true" {
+	testingURL := os.Getenv("INFOCMDB_WORKFLOW_TEST_URL")
+	if mocking {
 		ts := t.MockServer()
-		return ts.URL
+		testingURL = ts.URL
 	}
 
-	return os.Getenv("testing_url")
+	if testingURL == "" {
+		log.Fatal(ErrTestingInfocmdbUrlMissing)
+	}
+
+	log.Debugf("Testing-URL: %s", testingURL)
+	return testingURL
 }
 
 func ExampleWebservice_Webservice() {
@@ -90,8 +128,7 @@ func ExampleWebservice_Webservice() {
 
 	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
 	if err != nil {
-
-		fmt.Printf("Error: %v\n", err)
+		log.Error(err)
 		return
 	}
 
@@ -99,7 +136,7 @@ func ExampleWebservice_Webservice() {
 	params.Add("argv1", "1")
 	ret, err := i.WS.Webservice("int_getListOfCiIdsOfCiType", params)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+		log.Error(err)
 		return
 	}
 	fmt.Printf("Return: %v\n", ret)
@@ -108,20 +145,57 @@ func ExampleWebservice_Webservice() {
 	// Return: {"status":"OK","data":[{"ciid":"1"},{"ciid":"2"}]}
 }
 
+func ExampleInfoCmdbGoLib_LoadConfig() {
+	i := InfoCMDB{}
+	err := i.LoadConfig("test.yml")
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+}
+
 func ExampleCmdbWebClient_Login() {
 	t := testing{}
 	infocmdbURL := t.getUrl()
 
 	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+		log.Error(err)
 		return
 	}
 
-	fmt.Printf("Login ok, ApiKey(len): %d\n", len(i.WS.client.apikey))
+	fmt.Printf("Login ok, ApiKey(len): %d\n", len(i.WS.client.ApiKey))
 
 	// Output:
 	// Login ok, ApiKey(len): 30
+}
+func ExampleCmdbWebClient_LoginWithApiKey() {
+	t := testing{}
+	infocmdbURL := t.getUrl()
+
+	ilogin, err := NewCMDB(infocmdbURL, infocmdbCredentials)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+	cred := Credentials{ApiKey: ilogin.WC.ApiKey}
+	i, err := NewCMDB(infocmdbURL, cred)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+	_, err = i.GetCi(1)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	fmt.Printf("Login ok got ci, ApiKey(len): %d\n", len(i.WS.client.ApiKey))
+
+	// Output:
+	// Login ok got ci, ApiKey(len): 30
 }
 
 func ExampleCmdbWebClient_Get() {
@@ -130,8 +204,7 @@ func ExampleCmdbWebClient_Get() {
 
 	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
 	if err != nil {
-
-		fmt.Printf("Error: %v\n", err)
+		log.Error(err)
 		return
 	}
 
@@ -141,7 +214,7 @@ func ExampleCmdbWebClient_Get() {
 
 	ret, err := i.WC.Get("query", "int_getListOfCiIdsOfCiType", params)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+		log.Error(err)
 		return
 	}
 	fmt.Println("Get: ", ret)
@@ -156,8 +229,7 @@ func ExampleCmdbWebClient_Post() {
 
 	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
 	if err != nil {
-
-		fmt.Printf("Error: %v\n", err)
+		log.Error(err)
 		return
 	}
 
@@ -167,7 +239,7 @@ func ExampleCmdbWebClient_Post() {
 
 	ret, err := i.WC.Post("query", "int_getListOfCiIdsOfCiType", params)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+		log.Error(err)
 		return
 	}
 	fmt.Println("Post: ", ret)
@@ -182,14 +254,13 @@ func ExampleInfoCmdbGoLib_GetCi() {
 
 	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
 	if err != nil {
-
-		fmt.Printf("Error: %v\n", err)
+		log.Error(err)
 		return
 	}
 
 	rCi, err := i.GetCi(1)
 	if err != nil {
-		fmt.Printf("WS Error: %v", err)
+		log.Error(err)
 		return
 	}
 	fmt.Println(rCi)
@@ -204,14 +275,13 @@ func ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType() {
 
 	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
 	if err != nil {
-
-		fmt.Printf("Error: %v\n", err)
+		log.Error(err)
 		return
 	}
 
 	rCi, err := i.GetListOfCiIdsOfCiType(1)
 	if err != nil {
-		fmt.Printf("WS Error: %v\n", err)
+		log.Error(err)
 		return
 	}
 	fmt.Println(rCi)
@@ -226,11 +296,10 @@ func ExampleInfoCmdbGoLib_Login() {
 
 	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
 	if err != nil {
-
-		fmt.Printf("Error: %v\n", err)
+		log.Error(err)
 		return
 	}
-	fmt.Println("Apikey length: ", len(i.WC.apikey))
+	fmt.Println("Apikey length: ", len(i.WC.ApiKey))
 
 	// Output:
 	// Apikey length:  30
@@ -241,21 +310,25 @@ func ExampleInfoCmdbGoLib_GetCiAttributes() {
 	infocmdbURL := t.getUrl()
 
 	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
-	if err != nil {
 
-		fmt.Printf("Error: %v\n", err)
+	if err != nil {
+		log.Error(err)
 		return
 	}
 
 	rCi, err := i.GetCiAttributes(1)
 	if err != nil {
-		fmt.Printf("ws %v\n", err)
+		log.Error(err)
 		return
 	}
-	fmt.Println(rCi)
+
+	expectedAttributes := 18
+	if len(rCi.Data) == expectedAttributes {
+		fmt.Printf("Got all Attributes expected[%d].\n", expectedAttributes)
+	} else {
+		fmt.Printf("Didn't get exptected Attrbiutes[%d], got[%d].\n", expectedAttributes, len(rCi.Data))
+	}
 
 	// Output:
-	// {OK [{1 1 1 general_unique_input Unique Input input demo_1 2018-11-16 08:13:21} {1 2 3 general_regular_input Regular Input input Regular Single Line Text Input 2018-11-16 08:13:21} {1 3 4 general_numeric_input Numeric Input input 42 2018-11-16 08:13:21} {1 4 5 general_textarea Textarea textarea Multiline Text Input
-	//
-	//--> MORE TEXT 2018-11-16 08:13:21} {1 5 6 general_textedit Editor Area textEdit Multiline Text Input<br /><br />WITH <i>STYLING</i> <b>OPTIONS</b>! 2018-11-16 08:13:21} {1 6 7 general_dropdown_static Dropdown (static) select Option 1 2018-11-16 08:13:21} {1 7 8 general_checkbox Checkbox checkbox Check 3 2018-11-16 08:13:21} {1 8 9 general_radio Radio radio Radio 2 2018-11-16 08:13:21} {1 9 10 general_date Date date 2019-02-18 2018-11-16 08:13:21} {1 10 11 general_datetime Datetime dateTime 2013-11-01 12:24:10 2018-11-16 08:13:21} {1 11 12 general_currency Currency zahlungsmittel 29,99 2018-11-16 08:13:21} {1 12 13 general_password Password password secret demo password 2018-11-16 08:13:21} {1 13 14 general_hyperlink Hyperlink link #todo 2018-11-16 08:13:21} {1 14 23 general_dropdown_sql_filled_select Dropdown (SQL filled) - Regular Input selectQuery #todo 2018-11-16 08:13:21} {1 15 25 general_dropdown_sql_filled_multiselect Dropdown (SQL filled) - Multiselect selectQuery #todo 2018-11-16 08:13:21} {1 16 26 general_dropdown_sql_filled_multiselect_counter Dropdown (SQL filled) - Multiselect Counter selectQuery #todo 2018-11-16 08:13:21}]}
+	//Got all Attributes expected[18].
 }

@@ -4,8 +4,16 @@ import (
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
 	"net/url"
+	"os"
 	"strconv"
 )
+
+func init() {
+	log.SetLevel(log.InfoLevel)
+	if os.Getenv("INFOCMDB_WORKFLOW_DEBUGGING") == "true" {
+		log.SetLevel(log.DebugLevel)
+	}
+}
 
 type ListOfCiIdsOfCiType struct {
 	Status string `json:"status"`
@@ -14,7 +22,7 @@ type ListOfCiIdsOfCiType struct {
 	} `json:"data"`
 }
 
-func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiType, error) {
+func (i *InfoCMDB) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiType, error) {
 	r := ListOfCiIdsOfCiType{}
 
 	params := url.Values{
@@ -48,7 +56,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //// select :argv1:, :argv2:, :argv3:
 //// from dual
 //// where not exists(select id from ci_project where ci_id = :argv1: and project_id = :argv2:)
-////func (i *InfoCmdbGoLib) AddCiProjectMapping(ciID int, projectID int, historyID int) (AddCiProjectMapping, error) {
+////func (i *InfoCMDB) AddCiProjectMapping(ciID int, projectID int, historyID int) (AddCiProjectMapping, error) {
 ////
 ////}
 //// CreateAttribute
@@ -56,7 +64,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type CreateAttribute struct {
 //}
 //
-//func (i *InfoCmdbGoLib) CreateAttribute() (CreateAttribute, error) {
+//func (i *InfoCMDB) CreateAttribute() (CreateAttribute, error) {
 //
 //}
 //// CreateAttributeGroup
@@ -64,7 +72,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type CreateAttributeGroup struct {
 //}
 //
-//func (i *InfoCmdbGoLib) CreateAttributeGroup() (CreateAttributeGroup, error) {
+//func (i *InfoCMDB) CreateAttributeGroup() (CreateAttributeGroup, error) {
 //
 //}
 //// CreateCi
@@ -72,7 +80,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type CreateCi struct {
 //}
 //
-//func (i *InfoCmdbGoLib) CreateCi() (CreateCi, error) {
+//func (i *InfoCMDB) CreateCi() (CreateCi, error) {
 //
 //}
 //// CreateCiAttribute
@@ -80,7 +88,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type CreateCiAttribute struct {
 //}
 //
-//func (i *InfoCmdbGoLib) CreateCiAttribute() (CreateCiAttribute, error) {
+//func (i *InfoCMDB) CreateCiAttribute() (CreateCiAttribute, error) {
 //
 //}
 //// CreateCiRelation
@@ -88,7 +96,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type CreateCiRelation struct {
 //}
 //
-//func (i *InfoCmdbGoLib) CreateCiRelation() (CreateCiRelation, error) {
+//func (i *InfoCMDB) CreateCiRelation() (CreateCiRelation, error) {
 //
 //}
 //// CreateHistory
@@ -96,7 +104,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type CreateHistory struct {
 //}
 //
-//func (i *InfoCmdbGoLib) CreateHistory() (CreateHistory, error) {
+//func (i *InfoCMDB) CreateHistory() (CreateHistory, error) {
 //
 //}
 //// DeleteCi
@@ -104,7 +112,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type DeleteCi struct {
 //}
 //
-//func (i *InfoCmdbGoLib) DeleteCi() (DeleteCi, error) {
+//func (i *InfoCMDB) DeleteCi() (DeleteCi, error) {
 //
 //}
 //// DeleteCiAttribute
@@ -112,7 +120,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type DeleteCiAttribute struct {
 //}
 //
-//func (i *InfoCmdbGoLib) DeleteCiAttribute() (DeleteCiAttribute, error) {
+//func (i *InfoCMDB) DeleteCiAttribute() (DeleteCiAttribute, error) {
 //
 //}
 //// DeleteCiRelation
@@ -120,7 +128,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type DeleteCiRelation struct {
 //}
 //
-//func (i *InfoCmdbGoLib) DeleteCiRelation() (DeleteCiRelation, error) {
+//func (i *InfoCMDB) DeleteCiRelation() (DeleteCiRelation, error) {
 //
 //}
 //// DeleteCiRelationsByCiRelationType_directedFrom
@@ -128,7 +136,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type DeleteCiRelationsByCiRelationType_directedFrom struct {
 //}
 //
-//func (i *InfoCmdbGoLib) DeleteCiRelationsByCiRelationType_directedFrom() (DeleteCiRelationsByCiRelationType_directedFrom, error) {
+//func (i *InfoCMDB) DeleteCiRelationsByCiRelationType_directedFrom() (DeleteCiRelationsByCiRelationType_directedFrom, error) {
 //
 //}
 //// DeleteCiRelationsByCiRelationType_directedTo
@@ -136,7 +144,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type DeleteCiRelationsByCiRelationType_directedTo struct {
 //}
 //
-//func (i *InfoCmdbGoLib) DeleteCiRelationsByCiRelationType_directedTo() (DeleteCiRelationsByCiRelationType_directedTo, error) {
+//func (i *InfoCMDB) DeleteCiRelationsByCiRelationType_directedTo() (DeleteCiRelationsByCiRelationType_directedTo, error) {
 //
 //}
 //// DeleteCiRelationsByCiRelationType_directionList
@@ -144,7 +152,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type DeleteCiRelationsByCiRelationType_directionList struct {
 //}
 //
-//func (i *InfoCmdbGoLib) DeleteCiRelationsByCiRelationType_directionList() (DeleteCiRelationsByCiRelationType_directionList, error) {
+//func (i *InfoCMDB) DeleteCiRelationsByCiRelationType_directionList() (DeleteCiRelationsByCiRelationType_directionList, error) {
 //
 //}
 //// GetAttributeDefaultOption
@@ -152,7 +160,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type GetAttributeDefaultOption struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetAttributeDefaultOption() (GetAttributeDefaultOption, error) {
+//func (i *InfoCMDB) GetAttributeDefaultOption() (GetAttributeDefaultOption, error) {
 //
 //}
 //// GetAttributeDefaultOptionId
@@ -160,7 +168,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type GetAttributeDefaultOptionId struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetAttributeDefaultOptionId() (GetAttributeDefaultOptionId, error) {
+//func (i *InfoCMDB) GetAttributeDefaultOptionId() (GetAttributeDefaultOptionId, error) {
 //
 //}
 //// GetAttributeGroupIdByAttributeGroupName
@@ -168,7 +176,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type GetAttributeGroupIdByAttributeGroupName struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetAttributeGroupIdByAttributeGroupName() (GetAttributeGroupIdByAttributeGroupName, error) {
+//func (i *InfoCMDB) GetAttributeGroupIdByAttributeGroupName() (GetAttributeGroupIdByAttributeGroupName, error) {
 //
 //}
 //// GetAttributeIdByAttributeName
@@ -176,7 +184,7 @@ func (i *InfoCmdbGoLib) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiTyp
 //type GetAttributeIdByAttributeName struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetAttributeIdByAttributeName() (GetAttributeIdByAttributeName, error) {
+//func (i *InfoCMDB) GetAttributeIdByAttributeName() (GetAttributeIdByAttributeName, error) {
 //
 //}
 // GetCi
@@ -192,9 +200,8 @@ type GetCi struct {
 	} `json:"data"`
 }
 
-func (i *InfoCmdbGoLib) GetCi(ciID int) (GetCi, error) {
-
-	r := GetCi{}
+func (i *InfoCMDB) GetCi(ciID int) (GetCi, error) {
+	ci := GetCi{}
 
 	params := url.Values{
 		"argv1": {strconv.Itoa(ciID)},
@@ -202,17 +209,17 @@ func (i *InfoCmdbGoLib) GetCi(ciID int) (GetCi, error) {
 
 	ret, err := i.WS.client.Post("query", "int_getCi", params)
 	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
+		log.Debugf("Error: %v\n", err.Error())
+		return ci, err
 	}
 
-	err = json.Unmarshal([]byte(ret), &r)
+	err = json.Unmarshal([]byte(ret), &ci)
 	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
+		log.Errorf("Error: %v\n", err)
+		return ci, err
 	}
 
-	return r, nil
+	return ci, nil
 }
 
 //// GetCiAttributeId
@@ -220,7 +227,7 @@ func (i *InfoCmdbGoLib) GetCi(ciID int) (GetCi, error) {
 //type GetCiAttributeId struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetCiAttributeId() (GetCiAttributeId, error) {
+//func (i *InfoCMDB) GetCiAttributeId() (GetCiAttributeId, error) {
 //
 //}
 // GetCiAttributes
@@ -242,7 +249,7 @@ type GetCiAttributes struct {
 	Data   []GetCiAttribute `json:"data"`
 }
 
-func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
+func (i *InfoCMDB) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 
 	r := GetCiAttributes{}
 
@@ -270,7 +277,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetCiAttributeValue struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetCiAttributeValue() (GetCiAttributeValue, error) {
+//func (i *InfoCMDB) GetCiAttributeValue() (GetCiAttributeValue, error) {
 //
 //}
 //// GetCiIdByCiAttributeId
@@ -278,7 +285,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetCiIdByCiAttributeId struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetCiIdByCiAttributeId() (GetCiIdByCiAttributeId, error) {
+//func (i *InfoCMDB) GetCiIdByCiAttributeId() (GetCiIdByCiAttributeId, error) {
 //
 //}
 //// GetCiIdByCiAttributeValue
@@ -286,7 +293,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetCiIdByCiAttributeValue struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetCiIdByCiAttributeValue() (GetCiIdByCiAttributeValue, error) {
+//func (i *InfoCMDB) GetCiIdByCiAttributeValue() (GetCiIdByCiAttributeValue, error) {
 //
 //}
 //// GetCiProjectMappings
@@ -294,7 +301,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetCiProjectMappings struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetCiProjectMappings() (GetCiProjectMappings, error) {
+//func (i *InfoCMDB) GetCiProjectMappings() (GetCiProjectMappings, error) {
 //
 //}
 //// GetCiRelationCount
@@ -302,7 +309,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetCiRelationCount struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetCiRelationCount() (GetCiRelationCount, error) {
+//func (i *InfoCMDB) GetCiRelationCount() (GetCiRelationCount, error) {
 //
 //}
 //// GetCiRelationTypeIdByRelationTypeName
@@ -310,7 +317,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetCiRelationTypeIdByRelationTypeName struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetCiRelationTypeIdByRelationTypeName() (GetCiRelationTypeIdByRelationTypeName, error) {
+//func (i *InfoCMDB) GetCiRelationTypeIdByRelationTypeName() (GetCiRelationTypeIdByRelationTypeName, error) {
 //
 //}
 //// GetCiTypeIdByCiTypeName
@@ -318,7 +325,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetCiTypeIdByCiTypeName struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetCiTypeIdByCiTypeName() (GetCiTypeIdByCiTypeName, error) {
+//func (i *InfoCMDB) GetCiTypeIdByCiTypeName() (GetCiTypeIdByCiTypeName, error) {
 //
 //}
 //// GetCiTypeOfCi
@@ -326,7 +333,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetCiTypeOfCi struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetCiTypeOfCi() (GetCiTypeOfCi, error) {
+//func (i *InfoCMDB) GetCiTypeOfCi() (GetCiTypeOfCi, error) {
 //
 //}
 //// GetListOfCiIdsByCiRelation_directedFrom
@@ -334,7 +341,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetListOfCiIdsByCiRelation_directedFrom struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetListOfCiIdsByCiRelation_directedFrom() (GetListOfCiIdsByCiRelation_directedFrom, error) {
+//func (i *InfoCMDB) GetListOfCiIdsByCiRelation_directedFrom() (GetListOfCiIdsByCiRelation_directedFrom, error) {
 //
 //}
 //// GetListOfCiIdsByCiRelation_directedTo
@@ -342,7 +349,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetListOfCiIdsByCiRelation_directedTo struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetListOfCiIdsByCiRelation_directedTo() (GetListOfCiIdsByCiRelation_directedTo, error) {
+//func (i *InfoCMDB) GetListOfCiIdsByCiRelation_directedTo() (GetListOfCiIdsByCiRelation_directedTo, error) {
 //
 //}
 //// GetListOfCiIdsByCiRelation_directionList
@@ -350,7 +357,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetListOfCiIdsByCiRelation_directionList struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetListOfCiIdsByCiRelation_directionList() (GetListOfCiIdsByCiRelation_directionList, error) {
+//func (i *InfoCMDB) GetListOfCiIdsByCiRelation_directionList() (GetListOfCiIdsByCiRelation_directionList, error) {
 //
 //}
 //
@@ -359,7 +366,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetNumberOfCiAttributes struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetNumberOfCiAttributes() (GetNumberOfCiAttributes, error) {
+//func (i *InfoCMDB) GetNumberOfCiAttributes() (GetNumberOfCiAttributes, error) {
 //
 //}
 //// GetProjectIdByProjectName
@@ -367,7 +374,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetProjectIdByProjectName struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetProjectIdByProjectName() (GetProjectIdByProjectName, error) {
+//func (i *InfoCMDB) GetProjectIdByProjectName() (GetProjectIdByProjectName, error) {
 //
 //}
 //// GetProjects
@@ -375,7 +382,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetProjects struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetProjects() (GetProjects, error) {
+//func (i *InfoCMDB) GetProjects() (GetProjects, error) {
 //
 //}
 //// GetRoleIdByRoleName
@@ -383,7 +390,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetRoleIdByRoleName struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetRoleIdByRoleName() (GetRoleIdByRoleName, error) {
+//func (i *InfoCMDB) GetRoleIdByRoleName() (GetRoleIdByRoleName, error) {
 //
 //}
 //// GetUserIdByUsername
@@ -391,7 +398,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type GetUserIdByUsername struct {
 //}
 //
-//func (i *InfoCmdbGoLib) GetUserIdByUsername() (GetUserIdByUsername, error) {
+//func (i *InfoCMDB) GetUserIdByUsername() (GetUserIdByUsername, error) {
 //
 //}
 //// RemoveCiProjectMapping
@@ -399,7 +406,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type RemoveCiProjectMapping struct {
 //}
 //
-//func (i *InfoCmdbGoLib) RemoveCiProjectMapping() (RemoveCiProjectMapping, error) {
+//func (i *InfoCMDB) RemoveCiProjectMapping() (RemoveCiProjectMapping, error) {
 //
 //}
 //// SetAttributeRole
@@ -407,7 +414,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type SetAttributeRole struct {
 //}
 //
-//func (i *InfoCmdbGoLib) SetAttributeRole() (SetAttributeRole, error) {
+//func (i *InfoCMDB) SetAttributeRole() (SetAttributeRole, error) {
 //
 //}
 //// SetCiTypeOfCi
@@ -415,7 +422,7 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type SetCiTypeOfCi struct {
 //}
 //
-//func (i *InfoCmdbGoLib) SetCiTypeOfCi() (SetCiTypeOfCi, error) {
+//func (i *InfoCMDB) SetCiTypeOfCi() (SetCiTypeOfCi, error) {
 //
 //}
 //// UpdateCiAttribute
@@ -423,6 +430,6 @@ func (i *InfoCmdbGoLib) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 //type UpdateCiAttribute struct {
 //}
 //
-//func (i *InfoCmdbGoLib) UpdateCiAttribute() (UpdateCiAttribute, error) {
+//func (i *InfoCMDB) UpdateCiAttribute() (UpdateCiAttribute, error) {
 //
 //}
