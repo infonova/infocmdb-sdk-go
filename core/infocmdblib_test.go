@@ -1,4 +1,4 @@
-package infocmdbclient
+package core
 
 import (
 	"bytes"
