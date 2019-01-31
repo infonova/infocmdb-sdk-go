@@ -34,16 +34,14 @@ func init() {
 	}
 }
 
-func (i *InfoCMDB) LoadConfig(config string) (err error) {
-	_, err = os.Stat(config)
-	configFile := config
-	InfoCmdbBasePath := filepath.Base(config)
-
+func (i *InfoCMDB) LoadConfig(configFile string) (err error) {
+	_, err = os.Stat(configFile)
 	if err == nil {
-		log.Debugf("Configfile found with given string: %s", config)
+		log.Debugf("Configfile found with given string: %s", configFile)
 	} else {
-		InfoCmdbBasePath = filepath.Base(os.Getenv("INFOCMDB_WORKFLOW_CONFIG_PATH"))
-		configFile = filepath.Join(InfoCmdbBasePath, config)
+		InfoCmdbBasePath := filepath.Dir(os.Getenv("INFOCMDB_WORKFLOW_CONFIG_PATH") + "/")
+		log.Debugf("INFOCMDB_WORKFLOW_CONFIG_PATH: %s, InfoCmdbBasePath: %s", os.Getenv("INFOCMDB_WORKFLOW_CONFIG_PATH"), InfoCmdbBasePath)
+		configFile = filepath.Join(InfoCmdbBasePath, configFile)
 	}
 
 	log.Debugf("Configfile: %s", configFile)
