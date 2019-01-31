@@ -1,4 +1,4 @@
-package infocmdblibrary
+package infocmdbclient
 
 import (
 	"errors"
@@ -10,26 +10,20 @@ import (
 )
 
 var (
-	ErrNoCredentials = errors.New("must provide credentials")
+	ErrArgumentsMissing       = errors.New("arguments missing")
+	ErrFailedToCreateInfoCMDB = errors.New("failed to create infocmdb object")
+	ErrNoCredentials          = errors.New("must provide credentials")
 )
-
-type Credentials struct {
-	ApiKey   string
-	Username string
-	Password string
-}
 
 type Config struct {
 	ApiUrl       string `yaml:"apiUrl"`
 	ApiUser      string `yaml:"apiUser"`
 	ApiPassword  string `yaml:"apiPassword"`
+	ApiKey       string
 	CmdbBasePath string `yaml:"CmdbBasePath"`
-	URL          string
 }
 
 type InfoCMDB struct {
-	WS     Webservice
-	WC     CmdbWebClient
 	Config Config
 }
 
@@ -51,6 +45,7 @@ func (i *InfoCMDB) LoadConfig(config string) (err error) {
 		InfoCmdbBasePath = filepath.Base(os.Getenv("INFOCMDB_WORKFLOW_CONFIG_PATH"))
 		configFile = filepath.Join(InfoCmdbBasePath, config)
 	}
+
 	log.Debugf("Configfile: %s", configFile)
 
 	_, err = os.Stat(configFile)
@@ -65,22 +60,24 @@ func (i *InfoCMDB) LoadConfig(config string) (err error) {
 	return yaml.Unmarshal(yamlFile, &i.Config)
 }
 
-func NewCMDB(url string, cred Credentials) (i InfoCMDB, err error) {
-	i.WS.client = &i.WC
-	i.WC.Url = url
-	i.WC.ApiKey = cred.ApiKey
+func NewCMDB(config string) (i *InfoCMDB, err error) {
+	i = new(InfoCMDB)
+	err = i.LoadConfig(config)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
 
-	err = i.Login(url, cred)
-	return i, err
+	return i, nil
 }
 
-func (i *InfoCMDB) Login(url string, cred Credentials) error {
-	if i.WC.ApiKey != "" {
+func (i *InfoCMDB) Login() error {
+	if i.Config.ApiKey != "" {
 		log.Debug("already logged in")
 		return nil
 	}
-	if cred.Username == "" {
+	if i.Config.ApiUser == "" {
 		return ErrNoCredentials
 	}
-	return i.WC.Login(url, cred.Username, cred.Password)
+	return i.LoginWithUserPass(i.Config.ApiUrl, i.Config.ApiUser, i.Config.ApiPassword)
 }

@@ -1,4 +1,4 @@
 apiUrl: http://nginx/
-apiUser: testuser
-apiPassword: testpass
+apiUser: admin
+apiPassword: admin
 CmdbBasePath: /app/

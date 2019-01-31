@@ -1,4 +1,4 @@
-package infocmdblibrary
+package infocmdbclient
 
 import (
 	"encoding/json"
@@ -21,7 +21,7 @@ func (i *InfoCMDB) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiType, er
 		"argv1": {strconv.Itoa(ciTypeID)},
 	}
 
-	ret, err := i.WS.client.Post("query", "int_getListOfCiIdsOfCiType", params)
+	ret, err := i.Post("query", "int_getListOfCiIdsOfCiType", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -199,7 +199,7 @@ func (i *InfoCMDB) GetCi(ciID int) (GetCi, error) {
 		"argv1": {strconv.Itoa(ciID)},
 	}
 
-	ret, err := i.WS.client.Post("query", "int_getCi", params)
+	ret, err := i.Post("query", "int_getCi", params)
 	if err != nil {
 		log.Debugf("Error: %v", err.Error())
 		return ci, err
@@ -249,7 +249,7 @@ func (i *InfoCMDB) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 		"argv1": {strconv.Itoa(ciID)},
 	}
 
-	ret, err := i.WS.client.Post("query", "int_getCiAttributes", params)
+	ret, err := i.Post("query", "int_getCiAttributes", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err

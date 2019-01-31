@@ -1,4 +1,4 @@
-package infocmdblibrary
+package infocmdbclient
 
 import (
 	"bytes"
@@ -17,7 +17,6 @@ var (
 	ErrTestingInfocmdbUrlMissing = "INFOCMDB_WORKFLOW_TEST_URL must be provided or mocking enabled(INFOCMDB_WORKFLOW_TEST_MOCKING=true)"
 )
 
-var infocmdbCredentials = Credentials{Username: "admin", Password: "admin"}
 var mocking = false
 
 func init() {
@@ -119,9 +118,15 @@ func (t *testing) getUrl() string {
 
 func ExampleWebservice_Webservice() {
 	t := testing{}
-	infocmdbURL := t.getUrl()
 
-	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
+	i, err := NewCMDB("test.yml")
+	i.Config.ApiUrl = t.getUrl()
+	if err != nil {
+		log.Error(ErrFailedToCreateInfoCMDB)
+		return
+	}
+
+	err = i.Login()
 	if err != nil {
 		log.Error(err)
 		return
@@ -129,7 +134,7 @@ func ExampleWebservice_Webservice() {
 
 	params := url.Values{}
 	params.Add("argv1", "1")
-	ret, err := i.WS.Webservice("int_getListOfCiIdsOfCiType", params)
+	ret, err := i.Webservice("int_getListOfCiIdsOfCiType", params)
 	if err != nil {
 		log.Error(err)
 		return
@@ -150,7 +155,7 @@ func ExampleInfoCmdbGoLib_LoadConfigAbsolutePath() {
 	fmt.Printf("Config: %v\n", i.Config)
 	fmt.Printf("CmdbBasePath: %s\n", i.Config.CmdbBasePath)
 	// Output:
-	// Config: {http://nginx/ testuser testpass /app/ }
+	// Config: {http://nginx/ admin admin  /app/}
 	// CmdbBasePath: /app/
 }
 
@@ -164,48 +169,65 @@ func ExampleInfoCmdbGoLib_LoadConfig() {
 	fmt.Printf("Config: %v\n", i.Config)
 	fmt.Printf("CmdbBasePath: %s\n", i.Config.CmdbBasePath)
 	// Output:
-	// Config: {http://nginx/ testuser testpass /app/ }
+	// Config: {http://nginx/ admin admin  /app/}
 	// CmdbBasePath: /app/
 }
 
 func ExampleCmdbWebClient_Login() {
 	t := testing{}
-	infocmdbURL := t.getUrl()
 
-	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
+	i, err := NewCMDB("test.yml")
+	i.Config.ApiUrl = t.getUrl()
+	if i == nil {
+		log.Error(ErrFailedToCreateInfoCMDB)
+		return
+	}
+
+	i.Config.ApiKey = ""
+
+	err = i.Login()
 	if err != nil {
 		log.Error(err)
 		return
 	}
 
-	fmt.Printf("Login ok, ApiKey(len): %d\n", len(i.WS.client.ApiKey))
+	fmt.Printf("Login ok, ApiKey(len): %d\n", len(i.Config.ApiKey))
 
 	// Output:
 	// Login ok, ApiKey(len): 30
 }
 func ExampleCmdbWebClient_LoginWithApiKey() {
 	t := testing{}
-	infocmdbURL := t.getUrl()
 
-	ilogin, err := NewCMDB(infocmdbURL, infocmdbCredentials)
+	ilogin, err := NewCMDB("test.yml")
 	if err != nil {
 		log.Error(err)
 		return
 	}
 
-	cred := Credentials{ApiKey: ilogin.WC.ApiKey}
-	i, err := NewCMDB(infocmdbURL, cred)
+	ilogin.Config.ApiUrl = t.getUrl()
+	err = ilogin.Login()
 	if err != nil {
 		log.Error(err)
 		return
 	}
+
+	log.Debugf("Got API Key: %s", ilogin.Config.ApiKey)
+	i, err := NewCMDB("test.yml")
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+	i.Config.ApiKey = ilogin.Config.ApiKey
+	i.Config.ApiUrl = t.getUrl()
 
 	_, err = i.GetCi(1)
 	if err != nil {
 		log.Error(err)
 		return
 	}
-	fmt.Printf("Login ok got ci, ApiKey(len): %d\n", len(i.WS.client.ApiKey))
+	fmt.Printf("Login ok got ci, ApiKey(len): %d\n", len(i.Config.ApiKey))
 
 	// Output:
 	// Login ok got ci, ApiKey(len): 30
@@ -213,11 +235,16 @@ func ExampleCmdbWebClient_LoginWithApiKey() {
 
 func ExampleCmdbWebClient_Get() {
 	t := testing{}
-	infocmdbURL := t.getUrl()
 
-	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
+	i, err := NewCMDB("test.yml")
 	if err != nil {
 		log.Error(err)
+		return
+	}
+
+	i.Config.ApiUrl = t.getUrl()
+	if i == nil {
+		log.Error(ErrFailedToCreateInfoCMDB)
 		return
 	}
 
@@ -225,7 +252,7 @@ func ExampleCmdbWebClient_Get() {
 		"argv1": {"1"},
 	}
 
-	ret, err := i.WC.Get("query", "int_getListOfCiIdsOfCiType", params)
+	ret, err := i.Get("query", "int_getListOfCiIdsOfCiType", params)
 	if err != nil {
 		log.Error(err)
 		return
@@ -238,11 +265,16 @@ func ExampleCmdbWebClient_Get() {
 
 func ExampleCmdbWebClient_Post() {
 	t := testing{}
-	infocmdbURL := t.getUrl()
 
-	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
+	i, err := NewCMDB("test.yml")
 	if err != nil {
 		log.Error(err)
+		return
+	}
+
+	i.Config.ApiUrl = t.getUrl()
+	if i == nil {
+		log.Error(ErrFailedToCreateInfoCMDB)
 		return
 	}
 
@@ -250,7 +282,7 @@ func ExampleCmdbWebClient_Post() {
 		"argv1": {"1"},
 	}
 
-	ret, err := i.WC.Post("query", "int_getListOfCiIdsOfCiType", params)
+	ret, err := i.Post("query", "int_getListOfCiIdsOfCiType", params)
 	if err != nil {
 		log.Error(err)
 		return
@@ -263,11 +295,16 @@ func ExampleCmdbWebClient_Post() {
 
 func ExampleInfoCmdbGoLib_GetCi() {
 	t := testing{}
-	infocmdbURL := t.getUrl()
 
-	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
+	i, err := NewCMDB("test.yml")
 	if err != nil {
 		log.Error(err)
+		return
+	}
+
+	i.Config.ApiUrl = t.getUrl()
+	if err != nil {
+		log.Error(ErrFailedToCreateInfoCMDB)
 		return
 	}
 
@@ -284,11 +321,16 @@ func ExampleInfoCmdbGoLib_GetCi() {
 
 func ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType() {
 	t := testing{}
-	infocmdbURL := t.getUrl()
 
-	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
+	i, err := NewCMDB("test.yml")
 	if err != nil {
 		log.Error(err)
+		return
+	}
+
+	i.Config.ApiUrl = t.getUrl()
+	if err != nil {
+		log.Error(ErrFailedToCreateInfoCMDB)
 		return
 	}
 
@@ -303,29 +345,13 @@ func ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType() {
 	// {OK [{1} {2}]}
 }
 
-func ExampleInfoCmdbGoLib_Login() {
-	t := testing{}
-	infocmdbURL := t.getUrl()
-
-	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-	fmt.Println("Apikey length: ", len(i.WC.ApiKey))
-
-	// Output:
-	// Apikey length:  30
-}
-
 func ExampleInfoCmdbGoLib_GetCiAttributes() {
 	t := testing{}
-	infocmdbURL := t.getUrl()
 
-	i, err := NewCMDB(infocmdbURL, infocmdbCredentials)
-
+	i, err := NewCMDB("test.yml")
+	i.Config.ApiUrl = t.getUrl()
 	if err != nil {
-		log.Error(err)
+		log.Error(ErrFailedToCreateInfoCMDB)
 		return
 	}
 
