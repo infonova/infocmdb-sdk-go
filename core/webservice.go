@@ -22,7 +22,7 @@ type ResultLogin struct {
 
 func (i *InfoCMDB) LoginWithUserPass(url string, username string, password string) error {
 
-	log.Debugf("Opening new Webclient connection. (Url: %s, Username: %s)", url, username)
+	log.Debugf("Opening new WebClient connection. (Url: %s, Username: %s)", url, username)
 
 	reqURL := fmt.Sprintf("%s/api/login/username/%s/password/%s/timeout/21600/method/json", url, username, password)
 
@@ -30,7 +30,11 @@ func (i *InfoCMDB) LoginWithUserPass(url string, username string, password strin
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Error(err)
+		}
+	}()
 
 	byteBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -52,7 +56,7 @@ func (i *InfoCMDB) LoginWithUserPass(url string, username string, password strin
 }
 
 func (i *InfoCMDB) LoginWithApiKey(url string, apikey string) error {
-	log.Debugf("Opening new Webclient connection using Apikey. (Url: %s, ApiKey: %s)", url, apikey)
+	log.Debugf("Opening new WebClient connection using ApiKey. (Url: %s, ApiKey: %s)", url, apikey)
 	i.Config.ApiUrl = url
 	i.Config.ApiKey = apikey
 	return nil

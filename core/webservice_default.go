@@ -14,9 +14,7 @@ type ListOfCiIdsOfCiType struct {
 	} `json:"data"`
 }
 
-func (i *InfoCMDB) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiType, error) {
-	r := ListOfCiIdsOfCiType{}
-
+func (i *InfoCMDB) GetListOfCiIdsOfCiType(ciTypeID int) (r ListOfCiIdsOfCiType, err error) {
 	params := url.Values{
 		"argv1": {strconv.Itoa(ciTypeID)},
 	}
@@ -34,153 +32,110 @@ func (i *InfoCMDB) GetListOfCiIdsOfCiType(ciTypeID int) (ListOfCiIdsOfCiType, er
 		return r, err
 	}
 
-	return r, nil
+	return
 }
 
 //// Templates for others
-//type AddCiProjectMapping struct {
-//}
+type AddCiProjectMapping struct {
+	Status string `json:"status"`
+}
+
+// AddCiProjectMapping
+// int_addCiProjectMapping     add project-mapping to a ci
 //
-//// AddCiProjectMapping
-//// int_addCiProjectMapping     add project-mapping to a ci         Aktiv
-////
-//// insert into ci_project (ci_id, project_id, history_id)
-//// select :argv1:, :argv2:, :argv3:
-//// from dual
-//// where not exists(select id from ci_project where ci_id = :argv1: and project_id = :argv2:)
-////func (i *InfoCMDB) AddCiProjectMapping(ciID int, projectID int, historyID int) (AddCiProjectMapping, error) {
-////
-////}
+// insert into ci_project (ci_id, project_id, history_id)
+// select :argv1:, :argv2:, :argv3:
+// from dual
+// where not exists(select id from ci_project where ci_id = :argv1: and project_id = :argv2:)
+func (i *InfoCMDB) AddCiProjectMapping(ciID int, projectID int, historyID int) (r AddCiProjectMapping, err error) {
+	params := url.Values{
+		"argv1": {strconv.Itoa(ciID)},
+		"argv2": {strconv.Itoa(projectID)},
+		"argv3": {strconv.Itoa(historyID)},
+	}
+
+	ret, err := i.Post("query", "int_addCiProjectMapping", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		log.Error(ret)
+		return r, err
+	}
+
+	return
+}
+
 //// CreateAttribute
-//// int_createAttribute     create an attribute         Aktiv
-//type CreateAttribute struct {
-//}
-//
-//func (i *InfoCMDB) CreateAttribute() (CreateAttribute, error) {
-//
-//}
-//// CreateAttributeGroup
-//// int_createAttributeGroup    create an attribute-group       Aktiv
-//type CreateAttributeGroup struct {
-//}
-//
-//func (i *InfoCMDB) CreateAttributeGroup() (CreateAttributeGroup, error) {
-//
-//}
-//// CreateCi
-//// int_createCi    create a CI         Aktiv
-//type CreateCi struct {
-//}
-//
-//func (i *InfoCMDB) CreateCi() (CreateCi, error) {
-//
-//}
-//// CreateCiAttribute
-//// int_createCiAttribute   creates a ci_attribute-row      Aktiv
-//type CreateCiAttribute struct {
-//}
-//
-//func (i *InfoCMDB) CreateCiAttribute() (CreateCiAttribute, error) {
-//
-//}
-//// CreateCiRelation
-//// int_createCiRelation    inserts a relation: argv1 = ci_id_1 argv2 = ci_id_2 argv3 = ci_relation_type_id argv4 = direction       Aktiv
-//type CreateCiRelation struct {
-//}
-//
-//func (i *InfoCMDB) CreateCiRelation() (CreateCiRelation, error) {
-//
-//}
-//// CreateHistory
-//// int_createHistory   creates an History-ID       Aktiv
-//type CreateHistory struct {
-//}
-//
-//func (i *InfoCMDB) CreateHistory() (CreateHistory, error) {
-//
-//}
-//// DeleteCi
-//// int_deleteCi    delete a CI with all dependencies       Aktiv
-//type DeleteCi struct {
-//}
-//
-//func (i *InfoCMDB) DeleteCi() (DeleteCi, error) {
-//
-//}
-//// DeleteCiAttribute
-//// int_deleteCiAttribute   delete a ci_attribute-row by id         Aktiv
-//type DeleteCiAttribute struct {
-//}
-//
-//func (i *InfoCMDB) DeleteCiAttribute() (DeleteCiAttribute, error) {
-//
-//}
-//// DeleteCiRelation
-//// int_deleteCiRelation    delete a specific ci-relation       Aktiv
-//type DeleteCiRelation struct {
-//}
-//
-//func (i *InfoCMDB) DeleteCiRelation() (DeleteCiRelation, error) {
-//
-//}
-//// DeleteCiRelationsByCiRelationType_directedFrom
-//// int_deleteCiRelationsByCiRelationType_directedFrom  deletes all ci-relations with a specific relation-type of a specific CI (direction: from CI)        Aktiv
-//type DeleteCiRelationsByCiRelationType_directedFrom struct {
-//}
-//
-//func (i *InfoCMDB) DeleteCiRelationsByCiRelationType_directedFrom() (DeleteCiRelationsByCiRelationType_directedFrom, error) {
-//
-//}
-//// DeleteCiRelationsByCiRelationType_directedTo
-//// int_deleteCiRelationsByCiRelationType_directedTo    deletes all ci-relations with a specific relation-type of a specific CI (direction: to CI)      Aktiv
-//type DeleteCiRelationsByCiRelationType_directedTo struct {
-//}
-//
-//func (i *InfoCMDB) DeleteCiRelationsByCiRelationType_directedTo() (DeleteCiRelationsByCiRelationType_directedTo, error) {
-//
-//}
-//// DeleteCiRelationsByCiRelationType_directionList
-//// int_deleteCiRelationsByCiRelationType_directionList     deletes all ci-relations with a specific relation-type of a specific CI         Aktiv
-//type DeleteCiRelationsByCiRelationType_directionList struct {
-//}
-//
-//func (i *InfoCMDB) DeleteCiRelationsByCiRelationType_directionList() (DeleteCiRelationsByCiRelationType_directionList, error) {
-//
-//}
-//// GetAttributeDefaultOption
-//// int_getAttributeDefaultOption   returns the value of an option      Aktiv
-//type GetAttributeDefaultOption struct {
-//}
-//
-//func (i *InfoCMDB) GetAttributeDefaultOption() (GetAttributeDefaultOption, error) {
-//
-//}
-//// GetAttributeDefaultOptionId
-//// int_getAttributeDefaultOptionId     return the id of a specific attribute and value         Aktiv
-//type GetAttributeDefaultOptionId struct {
-//}
-//
-//func (i *InfoCMDB) GetAttributeDefaultOptionId() (GetAttributeDefaultOptionId, error) {
-//
-//}
-//// GetAttributeGroupIdByAttributeGroupName
-//// int_getAttributeGroupIdByAttributeGroupName     returns the id of an attribute group        Aktiv
-//type GetAttributeGroupIdByAttributeGroupName struct {
-//}
-//
-//func (i *InfoCMDB) GetAttributeGroupIdByAttributeGroupName() (GetAttributeGroupIdByAttributeGroupName, error) {
-//
-//}
-//// GetAttributeIdByAttributeName
-//// int_getAttributeIdByAttributeName   returns the id of an attribute      Aktiv
-//type GetAttributeIdByAttributeName struct {
-//}
-//
-//func (i *InfoCMDB) GetAttributeIdByAttributeName() (GetAttributeIdByAttributeName, error) {
-//
-//}
+//// int_createAttribute     create an attribute
+type CreateAttribute struct {
+	Status string `json:"status"`
+	CiID   int    `json:"id"`
+}
+
+func (i *InfoCMDB) CreateAttribute(ciID int, attrID int) (r CreateAttribute, err error) {
+	params := url.Values{
+		"argv1": {strconv.Itoa(ciID)},
+		"argv2": {strconv.Itoa(attrID)},
+	}
+
+	ret, err := i.Post("query", "int_createCiAttribute", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		log.Error(ret)
+		return r, err
+	}
+
+	return
+}
+
+// CreateCi
+// int_createCi    create a CI
+type CreateCi struct {
+	Status    string `json:"status"`
+	CiTypeID  int    `json:"ci_type_id"`
+	Icon      string `json:"icon"`
+	ValidFrom string `json:"valid_from"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
+
+func (i *InfoCMDB) CreateCi(ciTypeID int, icon string, historyID int) (r CreateCi, err error) {
+	params := url.Values{
+		"argv1": {strconv.Itoa(ciTypeID)},
+		"argv2": {icon},
+		"argv3": {strconv.Itoa(historyID)},
+	}
+
+	ret, err := i.Post("query", "int_createCi", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		log.Error(ret)
+		return r, err
+	}
+
+	return
+
+}
+
 // GetCi
-// int_getCi   Retrieve all informations about a ci        Aktiv
+// int_getCi   Retrieve all informations about a ci
 type GetCi struct {
 	Status string `json:"status"`
 	Data   []struct {
@@ -192,9 +147,7 @@ type GetCi struct {
 	} `json:"data"`
 }
 
-func (i *InfoCMDB) GetCi(ciID int) (GetCi, error) {
-	ci := GetCi{}
-
+func (i *InfoCMDB) GetCi(ciID int) (r GetCi, err error) {
 	params := url.Values{
 		"argv1": {strconv.Itoa(ciID)},
 	}
@@ -202,28 +155,20 @@ func (i *InfoCMDB) GetCi(ciID int) (GetCi, error) {
 	ret, err := i.Post("query", "int_getCi", params)
 	if err != nil {
 		log.Debugf("Error: %v", err.Error())
-		return ci, err
+		return
 	}
 
-	err = json.Unmarshal([]byte(ret), &ci)
+	err = json.Unmarshal([]byte(ret), &r)
 	if err != nil {
 		log.Errorf("Error: %v", err)
-		return ci, err
+		return
 	}
 
-	return ci, nil
+	return
 }
 
-//// GetCiAttributeId
-//// int_getCiAttributeId    returns the id of the first ci_attribute-row with the specific ci_id and attribute_id       Aktiv
-//type GetCiAttributeId struct {
-//}
-//
-//func (i *InfoCMDB) GetCiAttributeId() (GetCiAttributeId, error) {
-//
-//}
 // GetCiAttributes
-// int_getCiAttributes     get all attributes for given ci (:argv1:)       Aktiv
+// int_getCiAttributes     get all attributes for given ci (:argv1:)
 
 type GetCiAttribute struct {
 	CiID                 json.Number `json:"ci_id"`
@@ -241,10 +186,7 @@ type GetCiAttributes struct {
 	Data   []GetCiAttribute `json:"data"`
 }
 
-func (i *InfoCMDB) GetCiAttributes(ciID int) (GetCiAttributes, error) {
-
-	r := GetCiAttributes{}
-
+func (i *InfoCMDB) GetCiAttributes(ciID int) (r GetCiAttributes, err error) {
 	params := url.Values{
 		"argv1": {strconv.Itoa(ciID)},
 	}
@@ -261,167 +203,1028 @@ func (i *InfoCMDB) GetCiAttributes(ciID int) (GetCiAttributes, error) {
 		return r, err
 	}
 
-	return r, nil
+	return
 }
 
-//// GetCiAttributeValue
-//// int_getCiAttributeValue     get the value of a ci_attribute entry by ci_id and attribute_id         Aktiv
-//type GetCiAttributeValue struct {
-//}
-//
-//func (i *InfoCMDB) GetCiAttributeValue() (GetCiAttributeValue, error) {
-//
-//}
-//// GetCiIdByCiAttributeId
-//// int_getCiIdByCiAttributeId  returns the ciid of a specific ci_attribute-row         Aktiv
-//type GetCiIdByCiAttributeId struct {
-//}
-//
-//func (i *InfoCMDB) GetCiIdByCiAttributeId() (GetCiIdByCiAttributeId, error) {
-//
-//}
-//// GetCiIdByCiAttributeValue
-//// int_getCiIdByCiAttributeValue   returns the ci_id by a specific attribute_id and value      Aktiv
-//type GetCiIdByCiAttributeValue struct {
-//}
-//
-//func (i *InfoCMDB) GetCiIdByCiAttributeValue() (GetCiIdByCiAttributeValue, error) {
-//
-//}
-//// GetCiProjectMappings
-//// int_getCiProjectMappings    Get all Projects for a given CI         Aktiv
-//type GetCiProjectMappings struct {
-//}
-//
-//func (i *InfoCMDB) GetCiProjectMappings() (GetCiProjectMappings, error) {
-//
-//}
-//// GetCiRelationCount
-//// int_getCiRelationCount  returns the number of relations with the given parameters       Aktiv
-//type GetCiRelationCount struct {
-//}
-//
-//func (i *InfoCMDB) GetCiRelationCount() (GetCiRelationCount, error) {
-//
-//}
-//// GetCiRelationTypeIdByRelationTypeName
-//// int_getCiRelationTypeIdByRelationTypeName   returns the id of a relation-type       Aktiv
-//type GetCiRelationTypeIdByRelationTypeName struct {
-//}
-//
-//func (i *InfoCMDB) GetCiRelationTypeIdByRelationTypeName() (GetCiRelationTypeIdByRelationTypeName, error) {
-//
-//}
-//// GetCiTypeIdByCiTypeName
-//// int_getCiTypeIdByCiTypeName     returns the id for the CI-Type      Aktiv
-//type GetCiTypeIdByCiTypeName struct {
-//}
-//
-//func (i *InfoCMDB) GetCiTypeIdByCiTypeName() (GetCiTypeIdByCiTypeName, error) {
-//
-//}
-//// GetCiTypeOfCi
-//// int_getCiTypeOfCi   returns the ci-type of a CI         Aktiv
-//type GetCiTypeOfCi struct {
-//}
-//
-//func (i *InfoCMDB) GetCiTypeOfCi() (GetCiTypeOfCi, error) {
-//
-//}
-//// GetListOfCiIdsByCiRelation_directedFrom
-//// int_getListOfCiIdsByCiRelation_directedFrom     returns all related CI-IDs of a specific relation-type (direction: from CI)         Aktiv
-//type GetListOfCiIdsByCiRelation_directedFrom struct {
-//}
-//
-//func (i *InfoCMDB) GetListOfCiIdsByCiRelation_directedFrom() (GetListOfCiIdsByCiRelation_directedFrom, error) {
-//
-//}
-//// GetListOfCiIdsByCiRelation_directedTo
-//// int_getListOfCiIdsByCiRelation_directedTo   returns all related CI-IDs of a specific relation-type (direction: to CI)       Aktiv
-//type GetListOfCiIdsByCiRelation_directedTo struct {
-//}
-//
-//func (i *InfoCMDB) GetListOfCiIdsByCiRelation_directedTo() (GetListOfCiIdsByCiRelation_directedTo, error) {
-//
-//}
-//// GetListOfCiIdsByCiRelation_directionList
-//// int_getListOfCiIdsByCiRelation_directionList    returns all related CI-IDs of a specific relation-type      Aktiv
-//type GetListOfCiIdsByCiRelation_directionList struct {
-//}
-//
-//func (i *InfoCMDB) GetListOfCiIdsByCiRelation_directionList() (GetListOfCiIdsByCiRelation_directionList, error) {
-//
-//}
-//
-//// GetNumberOfCiAttributes
-//// int_getNumberOfCiAttributes     returns the number of values for a specific attribute of a CI       Aktiv
-//type GetNumberOfCiAttributes struct {
-//}
-//
-//func (i *InfoCMDB) GetNumberOfCiAttributes() (GetNumberOfCiAttributes, error) {
-//
-//}
-//// GetProjectIdByProjectName
-//// int_getProjectIdByProjectName   returns the id of the project with the given name       Aktiv
-//type GetProjectIdByProjectName struct {
-//}
-//
-//func (i *InfoCMDB) GetProjectIdByProjectName() (GetProjectIdByProjectName, error) {
-//
-//}
-//// GetProjects
-//// int_getProjects     Retrieve all CMDB Projects      Aktiv
-//type GetProjects struct {
-//}
-//
-//func (i *InfoCMDB) GetProjects() (GetProjects, error) {
-//
-//}
-//// GetRoleIdByRoleName
-//// int_getRoleIdByRoleName     returns the id of a role        Aktiv
-//type GetRoleIdByRoleName struct {
-//}
-//
-//func (i *InfoCMDB) GetRoleIdByRoleName() (GetRoleIdByRoleName, error) {
-//
-//}
-//// GetUserIdByUsername
-//// int_getUserIdByUsername     returns the ID of a infoCMDB-User       Aktiv
-//type GetUserIdByUsername struct {
-//}
-//
-//func (i *InfoCMDB) GetUserIdByUsername() (GetUserIdByUsername, error) {
-//
-//}
-//// RemoveCiProjectMapping
-//// int_removeCiProjectMapping  removes a ci project mapping        Aktiv
-//type RemoveCiProjectMapping struct {
-//}
-//
-//func (i *InfoCMDB) RemoveCiProjectMapping() (RemoveCiProjectMapping, error) {
-//
-//}
-//// SetAttributeRole
-//// int_setAttributeRole    set permisson for an attribute      Aktiv
-//type SetAttributeRole struct {
-//}
-//
-//func (i *InfoCMDB) SetAttributeRole() (SetAttributeRole, error) {
-//
-//}
-//// SetCiTypeOfCi
-//// int_setCiTypeOfCi   set the ci_type of a CI         Aktiv
-//type SetCiTypeOfCi struct {
-//}
-//
-//func (i *InfoCMDB) SetCiTypeOfCi() (SetCiTypeOfCi, error) {
-//
-//}
-//// UpdateCiAttribute
-//// int_updateCiAttribute   updates a specific ci_attribute_row argv1 = ci_attribute-ID argv2 = column argv3 = value argv4 = history_id         Akti
-//type UpdateCiAttribute struct {
-//}
-//
-//func (i *InfoCMDB) UpdateCiAttribute() (UpdateCiAttribute, error) {
-//
-//}
+// CreateCiAttribute
+// int_createCiAttribute   creates a ci_attribute-row
+type CreateCiAttribute struct {
+	Status      string `json:"status"`
+	CiID        int    `json:"ci_id"`
+	AttributeID int    `json:"attribute_id"`
+	HistoryID   int    `json:"history_id"`
+}
+
+func (i *InfoCMDB) CreateCiAttribute() (r CreateCiAttribute, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_createCiAttribute", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// CreateCiRelation
+// int_createCiRelation    inserts a relation: argv1 = ci_id_1 argv2 = ci_id_2 argv3 = ci_relation_type_id argv4 = direction
+type CreateCiRelation struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) CreateCiRelation() (r CreateCiRelation, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_createCiRelation", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// CreateHistory
+// int_createHistory   creates an History-ID
+type CreateHistory struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) CreateHistory() (r CreateHistory, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_createHistory", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// DeleteCi
+// int_deleteCi    delete a CI with all dependencies
+type DeleteCi struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) DeleteCi() (r DeleteCi, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_deleteCi", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// DeleteCiAttribute
+// int_deleteCiAttribute   delete a ci_attribute-row by id
+type DeleteCiAttribute struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) DeleteCiAttribute() (r DeleteCiAttribute, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_deleteCiAttribute", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// DeleteCiRelation
+// int_deleteCiRelation    delete a specific ci-relation
+type DeleteCiRelation struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) DeleteCiRelation() (r DeleteCiRelation, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_deleteCiRelation", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// DeleteCiRelationsByCiRelationTypeDirectedFrom
+// int_deleteCiRelationsByCiRelationTypeDirectedFrom  deletes all ci-relations with a specific relation-type of a specific CI (direction: from CI)
+type DeleteCiRelationsByCiRelationTypeDirectedFrom struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) DeleteCiRelationsByCiRelationTypeDirectedFrom() (r DeleteCiRelationsByCiRelationTypeDirectedFrom, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_deleteCiRelationsByCiRelationTypeDirectedFrom", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// DeleteCiRelationsByCiRelationTypeDirectedTo
+// int_deleteCiRelationsByCiRelationTypeDirectedTo    deletes all ci-relations with a specific relation-type of a specific CI (direction: to CI)
+type DeleteCiRelationsByCiRelationTypeDirectedTo struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) DeleteCiRelationsByCiRelationTypeDirectedTo() (r DeleteCiRelationsByCiRelationTypeDirectedTo, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_deleteCiRelationsByCiRelationTypeDirectedTo", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// DeleteCiRelationsByCiRelationTypeDirectionList
+// int_deleteCiRelationsByCiRelationTypeDirectionList     deletes all ci-relations with a specific relation-type of a specific CI
+type DeleteCiRelationsByCiRelationTypeDirectionList struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) DeleteCiRelationsByCiRelationTypeDirectionList() (r DeleteCiRelationsByCiRelationTypeDirectionList, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_deleteCiRelationsByCiRelationTypeDirectionList", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetAttributeDefaultOption
+// int_getAttributeDefaultOption   returns the value of an option
+type GetAttributeDefaultOption struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetAttributeDefaultOption() (r GetAttributeDefaultOption, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getAttributeDefaultOption", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetAttributeDefaultOptionId
+// int_getAttributeDefaultOptionId     return the id of a specific attribute and value
+type GetAttributeDefaultOptionId struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetAttributeDefaultOptionId() (r GetAttributeDefaultOptionId, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getAttributeDefaultOptionId", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetAttributeGroupIdByAttributeGroupName
+// int_getAttributeGroupIdByAttributeGroupName     returns the id of an attribute group
+type GetAttributeGroupIdByAttributeGroupName struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetAttributeGroupIdByAttributeGroupName() (r GetAttributeGroupIdByAttributeGroupName, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getAttributeGroupIdByAttributeGroupName", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetAttributeIdByAttributeName
+// int_getAttributeIdByAttributeName   returns the id of an attribute
+type GetAttributeIdByAttributeName struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetAttributeIdByAttributeName() (r GetAttributeIdByAttributeName, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getAttributeIdByAttributeName", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetCiAttributeId
+// int_getCiAttributeId    returns the id of the first ci_attribute-row with the specific ci_id and attribute_id
+type GetCiAttributeId struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetCiAttributeId(ciID int, attrID int) (r GetCiAttributeId, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getCiAttributeId", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetCiAttributeValue
+// int_getCiAttributeValue     get the value of a ci_attribute entry by ci_id and attribute_id
+type GetCiAttributeValue struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetCiAttributeValue() (r GetCiAttributeValue, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getCiAttributeValue", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetCiIdByCiAttributeId
+// int_getCiIdByCiAttributeId  returns the ciid of a specific ci_attribute-row
+type GetCiIdByCiAttributeId struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetCiIdByCiAttributeId() (r GetCiIdByCiAttributeId, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getCiIdByCiAttributeId", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetCiIdByCiAttributeValue
+// int_getCiIdByCiAttributeValue   returns the ci_id by a specific attribute_id and value
+type GetCiIdByCiAttributeValue struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetCiIdByCiAttributeValue() (r GetCiIdByCiAttributeValue, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getCiIdByCiAttributeValue", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetCiProjectMappings
+// int_getCiProjectMappings    Get all Projects for a given CI
+type GetCiProjectMappings struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetCiProjectMappings() (r GetCiProjectMappings, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getCiProjectMappings", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetCiRelationCount
+// int_getCiRelationCount  returns the number of relations with the given parameters
+type GetCiRelationCount struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetCiRelationCount() (r GetCiRelationCount, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getCiRelationCount", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetCiRelationTypeIdByRelationTypeName
+// int_getCiRelationTypeIdByRelationTypeName   returns the id of a relation-type
+type GetCiRelationTypeIdByRelationTypeName struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetCiRelationTypeIdByRelationTypeName() (r GetCiRelationTypeIdByRelationTypeName, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getCiRelationTypeIdByRelationTypeName", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetCiTypeIdByCiTypeName
+// int_getCiTypeIdByCiTypeName     returns the id for the CI-Type
+type GetCiTypeIdByCiTypeName struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetCiTypeIdByCiTypeName() (r GetCiTypeIdByCiTypeName, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getCiTypeIdByCiTypeName", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetCiTypeOfCi
+// int_getCiTypeOfCi   returns the ci-type of a CI
+type GetCiTypeOfCi struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetCiTypeOfCi() (r GetCiTypeOfCi, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getCiTypeOfCi", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetListOfCiIdsByCiRelationDirectedFrom
+// int_getListOfCiIdsByCiRelationDirectedFrom     returns all related CI-IDs of a specific relation-type (direction: from CI)
+type GetListOfCiIdsByCiRelationDirectedFrom struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetListOfCiIdsByCiRelationDirectedFrom() (r GetListOfCiIdsByCiRelationDirectedFrom, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getListOfCiIdsByCiRelationDirectedFrom", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetListOfCiIdsByCiRelationDirectedTo
+// int_getListOfCiIdsByCiRelationDirectedTo   returns all related CI-IDs of a specific relation-type (direction: to CI)
+type GetListOfCiIdsByCiRelationDirectedTo struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetListOfCiIdsByCiRelationDirectedTo() (r GetListOfCiIdsByCiRelationDirectedTo, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getListOfCiIdsByCiRelationDirectedTo", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetListOfCiIdsByCiRelationDirectionList
+// int_getListOfCiIdsByCiRelationDirectionList    returns all related CI-IDs of a specific relation-type
+type GetListOfCiIdsByCiRelationDirectionList struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetListOfCiIdsByCiRelationDirectionList() (r GetListOfCiIdsByCiRelationDirectionList, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getListOfCiIdsByCiRelationDirectionList", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetNumberOfCiAttributes
+// int_getNumberOfCiAttributes     returns the number of values for a specific attribute of a CI
+type GetNumberOfCiAttributes struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetNumberOfCiAttributes() (r GetNumberOfCiAttributes, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getNumberOfCiAttributes", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetProjectIdByProjectName
+// int_getProjectIdByProjectName   returns the id of the project with the given name
+type GetProjectIdByProjectName struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetProjectIdByProjectName() (r GetProjectIdByProjectName, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getProjectIdByProjectName", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetProjects
+// int_getProjects     Retrieve all CMDB Projects
+type GetProjects struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetProjects() (r GetProjects, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getProjects", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetRoleIdByRoleName
+// int_getRoleIdByRoleName     returns the id of a role
+type GetRoleIdByRoleName struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetRoleIdByRoleName() (r GetRoleIdByRoleName, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getRoleIdByRoleName", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// GetUserIdByUsername
+// int_getUserIdByUsername     returns the ID of a infoCMDB-User
+type GetUserIdByUsername struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) GetUserIdByUsername() (r GetUserIdByUsername, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_getUserIdByUsername", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// RemoveCiProjectMapping
+// int_removeCiProjectMapping  removes a ci project mapping
+type RemoveCiProjectMapping struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) RemoveCiProjectMapping() (r RemoveCiProjectMapping, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_removeCiProjectMapping", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// SetAttributeRole
+// int_setAttributeRole    set permisson for an attribute
+type SetAttributeRole struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) SetAttributeRole() (r SetAttributeRole, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_setAttributeRole", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// SetCiTypeOfCi
+// int_setCiTypeOfCi   set the ci_type of a CI
+type SetCiTypeOfCi struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) SetCiTypeOfCi() (r SetCiTypeOfCi, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_setCiTypeOfCi", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}
+
+// UpdateCiAttribute
+// int_updateCiAttribute   updates a specific ci_attribute_row argv1 = ci_attribute-ID argv2 = column argv3 = value argv4 = history_id
+type UpdateCiAttribute struct {
+	Status string `json:"status"`
+}
+
+func (i *InfoCMDB) UpdateCiAttribute() (r UpdateCiAttribute, err error) {
+	return r, ErrNotImplemented // TODO FIXME
+	params := url.Values{
+		// "argv1": {strconv.Itoa(%PARAM1%)},
+		// "argv2": {strconv.Itoa(%PARAM2%)},
+		// "argv3": {strconv.Itoa(%PARAM3%)},
+		// "argv4": {strconv.Itoa(%PARAM4%)},
+	}
+
+	ret, err := i.Post("query", "int_updateCiAttribute", params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	err = json.Unmarshal([]byte(ret), &r)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	return
+}

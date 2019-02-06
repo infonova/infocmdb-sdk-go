@@ -13,6 +13,7 @@ var (
 	ErrArgumentsMissing       = errors.New("arguments missing")
 	ErrFailedToCreateInfoCMDB = errors.New("failed to create infocmdb object")
 	ErrNoCredentials          = errors.New("must provide credentials")
+	ErrNotImplemented         = errors.New("not implemented")
 )
 
 type Config struct {
@@ -37,14 +38,14 @@ func init() {
 func (i *InfoCMDB) LoadConfig(configFile string) (err error) {
 	_, err = os.Stat(configFile)
 	if err == nil {
-		log.Debugf("Configfile found with given string: %s", configFile)
+		log.Debugf("ConfigFile found with given string: %s", configFile)
 	} else {
-		InfoCmdbBasePath := filepath.Dir(os.Getenv("INFOCMDB_WORKFLOW_CONFIG_PATH") + "/")
-		log.Debugf("INFOCMDB_WORKFLOW_CONFIG_PATH: %s, InfoCmdbBasePath: %s", os.Getenv("INFOCMDB_WORKFLOW_CONFIG_PATH"), InfoCmdbBasePath)
-		configFile = filepath.Join(InfoCmdbBasePath, configFile)
+		WorkflowConfigPath := filepath.Dir(os.Getenv("WORKFLOW_CONFIG_PATH") + "/")
+		log.Debugf("WORKFLOW_CONFIG_PATH: %s", WorkflowConfigPath)
+		configFile = filepath.Join(WorkflowConfigPath, configFile)
 	}
 
-	log.Debugf("Configfile: %s", configFile)
+	log.Debugf("ConfigFile: %s", configFile)
 
 	_, err = os.Stat(configFile)
 	if err != nil {
