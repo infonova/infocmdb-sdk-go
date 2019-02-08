@@ -14,13 +14,13 @@ import (
 type testing struct{}
 
 var (
-	ErrTestingInfocmdbUrlMissing = "INFOCMDB_WORKFLOW_TEST_URL must be provided or mocking enabled(INFOCMDB_WORKFLOW_TEST_MOCKING=true)"
+	ErrTestingInfocmdbUrlMissing = "WORKFLOW_TEST_URL must be provided or mocking enabled(INFOCMDB_WORKFLOW_TEST_MOCKING=true)"
 )
 
 var mocking = false
 
 func init() {
-	if os.Getenv("INFOCMDB_WORKFLOW_TEST_MOCKING") == "true" {
+	if os.Getenv("WORKFLOW_TEST_MOCKING") == "true" {
 		mocking = true
 		log.Debug("Mocking enabled")
 	}
@@ -33,7 +33,7 @@ func (t *testing) MockServer() *httptest.Server {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		infocmdbUrl := os.Getenv("INFOCMDB_WORKFLOW_TEST_URL") + r.URL.String()
+		infocmdbUrl := os.Getenv("WORKFLOW_TEST_URL") + r.URL.String()
 		mockString := fmt.Sprintf("%s##%s##%s", r.Method, r.URL.String(), string(body))
 		switch mockString {
 		case "GET##/api/login/username/admin/password/admin/timeout/21600/method/json##":
@@ -102,7 +102,7 @@ func (t *testing) MockServer() *httptest.Server {
 }
 
 func (t *testing) getUrl() string {
-	testingURL := os.Getenv("INFOCMDB_WORKFLOW_TEST_URL")
+	testingURL := os.Getenv("WORKFLOW_TEST_URL")
 	if mocking {
 		ts := t.MockServer()
 		testingURL = ts.URL
@@ -252,15 +252,16 @@ func ExampleCmdbWebClient_Get() {
 		"argv1": {"1"},
 	}
 
-	ret, err := i.Get("query", "int_getListOfCiIdsOfCiType", params)
+	ret := GetListOfCiIdsOfCiType{}
+	err = i.CallWebservice(http.MethodGet, "query", "int_getListOfCiIdsOfCiType", params, &ret)
 	if err != nil {
 		log.Error(err)
 		return
 	}
-	fmt.Println("Get: ", ret)
+	fmt.Printf("Get: %v\n", ret)
 
 	// Output:
-	// Get:  {"status":"OK","data":[{"ciid":"1"},{"ciid":"2"}]}
+	// Get: {OK [{1} {2}]}
 }
 
 func ExampleCmdbWebClient_Post() {
@@ -282,7 +283,8 @@ func ExampleCmdbWebClient_Post() {
 		"argv1": {"1"},
 	}
 
-	ret, err := i.Post("query", "int_getListOfCiIdsOfCiType", params)
+	ret := ""
+	err = i.CallWebservice(http.MethodPost, "query", "int_getListOfCiIdsOfCiType", params, &ret)
 	if err != nil {
 		log.Error(err)
 		return
@@ -316,7 +318,8 @@ func ExampleInfoCmdbGoLib_GetCi() {
 	fmt.Println(rCi)
 
 	// Output:
-	// {OK [{1 1 demo springfield 4}]}
+	// {1 1 demo springfield 4}
+
 }
 
 func ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType() {
@@ -342,32 +345,33 @@ func ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType() {
 	fmt.Println(rCi)
 
 	// Output:
-	// {OK [{1} {2}]}
+	// [{1} {2}]
 }
 
-func ExampleInfoCmdbGoLib_GetCiAttributes() {
-	t := testing{}
-
-	i, err := NewCMDB("test.yml")
-	i.Config.ApiUrl = t.getUrl()
-	if err != nil {
-		log.Error(ErrFailedToCreateInfoCMDB)
-		return
-	}
-
-	rCi, err := i.GetCiAttributes(1)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-
-	expectedAttributes := 18
-	if len(rCi.Data) == expectedAttributes {
-		fmt.Printf("Got all Attributes expected[%d].\n", expectedAttributes)
-	} else {
-		fmt.Printf("Didn't get exptected Attrbiutes[%d], got[%d].\n", expectedAttributes, len(rCi.Data))
-	}
-
-	// Output:
-	//Got all Attributes expected[18].
-}
+//
+// func ExampleInfoCmdbGoLib_GetCiAttributes() {
+// 	t := testing{}
+//
+// 	i, err := NewCMDB("test.yml")
+// 	i.Config.ApiUrl = t.getUrl()
+// 	if err != nil {
+// 		log.Error(ErrFailedToCreateInfoCMDB)
+// 		return
+// 	}
+//
+// 	rCi, err := i.GetCiAttributes(1)
+// 	if err != nil {
+// 		log.Error(err)
+// 		return
+// 	}
+//
+// 	expectedAttributes := 18
+// 	if len(rCi.Data) == expectedAttributes {
+// 		fmt.Printf("Got all Attributes expected[%d].\n", expectedAttributes)
+// 	} else {
+// 		fmt.Printf("Didn't get exptected Attrbiutes[%d], got[%d].\n", expectedAttributes, len(rCi.Data))
+// 	}
+//
+// 	// Output:
+// 	//Got all Attributes expected[18].
+// }

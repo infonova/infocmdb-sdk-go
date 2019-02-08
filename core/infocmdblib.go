@@ -10,10 +10,13 @@ import (
 )
 
 var (
-	ErrArgumentsMissing       = errors.New("arguments missing")
-	ErrFailedToCreateInfoCMDB = errors.New("failed to create infocmdb object")
-	ErrNoCredentials          = errors.New("must provide credentials")
-	ErrNotImplemented         = errors.New("not implemented")
+	ErrArgumentsMissing        = errors.New("arguments missing")
+	ErrFailedToCreateInfoCMDB  = errors.New("failed to create infocmdb object")
+	ErrNoCredentials           = errors.New("must provide credentials")
+	ErrNotImplemented          = errors.New("not implemented")
+	ErrNoResult                = errors.New("query returned no result")
+	ErrTooManyResults          = errors.New("query returned to many results, expected one")
+	ErrWebserviceResponseNotOk = errors.New("webservice response was not ok")
 )
 
 type Config struct {
@@ -30,7 +33,7 @@ type InfoCMDB struct {
 
 func init() {
 	log.SetLevel(log.InfoLevel)
-	if os.Getenv("INFOCMDB_WORKFLOW_DEBUGGING") == "true" {
+	if os.Getenv("WORKFLOW_DEBUGGING") == "true" {
 		log.SetLevel(log.DebugLevel)
 	}
 }

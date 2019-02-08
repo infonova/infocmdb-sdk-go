@@ -9,6 +9,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"reflect"
+	"strings"
 )
 
 var (
@@ -62,25 +64,30 @@ func (i *InfoCMDB) LoginWithApiKey(url string, apikey string) error {
 	return nil
 }
 
-// Get the api with a given method and parameters as a GetRequest
-func (i *InfoCMDB) Get(service string, serviceName string, params url.Values) (string, error) {
-	ret, err := i.CallWebservice(http.MethodGet, service, serviceName, params)
-	return ret, err
+// validWebserviceMethod verifies that only supported (GET, POST) method calls get send to the CMDB
+func validWebserviceMethod(method string) (err error) {
+	switch method {
+	case http.MethodGet:
+		return
+	case http.MethodPost:
+		return
+	}
+
+	return http.ErrNotSupported
 }
 
-// Post the api with a given method and parameters as a GetRequest
-func (i *InfoCMDB) Post(service string, serviceName string, params url.Values) (string, error) {
-	ret, err := i.CallWebservice(http.MethodPost, service, serviceName, params)
-	return ret, err
-}
+func (i *InfoCMDB) CallWebservice(method string, service string, serviceName string, params url.Values, variable interface{}) (err error) {
+	if err = validWebserviceMethod(method); err != nil {
+		return err
+	}
 
-func (i *InfoCMDB) CallWebservice(method string, service string, serviceName string, params url.Values) (response string, err error) {
 	if i.Config.ApiKey == "" {
 		err = i.Login()
 		if err != nil {
-			return "", err
+			return err
 		}
 	}
+
 	params.Set("apikey", i.Config.ApiKey)
 	reqURL := ""
 	httpClient := &http.Client{}
@@ -91,42 +98,79 @@ func (i *InfoCMDB) CallWebservice(method string, service string, serviceName str
 		reqURL = i.Config.ApiUrl + "/api/adapter/" + service + "/" + serviceName + "/method/json"
 		req, err := http.NewRequest(method, reqURL, bytes.NewBufferString(params.Encode()))
 		if err != nil {
-			return "", err
+			return err
 		}
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 		resp, err = httpClient.Do(req)
 		if err != nil {
-			return "", err
+			return err
 		}
 	case http.MethodGet:
 		reqURL = i.Config.ApiUrl + "/api/adapter/apikey/" + i.Config.ApiKey + "/" + service + "/" + serviceName + "/method/json"
 		req, err := http.NewRequest(method, reqURL, nil)
 		if err != nil {
-			return "", err
+			return err
 		}
 		req.URL.RawQuery = params.Encode()
 		resp, err = httpClient.Do(req)
 		if err != nil {
-			return "", err
+			return err
 		}
 	default:
 		log.Errorf("method unsupported[%s]", method)
-		return "", http.ErrNotSupported
+		return http.ErrNotSupported
 	}
 
 	byteBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return string(byteBody), nil
+	err = checkResponseStatusMessage(byteBody)
+	if err != nil {
+		return err
+	}
+
+	rv := reflect.Indirect(reflect.ValueOf(variable))
+	if rv.Kind() == reflect.String {
+		rv.SetString(string(byteBody))
+		return nil
+	}
+
+	err = json.Unmarshal([]byte(byteBody), &variable)
+	if err != nil {
+		log.Error("Error: ", err)
+		log.Error(string(byteBody))
+		return err
+	}
+	return nil
+}
+
+type ResponseStatus struct {
+	Status string `json:"status"`
+}
+
+// checkResponseStatusMessage will verify that the cmdb returend "status": "OK"
+func checkResponseStatusMessage(byteBody []byte) (err error) {
+	responseStatus := ResponseStatus{}
+	err = json.Unmarshal([]byte(byteBody), &responseStatus)
+	if err != nil {
+		log.Error("error checking StatusMessage: ", err)
+		log.Error(string(byteBody))
+		return err
+	}
+
+	if strings.Compare(responseStatus.Status, "OK") != 0 {
+		err = ErrWebserviceResponseNotOk
+	}
+	return
 }
 
 // Webservice queries a given webservice with all params supplied
 // Returns err != nil if query fails
-func (i *InfoCMDB) Webservice(ws string, params url.Values) (string, error) {
+func (i *InfoCMDB) Webservice(ws string, params url.Values) (r string, err error) {
 	log.Debugf("Webservice: %s, Params: %v", ws, params)
-	r, err := i.Post("query", ws, params)
+	err = i.CallWebservice(http.MethodPost, "query", ws, params, &r)
 	if err != nil {
 		return "", err
 	}

@@ -1,0 +1,34 @@
+package {{ .Packagename }}
+
+import (
+	"encoding/json"
+	log "github.com/sirupsen/logrus"
+	"net/url"
+	"strconv"
+)
+
+{{ with .Webservices }}
+    {{ range .}}
+        {{.Name}}
+        type GetListOfCiIdsOfCiType struct {
+            Status string `json:"status"`
+            Data   []struct {
+                CiID json.Number `json:"ciid"`
+            } `json:"data"`
+        }
+
+        func (i *InfoCMDB) GetListOfCiIdsOfCiType(ciTypeID int) (r GetListOfCiIdsOfCiType, err error) {
+            params := url.Values{
+                "argv1": {strconv.Itoa(ciTypeID)},
+            }
+
+            err = i.Post("query", "int_getListOfCiIdsOfCiType", params, &r)
+            if err != nil {
+                log.Error("Error: ", err)
+                return r, err
+            }
+
+            return
+        }
+    {{ end }}
+{{ end }}
