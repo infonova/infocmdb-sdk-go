@@ -1,7 +1,6 @@
 package core
 
 import (
-	"encoding/json"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"net/url"
@@ -9,7 +8,7 @@ import (
 )
 
 type ListOfCiIdsOfCiType []struct {
-	CiID json.Number `json:"ciid"`
+	CiID int `json:"ciid,string"`
 }
 
 type GetListOfCiIdsOfCiType struct {
@@ -63,8 +62,8 @@ func (i *InfoCMDB) AddCiProjectMapping(ciID int, projectID int, historyID int) (
 //// CreateAttribute
 //// int_createAttribute     create an attribute
 type CreateAttribute struct {
-	Status string      `json:"status"`
-	CiID   json.Number `json:"id"`
+	Status string `json:"status"`
+	CiID   int    `json:"id"`
 }
 
 func (i *InfoCMDB) CreateAttribute(ciID int, attrID int) (r CreateAttribute, err error) {
@@ -85,12 +84,12 @@ func (i *InfoCMDB) CreateAttribute(ciID int, attrID int) (r CreateAttribute, err
 // CreateCi
 // int_createCi    create a CI
 type CreateCi struct {
-	Status    string      `json:"status"`
-	CiTypeID  json.Number `json:"ci_type_id"`
-	Icon      string      `json:"icon"`
-	ValidFrom string      `json:"valid_from"`
-	CreatedAt string      `json:"created_at"`
-	UpdatedAt string      `json:"updated_at"`
+	Status    string `json:"status"`
+	CiTypeID  int    `json:"ci_type_id"`
+	Icon      string `json:"icon"`
+	ValidFrom string `json:"valid_from"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 }
 
 func (i *InfoCMDB) CreateCi(ciTypeID int, icon string, historyID int) (r CreateCi, err error) {
@@ -111,11 +110,11 @@ func (i *InfoCMDB) CreateCi(ciTypeID int, icon string, historyID int) (r CreateC
 // GetCi
 // int_getCi   Retrieve all informations about a ci
 type Ci struct {
-	CiID      json.Number `json:"ci_id"`
-	CiTypeID  json.Number `json:"ci_type_id"`
-	CiType    string      `json:"ci_type"`
-	Project   string      `json:"project"`
-	ProjectID json.Number `json:"project_id"`
+	CiID      int    `json:"ci_id,string"`
+	CiTypeID  int    `json:"ci_type_id,string"`
+	CiType    string `json:"ci_type"`
+	Project   string `json:"project"`
+	ProjectID int    `json:"project_id,string"`
 }
 type GetCi struct {
 	Status string `json:"status"`
@@ -151,23 +150,23 @@ func (i *InfoCMDB) GetCi(ciID int) (r Ci, err error) {
 // GetCiAttributes
 // int_getCiAttributes     get all attributes for given ci (:argv1:)
 
-type GetCiAttribute struct {
-	CiID                 json.Number `json:"ci_id"`
-	CiAttributeID        json.Number `json:"ci_attribute_id"`
-	AttributeID          json.Number `json:"attribute_id"`
-	AttributeName        string      `json:"attribute_name"`
-	AttributeDescription string      `json:"attribute_description"`
-	AttributeType        string      `json:"attribute_type"`
-	Value                string      `json:"value"`
-	ModifiedAt           string      `json:"modified_at"`
+type CiAttribute struct {
+	CiID                 int    `json:"ci_id,string,string"`
+	CiAttributeID        int    `json:"ci_attribute_id,string"`
+	AttributeID          int    `json:"attribute_id,string"`
+	AttributeName        string `json:"attribute_name"`
+	AttributeDescription string `json:"attribute_description"`
+	AttributeType        string `json:"attribute_type"`
+	Value                string `json:"value"`
+	ModifiedAt           string `json:"modified_at"`
 }
 
 type GetCiAttributes struct {
-	Status string           `json:"status"`
-	Data   []GetCiAttribute `json:"data"`
+	Status string        `json:"status"`
+	Data   []CiAttribute `json:"data"`
 }
 
-func (i *InfoCMDB) GetCiAttributes(ciID int) (r []GetCiAttribute, err error) {
+func (i *InfoCMDB) GetCiAttributes(ciID int) (r []CiAttribute, err error) {
 	params := url.Values{
 		"argv1": {strconv.Itoa(ciID)},
 	}
@@ -187,9 +186,9 @@ func (i *InfoCMDB) GetCiAttributes(ciID int) (r []GetCiAttribute, err error) {
 // int_createCiAttribute   creates a ci_attribute-row
 type CreateCiAttribute struct {
 	Status      string      `json:"status"`
-	CiID        json.Number `json:"ci_id"`
-	AttributeID json.Number `json:"attribute_id"`
-	HistoryID   json.Number `json:"history_id"`
+	CiID        int `json:"ci_id"`
+	AttributeID int `json:"attribute_id"`
+	HistoryID   int `json:"history_id"`
 }
 
 func (i *InfoCMDB) CreateCiAttribute() (r CreateCiAttribute, err error) {
