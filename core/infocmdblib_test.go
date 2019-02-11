@@ -56,6 +56,10 @@ func (t *testing) MockServer() *httptest.Server {
 			w.WriteHeader(200)
 			w.Write([]byte(`{"status":"OK","data":[{"ciid":"1"},{"ciid":"2"}]}`))
 			return
+		case "POST##/api/adapter/query/int_getCi/method/json##apikey=4afbf95c1d072664e35cd61339e152&argv1=-1":
+			w.WriteHeader(200)
+			w.Write([]byte(`{"status":"OK","data":[]}`))
+			return
 		// case "":
 		// 	w.WriteHeader(200)
 		// 	w.Write([]byte(``))
@@ -171,6 +175,20 @@ func ExampleInfoCmdbGoLib_LoadConfig() {
 	// Output:
 	// Config: {http://nginx/ admin admin  /app/}
 	// CmdbBasePath: /app/
+}
+
+func ExampleInfoCmdbGoLib_LoadConfig_Fail() {
+	i := InfoCMDB{}
+	err := i.LoadConfig("/test_missing.yml")
+	if err != nil {
+		fmt.Println("loading failed")
+		return
+	}
+	fmt.Printf("Config: %v\n", i.Config)
+	fmt.Printf("CmdbBasePath: %s\n", i.Config.CmdbBasePath)
+	// Output:
+	// loading failed
+
 }
 
 func ExampleCmdbWebClient_Login() {
@@ -321,6 +339,32 @@ func ExampleInfoCmdbGoLib_GetCi() {
 	// {1 1 demo springfield 4}
 
 }
+func ExampleInfoCmdbGoLib_GetCi_fail() {
+	t := testing{}
+
+	i, err := NewCMDB("test.yml")
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+	i.Config.ApiUrl = t.getUrl()
+	if err != nil {
+		log.Error(ErrFailedToCreateInfoCMDB)
+		return
+	}
+
+	rCi, err := i.GetCi(-1)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	fmt.Println(rCi)
+
+	// Output:
+	//
+
+}
 
 func ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType() {
 	t := testing{}
@@ -346,6 +390,34 @@ func ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType() {
 
 	// Output:
 	// [{1} {2}]
+}
+
+func ExampleInfoCmdbGoLib_GetCiAttributes() {
+	t := testing{}
+
+	i, err := NewCMDB("test.yml")
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+	i.Config.ApiUrl = t.getUrl()
+	if err != nil {
+		log.Error(ErrFailedToCreateInfoCMDB)
+		return
+	}
+
+	rCi, err := i.GetCiAttributes(1)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	fmt.Printf("Items: %d\n", len(rCi))
+	fmt.Printf("First Attribute: %s\n", rCi[1].Value)
+
+	// Output:
+	// Items: 18
+	// First Attribute: Regular Single Line Text Input
 }
 
 //
