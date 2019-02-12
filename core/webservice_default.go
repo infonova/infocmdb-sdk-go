@@ -180,40 +180,42 @@ func (i *InfoCMDB) GetCiAttributes(ciID int) (r []CiAttribute, err error) {
 	return
 }
 
-/*
-
 // CreateCiAttribute
 // int_createCiAttribute   creates a ci_attribute-row
 type CreateCiAttribute struct {
-	Status      string      `json:"status"`
-	CiID        int `json:"ci_id"`
-	AttributeID int `json:"attribute_id"`
-	HistoryID   int `json:"history_id"`
+	Status      string `json:"status"`
+	CiID        int    `json:"ci_id"`
+	AttributeID int    `json:"attribute_id"`
+	HistoryID   int    `json:"history_id"`
 }
 
 func (i *InfoCMDB) CreateCiAttribute() (r CreateCiAttribute, err error) {
 	return r, ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
+	/*
+		params := url.Values{
+			// "argv1": {strconv.Itoa(%PARAM1%)},
+			// "argv2": {strconv.Itoa(%PARAM2%)},
+			// "argv3": {strconv.Itoa(%PARAM3%)},
+			// "argv4": {strconv.Itoa(%PARAM4%)},
+		}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_createCiAttribute", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
+		ret, err := i.CallWebservice(http.MethodPost,"query", "int_createCiAttribute", params)
+		if err != nil {
+			log.Error("Error: ", err)
+			return r, err
+		}
 
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
+		err = json.Unmarshal([]byte(ret), &r)
+		if err != nil {
+			log.Error("Error: ", err)
+			return r, err
+		}
 
-	return
+		return
+	*/
 }
+
+/*
 
 // CreateCiRelation
 // int_createCiRelation    inserts a relation: argv1 = ci_id_1 argv2 = ci_id_2 argv3 = ci_relation_type_id argv4 = direction
