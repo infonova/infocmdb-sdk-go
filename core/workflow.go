@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"regexp"
 )
 
 type WorkflowParams struct {
@@ -16,7 +17,12 @@ type WorkflowParams struct {
 	FileImportHistoryId int    `json:"fileImportHistoryId,string"`
 }
 
+var reJsonParam = regexp.MustCompile(`^\s*'(.*?)\s*'$`)
+
 func ParseWorkflowParams(jsonParam string) (params WorkflowParams, err error) {
+	if reJsonParam.MatchString(jsonParam) {
+		jsonParam = reJsonParam.FindStringSubmatch(jsonParam)[1]
+	}
 	jsonErr := json.Unmarshal([]byte(jsonParam), &params)
 	if jsonErr != nil {
 		return params, jsonErr
