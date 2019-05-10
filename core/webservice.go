@@ -30,7 +30,8 @@ func (i *InfoCMDB) LoginWithUserPass(url string, username string, password strin
 
 	resp, err := http.Get(reqURL)
 	if err != nil {
-		return err
+		errMsg := strings.Replace(err.Error(), password, "*******", -1)
+		return errors.New(errMsg)
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
