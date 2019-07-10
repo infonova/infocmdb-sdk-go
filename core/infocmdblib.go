@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 )
 
 var (
@@ -17,6 +18,19 @@ var (
 	ErrNoResult                = errors.New("query returned no result")
 	ErrTooManyResults          = errors.New("query returned to many results, expected one")
 	ErrWebserviceResponseNotOk = errors.New("webservice response was not ok")
+)
+
+const (
+	ATTRIBUTE_VALUE_TYPE_TEXT    = "value_text"
+	ATTRIBUTE_VALUE_TYPE_DATE    = "value_date"
+	ATTRIBUTE_VALUE_TYPE_DEFAULT = "value_default"
+	ATTRIBUTE_VALUE_TYPE_CI      = "value_ci"
+
+	CI_RELATION_DIRECTION_ALL             = "all"
+	CI_RELATION_DIRECTION_DIRECTED_FROM   = "directed_from"
+	CI_RELATION_DIRECTION_DIRECTED_TO     = "directed_to"
+	CI_RELATION_DIRECTION_BIDIRECTIONAL   = "bidirectional"
+	CI_RELATION_DIRECTION_OMNIDIRECTIONAL = "omnidirectional"
 )
 
 type Config struct {
@@ -82,4 +96,15 @@ func (i *InfoCMDB) Login() error {
 		return ErrNoCredentials
 	}
 	return i.LoginWithUserPass(i.Config.ApiUrl, i.Config.ApiUser, i.Config.ApiPassword)
+}
+
+func (i *InfoCMDB) FunctionError(msg string) error {
+	pc := make([]uintptr, 15)
+	n := runtime.Callers(2, pc)
+	frames := runtime.CallersFrames(pc[:n])
+	frame, _ := frames.Next()
+
+	fullMsg := frame.Function + ": " + msg
+
+	return errors.New(fullMsg)
 }

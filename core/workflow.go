@@ -5,6 +5,26 @@ import (
 	"regexp"
 )
 
+const WORKFLOW_TRIGGER_TYPE_CI_CREATE = "ci_create"
+const WORKFLOW_TRIGGER_TYPE_CI_UPDATE = "ci_update"
+const WORKFLOW_TRIGGER_TYPE_CI_DELETE = "ci_delete"
+
+const WORKFLOW_TRIGGER_TYPE_CI_TYPE_CHANGE_UPDATE = "ci_type_change_update"
+
+const WORKFLOW_TRIGGER_TYPE_CI_ATTRIBUTE_CREATE = "ci_attribute_create"
+const WORKFLOW_TRIGGER_TYPE_CI_ATTRIBUTE_UPDATE = "ci_attribute_update"
+const WORKFLOW_TRIGGER_TYPE_CI_ATTRIBUTE_DELETE = "ci_attribute_delete"
+
+const WORKFLOW_TRIGGER_TYPE_CI_RELATION_CREATE = "ci_relation_create"
+const WORKFLOW_TRIGGER_TYPE_CI_RELATION_DELETE = "ci_relation_delete"
+
+const WORKFLOW_TRIGGER_TYPE_CI_PROJECT_CREATE = "ci_project_create"
+const WORKFLOW_TRIGGER_TYPE_CI_PROJECT_DELETE = "ci_project_delete"
+
+const WORKFLOW_TRIGGER_TYPE_FILEIMPORT_BEFORE = "fileimport_before"
+const WORKFLOW_TRIGGER_TYPE_FILEIMPORT_AFTER = "fileimport_after"
+const WORKFLOW_TRIGGER_TYPE_FILEIMPORT_BEFORE_AND_AFTER = "fileimport_before_and_after"
+
 type WorkflowParams struct {
 	Apikey              string `json:"apikey"`
 	TriggerType         string `json:"triggerType"`
