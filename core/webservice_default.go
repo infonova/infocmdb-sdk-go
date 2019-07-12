@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 type ListOfCiIdsOfCiType []struct {
@@ -118,11 +119,13 @@ func (i *InfoCMDB) CreateCi(ciTypeID int, icon string, historyID int) (r CreateC
 // GetCi
 // int_getCi   Retrieve all informations about a ci
 type Ci struct {
-	CiID      int    `json:"ci_id,string"`
-	CiTypeID  int    `json:"ci_type_id,string"`
-	CiType    string `json:"ci_type"`
-	Project   string `json:"project"`
-	ProjectID int    `json:"project_id,string"`
+	CiID               int    `json:"ci_id,string"`
+	CiTypeID           int    `json:"ci_type_id,string"`
+	CiType             string `json:"ci_type"`
+	ProjectsAsString   string `json:"project"`
+	ProjectIDsAsString string `json:"project_id"`
+	Projects           []string
+	ProjectIDs         []int
 }
 type GetCi struct {
 	Status string `json:"status"`
@@ -151,6 +154,13 @@ func (i *InfoCMDB) GetCi(ciID int) (r Ci, err error) {
 		r = jsonRet.Data[0].Ci
 	default:
 		err = i.FunctionError(strconv.Itoa(ciID) + " - " + ErrTooManyResults.Error())
+	}
+
+	r.Projects = strings.Split(r.ProjectsAsString, ",") // not safe :-/
+	projectIds := strings.Split(r.ProjectIDsAsString, ",")
+	for _, projectIdString := range projectIds {
+		projectId, _ := strconv.Atoi(projectIdString)
+		r.ProjectIDs = append(r.ProjectIDs, projectId)
 	}
 
 	return
@@ -234,7 +244,7 @@ type CreateCiRelation struct {
 func (i *InfoCMDB) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName string, direction string) (err error) {
 
 	var directionId int
-	switch (direction) {
+	switch direction {
 	case CI_RELATION_DIRECTION_DIRECTED_FROM:
 		directionId = 1
 	case CI_RELATION_DIRECTION_DIRECTED_TO:
@@ -605,7 +615,7 @@ func (i *InfoCMDB) GetAttributeIdByAttributeName(name string) (r int, err error)
 		"argv1": {name},
 	}
 
-	response := GetAttributeIdByAttributeName{};
+	response := GetAttributeIdByAttributeName{}
 	err = i.CallWebservice(http.MethodPost, "query", "int_getAttributeIdByAttributeName", params, &response)
 	if err != nil {
 		err = i.FunctionError(err.Error())
@@ -1070,7 +1080,7 @@ func (i *InfoCMDB) GetListOfCiIdsByCiRelation(ciId int, ciRelationTypeName strin
 		"argv2": {strconv.Itoa(ciRelationTypeId)},
 	}
 
-	switch (direction) {
+	switch direction {
 	case CI_RELATION_DIRECTION_ALL:
 		webservice = "int_getListOfCiIdsByCiRelation_directionList"
 		params.Add("argv3", "0,1,2,3,4")
