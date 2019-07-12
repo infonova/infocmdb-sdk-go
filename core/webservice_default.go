@@ -3,6 +3,7 @@ package core
 import (
 	"errors"
 	"fmt"
+	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"net/url"
@@ -528,6 +529,11 @@ type GetAttributeDefaultOption struct {
 }
 
 func (i *InfoCMDB) GetAttributeDefaultOption(optionId int) (r string, err error) {
+	cacheKey := "GetAttributeDefaultOption_" + strconv.Itoa(optionId)
+	cached, found := i.Cache.Get(cacheKey)
+	if found {
+		return cached.(string), nil
+	}
 
 	params := url.Values{
 		"argv1": {strconv.Itoa(optionId)},
@@ -546,6 +552,7 @@ func (i *InfoCMDB) GetAttributeDefaultOption(optionId int) (r string, err error)
 		err = i.FunctionError(strconv.Itoa(optionId) + " - " + ErrNoResult.Error())
 	case 1:
 		r = jsonRet.Data[0].Value
+		i.Cache.Set(cacheKey, r, cache.DefaultExpiration)
 	default:
 		err = i.FunctionError(strconv.Itoa(optionId) + " - " + ErrTooManyResults.Error())
 	}
@@ -623,6 +630,12 @@ type GetAttributeIdByAttributeName struct {
 }
 
 func (i *InfoCMDB) GetAttributeIdByAttributeName(name string) (r int, err error) {
+	cacheKey := "GetAttributeIdByAttributeName_" + name
+	cached, found := i.Cache.Get(cacheKey)
+	if found {
+		return cached.(int), nil
+	}
+
 	params := url.Values{
 		"argv1": {name},
 	}
@@ -640,6 +653,7 @@ func (i *InfoCMDB) GetAttributeIdByAttributeName(name string) (r int, err error)
 		err = i.FunctionError(name + " - " + ErrNoResult.Error())
 	case 1:
 		r = response.Data[0].Id
+		i.Cache.Set(cacheKey, r, cache.DefaultExpiration)
 	default:
 		err = i.FunctionError(name + " - " + ErrTooManyResults.Error())
 	}
@@ -924,6 +938,12 @@ type GetCiRelationTypeIdByRelationTypeName struct {
 }
 
 func (i *InfoCMDB) GetCiRelationTypeIdByRelationTypeName(name string) (r int, err error) {
+	cacheKey := "GetCiRelationTypeIdByRelationTypeName_" + name
+	cached, found := i.Cache.Get(cacheKey)
+	if found {
+		return cached.(int), nil
+	}
+
 	params := url.Values{
 		"argv1": {name},
 	}
@@ -941,6 +961,7 @@ func (i *InfoCMDB) GetCiRelationTypeIdByRelationTypeName(name string) (r int, er
 		err = i.FunctionError(name + " - " + ErrNoResult.Error())
 	case 1:
 		r = jsonRet.Data[0].Id
+		i.Cache.Set(cacheKey, r, cache.DefaultExpiration)
 	default:
 		err = i.FunctionError(name + " - " + ErrTooManyResults.Error())
 	}
@@ -956,6 +977,12 @@ type GetCiTypeIdByCiTypeName struct {
 }
 
 func (i *InfoCMDB) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
+	cacheKey := "GetCiRelationTypeIdByRelationTypeName_" + name
+	cached, found := i.Cache.Get(cacheKey)
+	if found {
+		return cached.(int), nil
+	}
+
 	params := url.Values{
 		"argv1": {name},
 	}
@@ -973,6 +1000,7 @@ func (i *InfoCMDB) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
 		err = i.FunctionError(name + " - " + ErrNoResult.Error())
 	case 1:
 		r = response.Data[0].Id
+		i.Cache.Set(cacheKey, r, cache.DefaultExpiration)
 	default:
 		err = i.FunctionError(name + " - " + ErrTooManyResults.Error())
 	}

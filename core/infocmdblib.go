@@ -2,12 +2,14 @@ package core
 
 import (
 	"errors"
+	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
+	"time"
 )
 
 var (
@@ -43,6 +45,7 @@ type Config struct {
 
 type InfoCMDB struct {
 	Config Config
+	Cache  *cache.Cache
 }
 
 func init() {
@@ -83,6 +86,8 @@ func NewCMDB(config string) (i *InfoCMDB, err error) {
 		log.Error(err)
 		return nil, err
 	}
+
+	i.Cache = cache.New(5*time.Minute, 10*time.Minute)
 
 	return i, nil
 }
