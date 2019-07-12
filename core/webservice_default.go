@@ -38,6 +38,18 @@ func (i *InfoCMDB) GetListOfCiIdsOfCiType(ciTypeID int) (r ListOfCiIdsOfCiType, 
 	return
 }
 
+func (i *InfoCMDB) GetListOfCiIdsOfCiTypeName(ciTypeName string) (r ListOfCiIdsOfCiType, err error) {
+
+	ciTypeId, err := i.GetCiTypeIdByCiTypeName(ciTypeName)
+	if err != nil {
+		err = errors.New(fmt.Sprintf("Failed to resolve id for ciTypeName '%s': %s", ciTypeName, err.Error()))
+		return
+	}
+
+	r, err = i.GetListOfCiIdsOfCiType(ciTypeId)
+	return
+}
+
 //// Templates for others
 type AddCiProjectMapping struct {
 	Status string `json:"status"`
@@ -936,37 +948,39 @@ func (i *InfoCMDB) GetCiRelationTypeIdByRelationTypeName(name string) (r int, er
 	return
 }
 
-/*
 // GetCiTypeIdByCiTypeName
 // int_getCiTypeIdByCiTypeName     returns the id for the CI-Type
 type GetCiTypeIdByCiTypeName struct {
-	Status string `json:"status"`
+	Status string       `json:"status"`
+	Data   []ResponseId `json:"data"`
 }
 
-func (i *InfoCMDB) GetCiTypeIdByCiTypeName() (r GetCiTypeIdByCiTypeName, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+func (i *InfoCMDB) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
 	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
+		"argv1": {name},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getCiTypeIdByCiTypeName", params)
+	response := GetCiTypeIdByCiTypeName{}
+	err = i.CallWebservice(http.MethodPost, "query", "int_getCiTypeIdByCiTypeName", params, &response)
 	if err != nil {
+		err = i.FunctionError(err.Error())
 		log.Error("Error: ", err)
-		return r, err
+		return
 	}
 
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
+	switch len(response.Data) {
+	case 0:
+		err = i.FunctionError(name + " - " + ErrNoResult.Error())
+	case 1:
+		r = response.Data[0].Id
+	default:
+		err = i.FunctionError(name + " - " + ErrTooManyResults.Error())
 	}
 
 	return
 }
 
+/*
 // GetCiTypeOfCi
 // int_getCiTypeOfCi   returns the ci-type of a CI
 type GetCiTypeOfCi struct {
@@ -983,66 +997,6 @@ func (i *InfoCMDB) GetCiTypeOfCi() (r GetCiTypeOfCi, err error) {
 	}
 
 	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getCiTypeOfCi", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// GetListOfCiIdsByCiRelationDirectedFrom
-// int_getListOfCiIdsByCiRelationDirectedFrom     returns all related CI-IDs of a specific relation-type (direction: from CI)
-type GetListOfCiIdsByCiRelationDirectedFrom struct {
-	Status string `json:"status"`
-}
-
-func (i *InfoCMDB) GetListOfCiIdsByCiRelationDirectedFrom() (r GetListOfCiIdsByCiRelationDirectedFrom, err error) {
-	return r, ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getListOfCiIdsByCiRelationDirectedFrom", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// GetListOfCiIdsByCiRelationDirectedTo
-// int_getListOfCiIdsByCiRelationDirectedTo   returns all related CI-IDs of a specific relation-type (direction: to CI)
-type GetListOfCiIdsByCiRelationDirectedTo struct {
-	Status string `json:"status"`
-}
-
-func (i *InfoCMDB) GetListOfCiIdsByCiRelationDirectedTo() (r GetListOfCiIdsByCiRelationDirectedTo, err error) {
-	return r, ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getListOfCiIdsByCiRelationDirectedTo", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
