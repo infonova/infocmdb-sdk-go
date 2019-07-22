@@ -19,3 +19,4 @@ infocmdblibrary.iml
 .glide/
 
 .env
+.DS_Store

@@ -1,4 +1,4 @@
-package core
+package cmdb
 
 import (
 	"errors"
@@ -55,7 +55,9 @@ func init() {
 	}
 }
 
-func (i *InfoCMDB) LoadConfig(configFile string) (err error) {
+
+
+func (i *InfoCMDB  ) LoadConfig(configFile string) (err error) {
 	_, err = os.Stat(configFile)
 	if err == nil {
 		log.Debugf("ConfigFile found with given string: %s", configFile)

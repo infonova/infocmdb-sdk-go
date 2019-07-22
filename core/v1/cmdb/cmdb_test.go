@@ -1,8 +1,9 @@
-package core
+package cmdb
 
 import (
 	"bytes"
 	"fmt"
+	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
@@ -17,9 +18,16 @@ var (
 	ErrTestingInfocmdbUrlMissing = "WORKFLOW_TEST_URL must be provided or mocking enabled(INFOCMDB_WORKFLOW_TEST_MOCKING=true)"
 )
 
-var mocking = false
+var (
+	mocking            = false
+	infoCMDBConfigFile = "test/test.yml"
+)
 
 func init() {
+	if err := godotenv.Load("../../.env"); err != nil {
+		log.Fatalf("failed to load env: %v", err)
+	}
+
 	if os.Getenv("WORKFLOW_TEST_MOCKING") == "true" {
 		mocking = true
 		log.Debug("Mocking enabled")
@@ -84,7 +92,7 @@ func (t *testing) MockServer() *httptest.Server {
 		}
 
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-		//req.PostForm = values
+		// req.PostForm = values
 
 		httpClient := &http.Client{}
 		resp, err := httpClient.Do(req)
@@ -123,7 +131,7 @@ func (t *testing) getUrl() string {
 func ExampleWebservice_Webservice() {
 	t := testing{}
 
-	i, err := NewCMDB("test.yml")
+	i, err := NewCMDB(infoCMDBConfigFile)
 	i.Config.ApiUrl = t.getUrl()
 	if err != nil {
 		log.Error(ErrFailedToCreateInfoCMDB)
@@ -151,30 +159,30 @@ func ExampleWebservice_Webservice() {
 
 func ExampleInfoCmdbGoLib_LoadConfigAbsolutePath() {
 	i := InfoCMDB{}
-	err := i.LoadConfig("./test/test.yml")
+	err := i.LoadConfig(infoCMDBConfigFile)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		return
 	}
 	fmt.Printf("Config: %v\n", i.Config)
-	fmt.Printf("CmdbBasePath: %s\n", i.Config.CmdbBasePath)
+	fmt.Printf("BasePath: %s\n", i.Config.CmdbBasePath)
 	// Output:
 	// Config: {http://nginx/ admin admin  /app/}
-	// CmdbBasePath: /app/
+	// BasePath: /app/
 }
 
 func ExampleInfoCmdbGoLib_LoadConfig() {
 	i := InfoCMDB{}
-	err := i.LoadConfig("test.yml")
+	err := i.LoadConfig(infoCMDBConfigFile)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		return
 	}
 	fmt.Printf("Config: %v\n", i.Config)
-	fmt.Printf("CmdbBasePath: %s\n", i.Config.CmdbBasePath)
+	fmt.Printf("BasePath: %s\n", i.Config.CmdbBasePath)
 	// Output:
 	// Config: {http://nginx/ admin admin  /app/}
-	// CmdbBasePath: /app/
+	// BasePath: /app/
 }
 
 func ExampleInfoCmdbGoLib_LoadConfig_Fail() {
@@ -185,7 +193,7 @@ func ExampleInfoCmdbGoLib_LoadConfig_Fail() {
 		return
 	}
 	fmt.Printf("Config: %v\n", i.Config)
-	fmt.Printf("CmdbBasePath: %s\n", i.Config.CmdbBasePath)
+	fmt.Printf("BasePath: %s\n", i.Config.CmdbBasePath)
 	// Output:
 	// loading failed
 
@@ -194,7 +202,7 @@ func ExampleInfoCmdbGoLib_LoadConfig_Fail() {
 func ExampleCmdbWebClient_Login() {
 	t := testing{}
 
-	i, err := NewCMDB("test.yml")
+	i, err := NewCMDB(infoCMDBConfigFile)
 	i.Config.ApiUrl = t.getUrl()
 	if i == nil {
 		log.Error(ErrFailedToCreateInfoCMDB)
@@ -217,7 +225,7 @@ func ExampleCmdbWebClient_Login() {
 func ExampleCmdbWebClient_LoginWithApiKey() {
 	t := testing{}
 
-	ilogin, err := NewCMDB("test.yml")
+	ilogin, err := NewCMDB(infoCMDBConfigFile)
 	if err != nil {
 		log.Error(err)
 		return
@@ -231,7 +239,7 @@ func ExampleCmdbWebClient_LoginWithApiKey() {
 	}
 
 	log.Debugf("Got API Key: %s", ilogin.Config.ApiKey)
-	i, err := NewCMDB("test.yml")
+	i, err := NewCMDB(infoCMDBConfigFile)
 	if err != nil {
 		log.Error(err)
 		return
@@ -254,7 +262,7 @@ func ExampleCmdbWebClient_LoginWithApiKey() {
 func ExampleCmdbWebClient_Get() {
 	t := testing{}
 
-	i, err := NewCMDB("test.yml")
+	i, err := NewCMDB(infoCMDBConfigFile)
 	if err != nil {
 		log.Error(err)
 		return
@@ -285,7 +293,7 @@ func ExampleCmdbWebClient_Get() {
 func ExampleCmdbWebClient_Post() {
 	t := testing{}
 
-	i, err := NewCMDB("test.yml")
+	i, err := NewCMDB(infoCMDBConfigFile)
 	if err != nil {
 		log.Error(err)
 		return
@@ -316,7 +324,7 @@ func ExampleCmdbWebClient_Post() {
 func ExampleInfoCmdbGoLib_GetCi() {
 	t := testing{}
 
-	i, err := NewCMDB("test.yml")
+	i, err := NewCMDB(infoCMDBConfigFile)
 	if err != nil {
 		log.Error(err)
 		return
@@ -336,13 +344,13 @@ func ExampleInfoCmdbGoLib_GetCi() {
 	fmt.Println(rCi)
 
 	// Output:
-	// {1 1 demo springfield 4}
+	// {1 1 demo springfield 4 [springfield] [4]}
 
 }
 func ExampleInfoCmdbGoLib_GetCi_fail() {
 	t := testing{}
 
-	i, err := NewCMDB("test.yml")
+	i, err := NewCMDB(infoCMDBConfigFile)
 	if err != nil {
 		log.Error(err)
 		return
@@ -369,7 +377,7 @@ func ExampleInfoCmdbGoLib_GetCi_fail() {
 func ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType() {
 	t := testing{}
 
-	i, err := NewCMDB("test.yml")
+	i, err := NewCMDB(infoCMDBConfigFile)
 	if err != nil {
 		log.Error(err)
 		return
@@ -395,7 +403,7 @@ func ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType() {
 func ExampleInfoCmdbGoLib_GetCiAttributes() {
 	t := testing{}
 
-	i, err := NewCMDB("test.yml")
+	i, err := NewCMDB(infoCMDBConfigFile)
 	if err != nil {
 		log.Error(err)
 		return
@@ -424,8 +432,8 @@ func ExampleInfoCmdbGoLib_GetCiAttributes() {
 // func ExampleInfoCmdbGoLib_GetCiAttributes() {
 // 	t := testing{}
 //
-// 	i, err := NewCMDB("test.yml")
-// 	i.Config.ApiUrl = t.getUrl()
+// 	i, err := NewCMDB(infoCMDBConfigFile")
+// 	i.Config.Url = t.getUrl()
 // 	if err != nil {
 // 		log.Error(ErrFailedToCreateInfoCMDB)
 // 		return
