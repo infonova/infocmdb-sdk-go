@@ -1,4 +1,4 @@
-package core
+package cmdb
 
 import (
 	"errors"
@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 	"time"
 )
 
@@ -55,7 +54,9 @@ func init() {
 	}
 }
 
-func (i *InfoCMDB) LoadConfig(configFile string) (err error) {
+
+
+func (i *InfoCMDB  ) LoadConfig(configFile string) (err error) {
 	_, err = os.Stat(configFile)
 	if err == nil {
 		log.Debugf("ConfigFile found with given string: %s", configFile)
@@ -101,15 +102,4 @@ func (i *InfoCMDB) Login() error {
 		return ErrNoCredentials
 	}
 	return i.LoginWithUserPass(i.Config.ApiUrl, i.Config.ApiUser, i.Config.ApiPassword)
-}
-
-func (i *InfoCMDB) FunctionError(msg string) error {
-	pc := make([]uintptr, 15)
-	n := runtime.Callers(2, pc)
-	frames := runtime.CallersFrames(pc[:n])
-	frame, _ := frames.Next()
-
-	fullMsg := frame.Function + ": " + msg
-
-	return errors.New(fullMsg)
 }

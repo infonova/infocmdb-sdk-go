@@ -1,13 +1,14 @@
-package core
+package cmdb
 
 import (
+	"git.appteam.infonova.cloud/infocmdb/library/core/v1/cmdb"
 	"regexp"
 	"strconv"
 )
 
 func (i *InfoCMDB) AttributeBasedRelation(ciId int, attributeName string, ciRelationTypeName string, triggerType string, swapCiColumns bool) (relationCisAdded []int, relationCisRemoved [] int, err error) {
 
-	currentCiRelations, err := i.GetListOfCiIdsByCiRelation(ciId, ciRelationTypeName, CI_RELATION_DIRECTION_ALL)
+	currentCiRelations, err := i.GetListOfCiIdsByCiRelation(ciId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_ALL)
 	if err != nil {
 		return
 	}
@@ -36,9 +37,9 @@ func (i *InfoCMDB) AttributeBasedRelation(ciId int, attributeName string, ciRela
 
 		if add == true {
 			if swapCiColumns == true {
-				err = i.CreateCiRelation(valueCiId, ciId, ciRelationTypeName, CI_RELATION_DIRECTION_OMNIDIRECTIONAL);
+				err = i.CreateCiRelation(valueCiId, ciId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_OMNIDIRECTIONAL);
 			} else {
-				err = i.CreateCiRelation(ciId, valueCiId, ciRelationTypeName, CI_RELATION_DIRECTION_OMNIDIRECTIONAL);
+				err = i.CreateCiRelation(ciId, valueCiId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_OMNIDIRECTIONAL);
 			}
 			if err != nil {
 				return

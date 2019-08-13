@@ -1,8 +1,10 @@
-package core
+package cmdb
 
 import (
 	"errors"
 	"fmt"
+	v1 "git.appteam.infonova.cloud/infocmdb/library/core/v1/cmdb"
+	error2 "git.appteam.infonova.cloud/infocmdb/library/util/error"
 	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -25,12 +27,34 @@ type ResponseId struct {
 }
 
 func (i *InfoCMDB) GetListOfCiIdsOfCiType(ciTypeID int) (r ListOfCiIdsOfCiType, err error) {
+	if ciTypeID <= 0 {
+		return nil, errors.New("CiTypeID must be integer greater 0")
+	}
+
 	params := url.Values{
 		"argv1": {strconv.Itoa(ciTypeID)},
 	}
 
 	ret := GetListOfCiIdsOfCiType{}
-	err = i.CallWebservice(http.MethodPost, "query", "int_getListOfCiIdsOfCiType", params, &ret)
+	err = i.v1.CallWebservice(http.MethodPost, "query", "int_getListOfCiIdsOfCiType", params, &ret)
+	if err != nil {
+		log.Error("Error: ", err)
+		return r, err
+	}
+	r = ret.Data
+	return
+}
+func (i *InfoCMDB) GetListOfCiIdsOfCiTypeV2(ciTypeID int) (r ListOfCiIdsOfCiType, err error) {
+	if ciTypeID <= 0 {
+		return nil, errors.New("CiTypeID must be integer greater 0")
+	}
+
+	params := map[string]string{
+		"argv1": strconv.Itoa(ciTypeID),
+	}
+
+	ret := GetListOfCiIdsOfCiType{}
+	err = i.v2.Query("int_getListOfCiIdsOfCiType", &ret, params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -70,7 +94,7 @@ func (i *InfoCMDB) AddCiProjectMapping(ciID int, projectID int, historyID int) (
 		"argv3": {strconv.Itoa(historyID)},
 	}
 
-	err = i.CallWebservice(http.MethodPost, "query", "int_addCiProjectMapping", params, &r)
+	err = i.v1.CallWebservice(http.MethodPost, "query", "int_addCiProjectMapping", params, &r)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -92,9 +116,9 @@ func (i *InfoCMDB) CreateAttribute(ciID int, attrID int) (r CreateAttribute, err
 		"argv2": {strconv.Itoa(attrID)},
 	}
 
-	err = i.CallWebservice(http.MethodPost, "query", "int_createCiAttribute", params, &r)
+	err = i.v1.CallWebservice(http.MethodPost, "query", "int_createCiAttribute", params, &r)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		log.Error("Error: ", err)
 		return r, err
 	}
@@ -120,9 +144,9 @@ func (i *InfoCMDB) CreateCi(ciTypeID int, icon string, historyID int) (r CreateC
 		"argv3": {strconv.Itoa(historyID)},
 	}
 
-	err = i.CallWebservice(http.MethodPost, "query", "int_createCi", params, &r)
+	err = i.v1.CallWebservice(http.MethodPost, "query", "int_createCi", params, &r)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		log.Error("Error: ", err)
 		return r, err
 	}
@@ -153,20 +177,20 @@ func (i *InfoCMDB) GetCi(ciID int) (r Ci, err error) {
 	}
 
 	jsonRet := GetCi{}
-	err = i.CallWebservice(http.MethodPost, "query", "int_getCi", params, &jsonRet)
+	err = i.v1.CallWebservice(http.MethodPost, "query", "int_getCi", params, &jsonRet)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		log.Debugf("Error: %v", err.Error())
 		return
 	}
 
 	switch len(jsonRet.Data) {
 	case 0:
-		err = i.FunctionError(strconv.Itoa(ciID) + " - " + ErrNoResult.Error())
+		err = error2.FunctionError(strconv.Itoa(ciID) + " - " + v1.ErrNoResult.Error())
 	case 1:
 		r = jsonRet.Data[0].Ci
 	default:
-		err = i.FunctionError(strconv.Itoa(ciID) + " - " + ErrTooManyResults.Error())
+		err = error2.FunctionError(strconv.Itoa(ciID) + " - " + v1.ErrTooManyResults.Error())
 	}
 
 	r.Projects = strings.Split(r.ProjectsAsString, ",") // not safe :-/
@@ -204,9 +228,9 @@ func (i *InfoCMDB) GetCiAttributes(ciID int) (r []CiAttribute, err error) {
 	}
 
 	jsonRet := GetCiAttributes{}
-	err = i.CallWebservice(http.MethodPost, "query", "int_getCiAttributes", params, &jsonRet)
+	err = i.v1.CallWebservice(http.MethodPost, "query", "int_getCiAttributes", params, &jsonRet)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		log.Error("Error: ", err)
 	}
 	r = jsonRet.Data
@@ -223,7 +247,7 @@ type CreateCiAttribute struct {
 }
 
 func (i *InfoCMDB) CreateCiAttribute() (r CreateCiAttribute, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	/*
 		params := url.Values{
 			// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -232,7 +256,7 @@ func (i *InfoCMDB) CreateCiAttribute() (r CreateCiAttribute, err error) {
 			// "argv4": {strconv.Itoa(%PARAM4%)},
 		}
 
-		ret, err := i.CallWebservice(http.MethodPost,"query", "int_createCiAttribute", params)
+		ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_createCiAttribute", params)
 		if err != nil {
 			log.Error("Error: ", err)
 			return r, err
@@ -258,13 +282,13 @@ func (i *InfoCMDB) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName str
 
 	var directionId int
 	switch direction {
-	case CI_RELATION_DIRECTION_DIRECTED_FROM:
+	case v1.CI_RELATION_DIRECTION_DIRECTED_FROM:
 		directionId = 1
-	case CI_RELATION_DIRECTION_DIRECTED_TO:
+	case v1.CI_RELATION_DIRECTION_DIRECTED_TO:
 		directionId = 2
-	case CI_RELATION_DIRECTION_BIDIRECTIONAL:
+	case v1.CI_RELATION_DIRECTION_BIDIRECTIONAL:
 		directionId = 3
-	case CI_RELATION_DIRECTION_OMNIDIRECTIONAL:
+	case v1.CI_RELATION_DIRECTION_OMNIDIRECTIONAL:
 		directionId = 4
 	default:
 		err = errors.New(fmt.Sprintf("Invalid direction '%s'", direction))
@@ -273,7 +297,7 @@ func (i *InfoCMDB) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName str
 
 	counter, err := i.GetCiRelationCount(ciId1, ciId2, ciRelationTypeName)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		return
 	}
 
@@ -281,7 +305,7 @@ func (i *InfoCMDB) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName str
 		var ciRelationTypeId int
 		ciRelationTypeId, err = i.GetCiRelationTypeIdByRelationTypeName(ciRelationTypeName)
 		if err != nil {
-			err = i.FunctionError(err.Error())
+			err = error2.FunctionError(err.Error())
 			return
 		}
 
@@ -293,9 +317,9 @@ func (i *InfoCMDB) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName str
 		}
 
 		jsonRet := CreateCiRelation{}
-		err = i.CallWebservice(http.MethodPost, "query", "int_createCiRelation", params, &jsonRet)
+		err = i.v1.CallWebservice(http.MethodPost, "query", "int_createCiRelation", params, &jsonRet)
 		if err != nil {
-			err = i.FunctionError(err.Error())
+			err = error2.FunctionError(err.Error())
 			log.Error("Error: ", err)
 			return
 		}
@@ -313,7 +337,7 @@ type CreateHistory struct {
 }
 
 func (i *InfoCMDB) CreateHistory() (r CreateHistory, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -321,7 +345,7 @@ func (i *InfoCMDB) CreateHistory() (r CreateHistory, err error) {
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_createHistory", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_createHistory", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -343,7 +367,7 @@ type DeleteCi struct {
 }
 
 func (i *InfoCMDB) DeleteCi() (r DeleteCi, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -351,7 +375,7 @@ func (i *InfoCMDB) DeleteCi() (r DeleteCi, err error) {
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_deleteCi", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_deleteCi", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -373,7 +397,7 @@ type DeleteCiAttribute struct {
 }
 
 func (i *InfoCMDB) DeleteCiAttribute() (r DeleteCiAttribute, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -381,7 +405,7 @@ func (i *InfoCMDB) DeleteCiAttribute() (r DeleteCiAttribute, err error) {
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_deleteCiAttribute", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_deleteCiAttribute", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -406,7 +430,7 @@ type DeleteCiRelation struct {
 func (i *InfoCMDB) DeleteCiRelation(ciId1 int, ciId2 int, ciRelationTypeName string) (err error) {
 	ciRelationTypeId, err := i.GetCiRelationTypeIdByRelationTypeName(ciRelationTypeName)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		return
 	}
 
@@ -417,9 +441,9 @@ func (i *InfoCMDB) DeleteCiRelation(ciId1 int, ciId2 int, ciRelationTypeName str
 	}
 
 	jsonRet := DeleteCiRelation{}
-	err = i.CallWebservice(http.MethodPost, "query", "int_deleteCiRelation", params, &jsonRet)
+	err = i.v1.CallWebservice(http.MethodPost, "query", "int_deleteCiRelation", params, &jsonRet)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		log.Error("Error: ", err)
 		return
 	}
@@ -435,7 +459,7 @@ type DeleteCiRelationsByCiRelationTypeDirectedFrom struct {
 }
 
 func (i *InfoCMDB) DeleteCiRelationsByCiRelationTypeDirectedFrom() (r DeleteCiRelationsByCiRelationTypeDirectedFrom, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -443,7 +467,7 @@ func (i *InfoCMDB) DeleteCiRelationsByCiRelationTypeDirectedFrom() (r DeleteCiRe
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_deleteCiRelationsByCiRelationTypeDirectedFrom", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_deleteCiRelationsByCiRelationTypeDirectedFrom", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -465,7 +489,7 @@ type DeleteCiRelationsByCiRelationTypeDirectedTo struct {
 }
 
 func (i *InfoCMDB) DeleteCiRelationsByCiRelationTypeDirectedTo() (r DeleteCiRelationsByCiRelationTypeDirectedTo, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -473,7 +497,7 @@ func (i *InfoCMDB) DeleteCiRelationsByCiRelationTypeDirectedTo() (r DeleteCiRela
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_deleteCiRelationsByCiRelationTypeDirectedTo", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_deleteCiRelationsByCiRelationTypeDirectedTo", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -495,7 +519,7 @@ type DeleteCiRelationsByCiRelationTypeDirectionList struct {
 }
 
 func (i *InfoCMDB) DeleteCiRelationsByCiRelationTypeDirectionList() (r DeleteCiRelationsByCiRelationTypeDirectionList, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -503,7 +527,7 @@ func (i *InfoCMDB) DeleteCiRelationsByCiRelationTypeDirectionList() (r DeleteCiR
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_deleteCiRelationsByCiRelationTypeDirectionList", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_deleteCiRelationsByCiRelationTypeDirectionList", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -530,7 +554,7 @@ type GetAttributeDefaultOption struct {
 
 func (i *InfoCMDB) GetAttributeDefaultOption(optionId int) (r string, err error) {
 	cacheKey := "GetAttributeDefaultOption_" + strconv.Itoa(optionId)
-	cached, found := i.Cache.Get(cacheKey)
+	cached, found := i.v1.Cache.Get(cacheKey)
 	if found {
 		return cached.(string), nil
 	}
@@ -540,21 +564,21 @@ func (i *InfoCMDB) GetAttributeDefaultOption(optionId int) (r string, err error)
 	}
 
 	jsonRet := GetAttributeDefaultOption{}
-	err = i.CallWebservice(http.MethodPost, "query", "int_getAttributeDefaultOption", params, &jsonRet)
+	err = i.v1.CallWebservice(http.MethodPost, "query", "int_getAttributeDefaultOption", params, &jsonRet)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		log.Error("Error: ", err)
 		return
 	}
 
 	switch len(jsonRet.Data) {
 	case 0:
-		err = i.FunctionError(strconv.Itoa(optionId) + " - " + ErrNoResult.Error())
+		err = error2.FunctionError(strconv.Itoa(optionId) + " - " + v1.ErrNoResult.Error())
 	case 1:
 		r = jsonRet.Data[0].Value
-		i.Cache.Set(cacheKey, r, cache.DefaultExpiration)
+		i.v1.Cache.Set(cacheKey, r, cache.DefaultExpiration)
 	default:
-		err = i.FunctionError(strconv.Itoa(optionId) + " - " + ErrTooManyResults.Error())
+		err = error2.FunctionError(strconv.Itoa(optionId) + " - " + v1.ErrTooManyResults.Error())
 	}
 
 	return
@@ -568,7 +592,7 @@ type GetAttributeDefaultOptionId struct {
 }
 
 func (i *InfoCMDB) GetAttributeDefaultOptionId() (r GetAttributeDefaultOptionId, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -576,7 +600,7 @@ func (i *InfoCMDB) GetAttributeDefaultOptionId() (r GetAttributeDefaultOptionId,
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getAttributeDefaultOptionId", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getAttributeDefaultOptionId", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -598,7 +622,7 @@ type GetAttributeGroupIdByAttributeGroupName struct {
 }
 
 func (i *InfoCMDB) GetAttributeGroupIdByAttributeGroupName() (r GetAttributeGroupIdByAttributeGroupName, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -606,7 +630,7 @@ func (i *InfoCMDB) GetAttributeGroupIdByAttributeGroupName() (r GetAttributeGrou
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getAttributeGroupIdByAttributeGroupName", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getAttributeGroupIdByAttributeGroupName", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -631,7 +655,7 @@ type GetAttributeIdByAttributeName struct {
 
 func (i *InfoCMDB) GetAttributeIdByAttributeName(name string) (r int, err error) {
 	cacheKey := "GetAttributeIdByAttributeName_" + name
-	cached, found := i.Cache.Get(cacheKey)
+	cached, found := i.v1.Cache.Get(cacheKey)
 	if found {
 		return cached.(int), nil
 	}
@@ -641,21 +665,21 @@ func (i *InfoCMDB) GetAttributeIdByAttributeName(name string) (r int, err error)
 	}
 
 	response := GetAttributeIdByAttributeName{}
-	err = i.CallWebservice(http.MethodPost, "query", "int_getAttributeIdByAttributeName", params, &response)
+	err = i.v1.CallWebservice(http.MethodPost, "query", "int_getAttributeIdByAttributeName", params, &response)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		log.Error("Error: ", err)
 		return
 	}
 
 	switch len(response.Data) {
 	case 0:
-		err = i.FunctionError(name + " - " + ErrNoResult.Error())
+		err = error2.FunctionError(name + " - " + v1.ErrNoResult.Error())
 	case 1:
 		r = response.Data[0].Id
-		i.Cache.Set(cacheKey, r, cache.DefaultExpiration)
+		i.v1.Cache.Set(cacheKey, r, cache.DefaultExpiration)
 	default:
-		err = i.FunctionError(name + " - " + ErrTooManyResults.Error())
+		err = error2.FunctionError(name + " - " + v1.ErrTooManyResults.Error())
 	}
 
 	return
@@ -669,7 +693,7 @@ type GetCiAttributeId struct {
 }
 
 func (i *InfoCMDB) GetCiAttributeId(ciID int, attrID int) (r GetCiAttributeId, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -677,7 +701,7 @@ func (i *InfoCMDB) GetCiAttributeId(ciID int, attrID int) (r GetCiAttributeId, e
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getCiAttributeId", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getCiAttributeId", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -706,7 +730,7 @@ type GetCiAttributeValue struct {
 func (i *InfoCMDB) GetCiAttributeValue(ciId int, attributeName string, valueType string) (r GetCiAttributeValue, err error) {
 	attributeId, err := i.GetAttributeIdByAttributeName(attributeName)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		return
 	}
 
@@ -716,15 +740,15 @@ func (i *InfoCMDB) GetCiAttributeValue(ciId int, attributeName string, valueType
 		"argv3": {valueType},
 	}
 
-	err = i.CallWebservice(http.MethodPost, "query", "int_getCiAttributeValue", params, &r)
+	err = i.v1.CallWebservice(http.MethodPost, "query", "int_getCiAttributeValue", params, &r)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		log.Error("Error: ", err)
 		return
 	}
 
 	if len(r.Data) == 0 {
-		err = i.FunctionError(strconv.Itoa(ciId) + ", " + attributeName + " - " + ErrNoResult.Error())
+		err = error2.FunctionError(strconv.Itoa(ciId) + ", " + attributeName + " - " + v1.ErrNoResult.Error())
 		return
 	}
 
@@ -732,9 +756,9 @@ func (i *InfoCMDB) GetCiAttributeValue(ciId int, attributeName string, valueType
 }
 
 func (i *InfoCMDB) GetCiAttributeValueText(ciId int, attributeName string) (value string, id int, err error) {
-	result, err := i.GetCiAttributeValue(ciId, attributeName, ATTRIBUTE_VALUE_TYPE_TEXT)
+	result, err := i.GetCiAttributeValue(ciId, attributeName, v1.ATTRIBUTE_VALUE_TYPE_TEXT)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		return
 	}
 
@@ -745,9 +769,9 @@ func (i *InfoCMDB) GetCiAttributeValueText(ciId int, attributeName string) (valu
 }
 
 func (i *InfoCMDB) GetCiAttributeValueDate(ciId int, attributeName string) (value string, id int, err error) {
-	result, err := i.GetCiAttributeValue(ciId, attributeName, ATTRIBUTE_VALUE_TYPE_DATE)
+	result, err := i.GetCiAttributeValue(ciId, attributeName, v1.ATTRIBUTE_VALUE_TYPE_DATE)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		return
 	}
 
@@ -758,9 +782,9 @@ func (i *InfoCMDB) GetCiAttributeValueDate(ciId int, attributeName string) (valu
 }
 
 func (i *InfoCMDB) GetCiAttributeValueDefault(ciId int, attributeName string) (value string, id int, err error) {
-	result, err := i.GetCiAttributeValue(ciId, attributeName, ATTRIBUTE_VALUE_TYPE_DEFAULT)
+	result, err := i.GetCiAttributeValue(ciId, attributeName, v1.ATTRIBUTE_VALUE_TYPE_DEFAULT)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		return
 	}
 
@@ -768,13 +792,13 @@ func (i *InfoCMDB) GetCiAttributeValueDefault(ciId int, attributeName string) (v
 
 	valueInt, err := strconv.Atoi(result.Data[0].Value)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		return
 	}
 
 	value, err = i.GetAttributeDefaultOption(valueInt)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		return
 	}
 
@@ -782,9 +806,9 @@ func (i *InfoCMDB) GetCiAttributeValueDefault(ciId int, attributeName string) (v
 }
 
 func (i *InfoCMDB) GetCiAttributeValueCi(ciId int, attributeName string) (value string, id int, err error) {
-	result, err := i.GetCiAttributeValue(ciId, attributeName, ATTRIBUTE_VALUE_TYPE_CI)
+	result, err := i.GetCiAttributeValue(ciId, attributeName, v1.ATTRIBUTE_VALUE_TYPE_CI)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		return
 	}
 
@@ -802,7 +826,7 @@ type GetCiIdByCiAttributeId struct {
 }
 
 func (i *InfoCMDB) GetCiIdByCiAttributeId() (r GetCiIdByCiAttributeId, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -810,7 +834,7 @@ func (i *InfoCMDB) GetCiIdByCiAttributeId() (r GetCiIdByCiAttributeId, err error
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getCiIdByCiAttributeId", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getCiIdByCiAttributeId", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -832,7 +856,7 @@ type GetCiIdByCiAttributeValue struct {
 }
 
 func (i *InfoCMDB) GetCiIdByCiAttributeValue() (r GetCiIdByCiAttributeValue, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -840,7 +864,7 @@ func (i *InfoCMDB) GetCiIdByCiAttributeValue() (r GetCiIdByCiAttributeValue, err
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getCiIdByCiAttributeValue", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getCiIdByCiAttributeValue", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -862,7 +886,7 @@ type GetCiProjectMappings struct {
 }
 
 func (i *InfoCMDB) GetCiProjectMappings() (r GetCiProjectMappings, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -870,7 +894,7 @@ func (i *InfoCMDB) GetCiProjectMappings() (r GetCiProjectMappings, err error) {
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getCiProjectMappings", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getCiProjectMappings", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -898,7 +922,7 @@ type GetCiRelationCount struct {
 func (i *InfoCMDB) GetCiRelationCount(ciId1 int, ciId2 int, ciRelationTypeName string) (r int, err error) {
 	ciRelationTypeId, err := i.GetCiRelationTypeIdByRelationTypeName(ciRelationTypeName)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		return
 	}
 
@@ -909,9 +933,9 @@ func (i *InfoCMDB) GetCiRelationCount(ciId1 int, ciId2 int, ciRelationTypeName s
 	}
 
 	jsonRet := GetCiRelationCount{}
-	err = i.CallWebservice(http.MethodPost, "query", "int_getCiRelationCount", params, &jsonRet)
+	err = i.v1.CallWebservice(http.MethodPost, "query", "int_getCiRelationCount", params, &jsonRet)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		log.Error("Error: ", err)
 		return r, err
 	}
@@ -919,11 +943,11 @@ func (i *InfoCMDB) GetCiRelationCount(ciId1 int, ciId2 int, ciRelationTypeName s
 	errPrefix := strconv.Itoa(ciId1) + ", " + strconv.Itoa(ciId2) + ", " + ciRelationTypeName + "(" + strconv.Itoa(ciRelationTypeId) + ")" + " - "
 	switch len(jsonRet.Data) {
 	case 0:
-		err = i.FunctionError(errPrefix + ErrNoResult.Error())
+		err = error2.FunctionError(errPrefix + v1.ErrNoResult.Error())
 	case 1:
 		r = jsonRet.Data[0].Count
 	default:
-		err = i.FunctionError(errPrefix + ErrTooManyResults.Error())
+		err = error2.FunctionError(errPrefix + v1.ErrTooManyResults.Error())
 	}
 
 	return
@@ -939,7 +963,7 @@ type GetCiRelationTypeIdByRelationTypeName struct {
 
 func (i *InfoCMDB) GetCiRelationTypeIdByRelationTypeName(name string) (r int, err error) {
 	cacheKey := "GetCiRelationTypeIdByRelationTypeName_" + name
-	cached, found := i.Cache.Get(cacheKey)
+	cached, found := i.v1.Cache.Get(cacheKey)
 	if found {
 		return cached.(int), nil
 	}
@@ -949,21 +973,21 @@ func (i *InfoCMDB) GetCiRelationTypeIdByRelationTypeName(name string) (r int, er
 	}
 
 	jsonRet := GetCiRelationTypeIdByRelationTypeName{}
-	err = i.CallWebservice(http.MethodPost, "query", "int_getCiRelationTypeIdByRelationTypeName", params, &jsonRet)
+	err = i.v1.CallWebservice(http.MethodPost, "query", "int_getCiRelationTypeIdByRelationTypeName", params, &jsonRet)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		log.Error("Error: ", err)
 		return
 	}
 
 	switch len(jsonRet.Data) {
 	case 0:
-		err = i.FunctionError(name + " - " + ErrNoResult.Error())
+		err = error2.FunctionError(name + " - " + v1.ErrNoResult.Error())
 	case 1:
 		r = jsonRet.Data[0].Id
-		i.Cache.Set(cacheKey, r, cache.DefaultExpiration)
+		i.v1.Cache.Set(cacheKey, r, cache.DefaultExpiration)
 	default:
-		err = i.FunctionError(name + " - " + ErrTooManyResults.Error())
+		err = error2.FunctionError(name + " - " + v1.ErrTooManyResults.Error())
 	}
 
 	return
@@ -978,7 +1002,7 @@ type GetCiTypeIdByCiTypeName struct {
 
 func (i *InfoCMDB) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
 	cacheKey := "GetCiRelationTypeIdByRelationTypeName_" + name
-	cached, found := i.Cache.Get(cacheKey)
+	cached, found := i.v1.Cache.Get(cacheKey)
 	if found {
 		return cached.(int), nil
 	}
@@ -988,21 +1012,21 @@ func (i *InfoCMDB) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
 	}
 
 	response := GetCiTypeIdByCiTypeName{}
-	err = i.CallWebservice(http.MethodPost, "query", "int_getCiTypeIdByCiTypeName", params, &response)
+	err = i.v1.CallWebservice(http.MethodPost, "query", "int_getCiTypeIdByCiTypeName", params, &response)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		log.Error("Error: ", err)
 		return
 	}
 
 	switch len(response.Data) {
 	case 0:
-		err = i.FunctionError(name + " - " + ErrNoResult.Error())
+		err = error2.FunctionError(name + " - " + v1.ErrNoResult.Error())
 	case 1:
 		r = response.Data[0].Id
-		i.Cache.Set(cacheKey, r, cache.DefaultExpiration)
+		i.v1.Cache.Set(cacheKey, r, cache.DefaultExpiration)
 	default:
-		err = i.FunctionError(name + " - " + ErrTooManyResults.Error())
+		err = error2.FunctionError(name + " - " + v1.ErrTooManyResults.Error())
 	}
 
 	return
@@ -1016,7 +1040,7 @@ type GetCiTypeOfCi struct {
 }
 
 func (i *InfoCMDB) GetCiTypeOfCi() (r GetCiTypeOfCi, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -1024,7 +1048,7 @@ func (i *InfoCMDB) GetCiTypeOfCi() (r GetCiTypeOfCi, err error) {
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getCiTypeOfCi", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getCiTypeOfCi", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -1052,7 +1076,7 @@ type GetListOfCiIdsByCiRelation struct {
 func (i *InfoCMDB) GetListOfCiIdsByCiRelation(ciId int, ciRelationTypeName string, direction string) (r []int, err error) {
 	ciRelationTypeId, err := i.GetCiRelationTypeIdByRelationTypeName(ciRelationTypeName)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		return
 	}
 
@@ -1063,25 +1087,25 @@ func (i *InfoCMDB) GetListOfCiIdsByCiRelation(ciId int, ciRelationTypeName strin
 	}
 
 	switch direction {
-	case CI_RELATION_DIRECTION_ALL:
+	case v1.CI_RELATION_DIRECTION_ALL:
 		webservice = "int_getListOfCiIdsByCiRelation_directionList"
 		params.Add("argv3", "0,1,2,3,4")
-	case CI_RELATION_DIRECTION_DIRECTED_FROM:
+	case v1.CI_RELATION_DIRECTION_DIRECTED_FROM:
 		webservice = "int_getListOfCiIdsByCiRelation_directedFrom"
-	case CI_RELATION_DIRECTION_DIRECTED_TO:
+	case v1.CI_RELATION_DIRECTION_DIRECTED_TO:
 		webservice = "int_getListOfCiIdsByCiRelation_directedTo"
-	case CI_RELATION_DIRECTION_BIDIRECTIONAL:
+	case v1.CI_RELATION_DIRECTION_BIDIRECTIONAL:
 		webservice = "int_getListOfCiIdsByCiRelation_directionList"
 		params.Add("argv3", "3")
-	case CI_RELATION_DIRECTION_OMNIDIRECTIONAL:
+	case v1.CI_RELATION_DIRECTION_OMNIDIRECTIONAL:
 		webservice = "int_getListOfCiIdsByCiRelation_directionList"
 		params.Add("argv3", "0,4")
 	}
 
 	jsonRet := GetListOfCiIdsByCiRelation{}
-	err = i.CallWebservice(http.MethodPost, "query", webservice, params, &jsonRet)
+	err = i.v1.CallWebservice(http.MethodPost, "query", webservice, params, &jsonRet)
 	if err != nil {
-		err = i.FunctionError(err.Error())
+		err = error2.FunctionError(err.Error())
 		log.Error("Error: ", err)
 		return
 	}
@@ -1101,7 +1125,7 @@ type GetNumberOfCiAttributes struct {
 }
 
 func (i *InfoCMDB) GetNumberOfCiAttributes() (r GetNumberOfCiAttributes, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -1109,7 +1133,7 @@ func (i *InfoCMDB) GetNumberOfCiAttributes() (r GetNumberOfCiAttributes, err err
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getNumberOfCiAttributes", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getNumberOfCiAttributes", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -1131,7 +1155,7 @@ type GetProjectIdByProjectName struct {
 }
 
 func (i *InfoCMDB) GetProjectIdByProjectName() (r GetProjectIdByProjectName, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -1139,7 +1163,7 @@ func (i *InfoCMDB) GetProjectIdByProjectName() (r GetProjectIdByProjectName, err
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getProjectIdByProjectName", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getProjectIdByProjectName", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -1161,7 +1185,7 @@ type GetProjects struct {
 }
 
 func (i *InfoCMDB) GetProjects() (r GetProjects, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -1169,7 +1193,7 @@ func (i *InfoCMDB) GetProjects() (r GetProjects, err error) {
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getProjects", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getProjects", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -1191,7 +1215,7 @@ type GetRoleIdByRoleName struct {
 }
 
 func (i *InfoCMDB) GetRoleIdByRoleName() (r GetRoleIdByRoleName, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -1199,7 +1223,7 @@ func (i *InfoCMDB) GetRoleIdByRoleName() (r GetRoleIdByRoleName, err error) {
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getRoleIdByRoleName", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getRoleIdByRoleName", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -1221,7 +1245,7 @@ type GetUserIdByUsername struct {
 }
 
 func (i *InfoCMDB) GetUserIdByUsername() (r GetUserIdByUsername, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -1229,7 +1253,7 @@ func (i *InfoCMDB) GetUserIdByUsername() (r GetUserIdByUsername, err error) {
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_getUserIdByUsername", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getUserIdByUsername", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -1251,7 +1275,7 @@ type RemoveCiProjectMapping struct {
 }
 
 func (i *InfoCMDB) RemoveCiProjectMapping() (r RemoveCiProjectMapping, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -1259,7 +1283,7 @@ func (i *InfoCMDB) RemoveCiProjectMapping() (r RemoveCiProjectMapping, err error
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_removeCiProjectMapping", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_removeCiProjectMapping", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -1281,7 +1305,7 @@ type SetAttributeRole struct {
 }
 
 func (i *InfoCMDB) SetAttributeRole() (r SetAttributeRole, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -1289,7 +1313,7 @@ func (i *InfoCMDB) SetAttributeRole() (r SetAttributeRole, err error) {
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_setAttributeRole", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_setAttributeRole", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -1311,7 +1335,7 @@ type SetCiTypeOfCi struct {
 }
 
 func (i *InfoCMDB) SetCiTypeOfCi() (r SetCiTypeOfCi, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -1319,7 +1343,7 @@ func (i *InfoCMDB) SetCiTypeOfCi() (r SetCiTypeOfCi, err error) {
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_setCiTypeOfCi", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_setCiTypeOfCi", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
@@ -1341,7 +1365,7 @@ type UpdateCiAttribute struct {
 }
 
 func (i *InfoCMDB) UpdateCiAttribute() (r UpdateCiAttribute, err error) {
-	return r, ErrNotImplemented // TODO FIXME
+	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
 		// "argv2": {strconv.Itoa(%PARAM2%)},
@@ -1349,7 +1373,7 @@ func (i *InfoCMDB) UpdateCiAttribute() (r UpdateCiAttribute, err error) {
 		// "argv4": {strconv.Itoa(%PARAM4%)},
 	}
 
-	ret, err := i.CallWebservice(http.MethodPost,"query", "int_updateCiAttribute", params)
+	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_updateCiAttribute", params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
