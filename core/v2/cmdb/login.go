@@ -1,6 +1,8 @@
 package cmdb
 
 import (
+	"git.appteam.infonova.cloud/infocmdb/library/core/v1/cmdb"
+	"git.appteam.infonova.cloud/infocmdb/library/core/v2/cmdb/client"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -19,7 +21,7 @@ func (i *InfoCMDB) Login() (err error) {
 		return nil
 	}
 	if i.Config.Username == "" || i.Config.Password == "" {
-		return ErrNoCredentials
+		return cmdb.ErrNoCredentials
 	}
 
 	var loginResult LoginTokenReturn
@@ -27,6 +29,10 @@ func (i *InfoCMDB) Login() (err error) {
 		"username": i.Config.Username,
 		"password": i.Config.Password ,
 		"lifetime": "600",
+	}
+
+	if i.Client == nil {
+		i.Client = client.NewClient(i.Config.Url)
 	}
 
 	i.Client.SetHostURL(i.Config.Url)
@@ -37,7 +43,7 @@ func (i *InfoCMDB) Login() (err error) {
 	}
 
 	if loginResult.Data.Token == "" {
-		return ErrLoginFailed
+		return cmdb.ErrLoginFailed
 	}
 
 	i.Config.ApiKey = loginResult.Data.Token
