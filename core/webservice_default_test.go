@@ -13,7 +13,7 @@ import (
 var (
 	mocking            = false
 	infoCMDBConfigFile = "test/test.yml"
-	infocmdbUrl = "http://localhost"
+	infocmdbUrl        = "http://localhost"
 )
 
 func init() {
@@ -48,9 +48,9 @@ func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
 			"v1 List Ci's pf Type '1' with wrong Credentials (fail)",
 			fields{
 				&v1.InfoCMDB{Config: v1.Config{
-					ApiUrl: infocmdbUrl,
-					ApiUser: "fail",
-					ApiPassword: "fail",
+					ApiUrl:       infocmdbUrl,
+					ApiUser:      "fail",
+					ApiPassword:  "fail",
 					CmdbBasePath: "/app/",
 				}},
 				&v2.InfoCMDB{Config: v2.Config{}},
@@ -63,24 +63,24 @@ func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
 			"v1 List Ci's of Type '1' (demo)",
 			fields{
 				&v1.InfoCMDB{Config: v1.Config{
-					ApiUrl: infocmdbUrl,
-					ApiUser: "admin",
-					ApiPassword: "admin",
+					ApiUrl:       infocmdbUrl,
+					ApiUser:      "admin",
+					ApiPassword:  "admin",
 					CmdbBasePath: "/app/",
 				}},
 				&v2.InfoCMDB{Config: v2.Config{}},
 			},
 			args{ciTypeID: 1},
-			ListOfCiIdsOfCiType{{1},{2}},
+			ListOfCiIdsOfCiType{{1}, {2}},
 			false,
 		},
 		{
 			"v1 List Ci's of Type '-1' (error)",
 			fields{
 				&v1.InfoCMDB{Config: v1.Config{
-					ApiUrl: infocmdbUrl,
-					ApiUser: "admin",
-					ApiPassword: "admin",
+					ApiUrl:       infocmdbUrl,
+					ApiUser:      "admin",
+					ApiPassword:  "admin",
 					CmdbBasePath: "/app/",
 				}},
 				&v2.InfoCMDB{Config: v2.Config{}},
@@ -150,7 +150,7 @@ func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
 				}},
 			},
 			args{ciTypeID: 1},
-			ListOfCiIdsOfCiType{{1},{2}},
+			ListOfCiIdsOfCiType{{1}, {2}},
 			false,
 		},
 		{

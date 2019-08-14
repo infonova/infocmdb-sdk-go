@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func (i *InfoCMDB) AttributeBasedRelation(ciId int, attributeName string, ciRelationTypeName string, triggerType string, swapCiColumns bool) (relationCisAdded []int, relationCisRemoved [] int, err error) {
+func (i *InfoCMDB) AttributeBasedRelation(ciId int, attributeName string, ciRelationTypeName string, triggerType string, swapCiColumns bool) (relationCisAdded []int, relationCisRemoved []int, err error) {
 
 	currentCiRelations, err := i.GetListOfCiIdsByCiRelation(ciId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_ALL)
 	if err != nil {
@@ -27,7 +27,7 @@ func (i *InfoCMDB) AttributeBasedRelation(ciId int, attributeName string, ciRela
 	// add relations
 	for _, valueCiIdString := range currentCiValues {
 		valueCiId, _ := strconv.Atoi(valueCiIdString)
-		add := true;
+		add := true
 		for _, relationCiId := range currentCiRelations {
 			if valueCiId == relationCiId {
 				add = false
@@ -37,9 +37,9 @@ func (i *InfoCMDB) AttributeBasedRelation(ciId int, attributeName string, ciRela
 
 		if add == true {
 			if swapCiColumns == true {
-				err = i.CreateCiRelation(valueCiId, ciId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_OMNIDIRECTIONAL);
+				err = i.CreateCiRelation(valueCiId, ciId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_OMNIDIRECTIONAL)
 			} else {
-				err = i.CreateCiRelation(ciId, valueCiId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_OMNIDIRECTIONAL);
+				err = i.CreateCiRelation(ciId, valueCiId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_OMNIDIRECTIONAL)
 			}
 			if err != nil {
 				return
