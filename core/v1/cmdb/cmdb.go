@@ -54,7 +54,7 @@ func init() {
 	}
 }
 
-func (i *InfoCMDB) LoadConfig(configFile string) (err error) {
+func (i *InfoCMDB) LoadConfigFile(configFile string) (err error) {
 	_, err = os.Stat(configFile)
 	if err == nil {
 		log.Debugf("ConfigFile found with given string: %s", configFile)
@@ -68,19 +68,24 @@ func (i *InfoCMDB) LoadConfig(configFile string) (err error) {
 
 	_, err = os.Stat(configFile)
 	if err != nil {
-		return err
+		return
 	}
 
 	yamlFile, err := ioutil.ReadFile(configFile)
 	if err != nil {
-		return err
+		return
 	}
-	return yaml.Unmarshal(yamlFile, &i.Config)
+
+	return i.LoadConfig(yamlFile)
+}
+
+func (i *InfoCMDB) LoadConfig(config []byte) (err error) {
+	return yaml.Unmarshal(config, &i.Config)
 }
 
 func NewCMDB(config string) (i *InfoCMDB, err error) {
 	i = new(InfoCMDB)
-	err = i.LoadConfig(config)
+	err = i.LoadConfigFile(config)
 	if err != nil {
 		log.Error(err)
 		return nil, err
