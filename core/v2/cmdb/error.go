@@ -1,7 +1,7 @@
 package cmdb
 
 import (
-	util_error "git.appteam.infonova.cloud/infocmdb/library/util/error"
+	util_error "github.com/infonova/infocmdb-lib-go/util/error"
 )
 
 

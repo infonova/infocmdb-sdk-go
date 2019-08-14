@@ -3,7 +3,7 @@ package cmdb
 import (
 	"testing"
 
-	"git.appteam.infonova.cloud/infocmdb/library/core/v2/cmdb/client"
+	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
 	"github.com/patrickmn/go-cache"
 )
 
