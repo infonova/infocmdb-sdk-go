@@ -32,10 +32,12 @@ func NewCMDB() (i *InfoCMDB, err error) {
 }
 
 func (i *InfoCMDB) LoadConfig(f string) (err error) {
-	if err = i.v1.LoadConfig("/app/application/configs/workflows/infocmdb.yml"); err!=nil{
+	if err = i.v1.LoadConfig("/app/application/configs/workflows/infocmdb.yml"); err != nil {
 		return
 	}
-	if err = i.v2.LoadConfigFile("/app/application/configs/workflows/infocmdb.yml").Error; err!=nil{
+	if err = i.v2.LoadConfigFile("/app/application/configs/workflows/infocmdb.yml").Error; err != nil {
 		return
 	}
+
+	return
 }
