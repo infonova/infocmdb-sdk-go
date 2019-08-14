@@ -2,7 +2,7 @@ package client
 
 import (
 	"errors"
-	"github.com/go-resty/resty"
+	"gopkg.in/resty.v1"
 )
 
 type Client struct {

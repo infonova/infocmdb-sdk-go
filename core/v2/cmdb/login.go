@@ -1,8 +1,8 @@
 package cmdb
 
 import (
-	"git.appteam.infonova.cloud/infocmdb/library/core/v1/cmdb"
-	"git.appteam.infonova.cloud/infocmdb/library/core/v2/cmdb/client"
+	"github.com/infonova/infocmdb-lib-go/core/v1/cmdb"
+	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
 	log "github.com/sirupsen/logrus"
 )
 

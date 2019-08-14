@@ -1,8 +1,8 @@
-package cmdb
+package core
 
 import (
-	v1 "git.appteam.infonova.cloud/infocmdb/library/core/v1/cmdb"
-	v2 "git.appteam.infonova.cloud/infocmdb/library/core/v2/cmdb"
+	v1 "github.com/infonova/infocmdb-lib-go/core/v1/cmdb"
+	v2 "github.com/infonova/infocmdb-lib-go/core/v2/cmdb"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"os"

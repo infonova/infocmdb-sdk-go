@@ -1,7 +1,7 @@
-package cmdb
+package core
 
 import (
-	"git.appteam.infonova.cloud/infocmdb/library/core/v1/cmdb"
+	"github.com/infonova/infocmdb-lib-go/core/v1/cmdb"
 	"regexp"
 	"strconv"
 )
