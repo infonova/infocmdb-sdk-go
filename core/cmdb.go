@@ -28,14 +28,18 @@ func init() {
 }
 
 func NewCMDB() (i *InfoCMDB, err error) {
+
 	return new(InfoCMDB), nil
 }
 
 func (i *InfoCMDB) LoadConfig(f string) (err error) {
-	if err = i.v1.LoadConfig("/app/application/configs/workflows/infocmdb.yml"); err != nil {
+	i.v1, err = v1.NewCMDB(f)
+	if err != nil {
 		return
 	}
-	if err = i.v2.LoadConfigFile("/app/application/configs/workflows/infocmdb.yml").Error; err != nil {
+
+	i.v2 = v2.NewCMDB()
+	if err = i.v2.LoadConfigFile(f).Error; err != nil {
 		return
 	}
 
