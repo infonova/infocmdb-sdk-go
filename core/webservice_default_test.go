@@ -139,7 +139,7 @@ func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
 			true,
 		},
 		{
-			"v2 List Ci's of Type '1' (demo)",
+			"v2 List CIs of Type 1 (demo)",
 			fields{
 				&v1.InfoCMDB{Config: v1.Config{}},
 				&v2.InfoCMDB{Config: v2.Config{

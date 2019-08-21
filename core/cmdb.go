@@ -27,9 +27,8 @@ func init() {
 	}
 }
 
-func NewCMDB() (i *InfoCMDB, err error) {
-
-	return new(InfoCMDB), nil
+func NewCMDB() *InfoCMDB {
+	return new(InfoCMDB)
 }
 
 func (i *InfoCMDB) LoadConfig(f string) (err error) {

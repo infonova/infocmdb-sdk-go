@@ -20,6 +20,10 @@ var (
 
 var (
 	mocking            = false
+	infoCMDBConfig = []byte(`apiUrl: http://nginx/
+apiUser: admin
+apiPassword: admin
+CmdbBasePath: /app/`)
 	infoCMDBConfigFile = "test/test.yml"
 )
 
@@ -159,7 +163,7 @@ func ExampleWebservice_Webservice() {
 
 func ExampleInfoCmdbGoLib_LoadConfigAbsolutePath() {
 	i := InfoCMDB{}
-	err := i.LoadConfig(infoCMDBConfigFile)
+	err := i.LoadConfig(infoCMDBConfig)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		return
@@ -173,7 +177,7 @@ func ExampleInfoCmdbGoLib_LoadConfigAbsolutePath() {
 
 func ExampleInfoCmdbGoLib_LoadConfig() {
 	i := InfoCMDB{}
-	err := i.LoadConfig(infoCMDBConfigFile)
+	err := i.LoadConfig(infoCMDBConfig)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		return
@@ -187,7 +191,7 @@ func ExampleInfoCmdbGoLib_LoadConfig() {
 
 func ExampleInfoCmdbGoLib_LoadConfig_Fail() {
 	i := InfoCMDB{}
-	err := i.LoadConfig("/test_missing.yml")
+	err := i.LoadConfigFile("/test_missing.yml")
 	if err != nil {
 		fmt.Println("loading failed")
 		return
@@ -248,46 +252,10 @@ func ExampleCmdbWebClient_LoginWithApiKey() {
 	i.Config.ApiKey = ilogin.Config.ApiKey
 	i.Config.ApiUrl = t.getUrl()
 
-	_, err = i.GetCi(1)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-	fmt.Printf("Login ok got ci, ApiKey(len): %d\n", len(i.Config.ApiKey))
+	fmt.Printf("Login ok, ApiKey(len): %d\n", len(i.Config.ApiKey))
 
 	// Output:
-	// Login ok got ci, ApiKey(len): 30
-}
-
-func ExampleCmdbWebClient_Get() {
-	t := testing{}
-
-	i, err := NewCMDB(infoCMDBConfigFile)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-
-	i.Config.ApiUrl = t.getUrl()
-	if i == nil {
-		log.Error(ErrFailedToCreateInfoCMDB)
-		return
-	}
-
-	params := url.Values{
-		"argv1": {"1"},
-	}
-
-	ret := GetListOfCiIdsOfCiType{}
-	err = i.CallWebservice(http.MethodGet, "query", "int_getListOfCiIdsOfCiType", params, &ret)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-	fmt.Printf("Get: %v\n", ret)
-
-	// Output:
-	// Get: {OK [{1} {2}]}
+	// Login ok, ApiKey(len): 30
 }
 
 func ExampleCmdbWebClient_Post() {
@@ -321,137 +289,3 @@ func ExampleCmdbWebClient_Post() {
 	// Post:  {"status":"OK","data":[{"ciid":"1"},{"ciid":"2"}]}
 }
 
-func ExampleInfoCmdbGoLib_GetCi() {
-	t := testing{}
-
-	i, err := NewCMDB(infoCMDBConfigFile)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-
-	i.Config.ApiUrl = t.getUrl()
-	if err != nil {
-		log.Error(ErrFailedToCreateInfoCMDB)
-		return
-	}
-
-	rCi, err := i.GetCi(1)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-	fmt.Println(rCi)
-
-	// Output:
-	// {1 1 demo springfield 4 [springfield] [4]}
-
-}
-func ExampleInfoCmdbGoLib_GetCi_fail() {
-	t := testing{}
-
-	i, err := NewCMDB(infoCMDBConfigFile)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-
-	i.Config.ApiUrl = t.getUrl()
-	if err != nil {
-		log.Error(ErrFailedToCreateInfoCMDB)
-		return
-	}
-
-	rCi, err := i.GetCi(-1)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-	fmt.Println(rCi)
-
-	// Output:
-	//
-
-}
-
-func ExampleInfoCmdbGoLib_GetListOfCiIdsOfCiType() {
-	t := testing{}
-
-	i, err := NewCMDB(infoCMDBConfigFile)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-
-	i.Config.ApiUrl = t.getUrl()
-	if err != nil {
-		log.Error(ErrFailedToCreateInfoCMDB)
-		return
-	}
-
-	rCi, err := i.GetListOfCiIdsOfCiType(1)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-	fmt.Println(rCi)
-
-	// Output:
-	// [{1} {2}]
-}
-
-func ExampleInfoCmdbGoLib_GetCiAttributes() {
-	t := testing{}
-
-	i, err := NewCMDB(infoCMDBConfigFile)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-
-	i.Config.ApiUrl = t.getUrl()
-	if err != nil {
-		log.Error(ErrFailedToCreateInfoCMDB)
-		return
-	}
-
-	rCi, err := i.GetCiAttributes(1)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-	fmt.Printf("Items: %d\n", len(rCi))
-	fmt.Printf("First Attribute: %s\n", rCi[1].Value)
-
-	// Output:
-	// Items: 18
-	// First Attribute: Regular Single Line Text Input
-}
-
-//
-// func ExampleInfoCmdbGoLib_GetCiAttributes() {
-// 	t := testing{}
-//
-// 	i, err := NewCMDB(infoCMDBConfigFile")
-// 	i.Config.Url = t.getUrl()
-// 	if err != nil {
-// 		log.Error(ErrFailedToCreateInfoCMDB)
-// 		return
-// 	}
-//
-// 	rCi, err := i.GetCiAttributes(1)
-// 	if err != nil {
-// 		log.Error(err)
-// 		return
-// 	}
-//
-// 	expectedAttributes := 18
-// 	if len(rCi.Data) == expectedAttributes {
-// 		fmt.Printf("Got all Attributes expected[%d].\n", expectedAttributes)
-// 	} else {
-// 		fmt.Printf("Didn't get exptected Attrbiutes[%d], got[%d].\n", expectedAttributes, len(rCi.Data))
-// 	}
-//
-// 	// Output:
-// 	//Got all Attributes expected[18].
-// }
