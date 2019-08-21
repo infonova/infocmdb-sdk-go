@@ -101,6 +101,7 @@ func (i *InfoCMDB) Login() error {
 		log.Debug("already logged in")
 		return nil
 	}
+
 	if i.Config.ApiUser == "" {
 		return ErrNoCredentials
 	}
