@@ -27,6 +27,11 @@ type ResponseId struct {
 }
 
 func (i *InfoCMDB) GetListOfCiIdsOfCiType(ciTypeID int) (r ListOfCiIdsOfCiType, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	if ciTypeID <= 0 {
 		return nil, errors.New("CiTypeID must be integer greater 0")
 	}
@@ -44,7 +49,13 @@ func (i *InfoCMDB) GetListOfCiIdsOfCiType(ciTypeID int) (r ListOfCiIdsOfCiType, 
 	r = ret.Data
 	return
 }
+
 func (i *InfoCMDB) GetListOfCiIdsOfCiTypeV2(ciTypeID int) (r ListOfCiIdsOfCiType, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	if ciTypeID <= 0 {
 		return nil, errors.New("CiTypeID must be integer greater 0")
 	}
@@ -65,6 +76,10 @@ func (i *InfoCMDB) GetListOfCiIdsOfCiTypeV2(ciTypeID int) (r ListOfCiIdsOfCiType
 
 func (i *InfoCMDB) GetListOfCiIdsOfCiTypeName(ciTypeName string) (r ListOfCiIdsOfCiType, err error) {
 
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	ciTypeId, err := i.GetCiTypeIdByCiTypeName(ciTypeName)
 	if err != nil {
 		err = errors.New(fmt.Sprintf("Failed to resolve id for ciTypeName '%s': %s", ciTypeName, err.Error()))
@@ -75,7 +90,7 @@ func (i *InfoCMDB) GetListOfCiIdsOfCiTypeName(ciTypeName string) (r ListOfCiIdsO
 	return
 }
 
-//// Templates for others
+// // Templates for others
 type AddCiProjectMapping struct {
 	Status string `json:"status"`
 }
@@ -87,7 +102,13 @@ type AddCiProjectMapping struct {
 // select :argv1:, :argv2:, :argv3:
 // from dual
 // where not exists(select id from ci_project where ci_id = :argv1: and project_id = :argv2:)
+
 func (i *InfoCMDB) AddCiProjectMapping(ciID int, projectID int, historyID int) (r AddCiProjectMapping, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	params := url.Values{
 		"argv1": {strconv.Itoa(ciID)},
 		"argv2": {strconv.Itoa(projectID)},
@@ -103,14 +124,19 @@ func (i *InfoCMDB) AddCiProjectMapping(ciID int, projectID int, historyID int) (
 	return
 }
 
-//// CreateAttribute
-//// int_createAttribute     create an attribute
+// // CreateAttribute
+// // int_createAttribute     create an attribute
 type CreateAttribute struct {
 	Status string `json:"status"`
 	CiID   int    `json:"id"`
 }
 
 func (i *InfoCMDB) CreateAttribute(ciID int, attrID int) (r CreateAttribute, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	params := url.Values{
 		"argv1": {strconv.Itoa(ciID)},
 		"argv2": {strconv.Itoa(attrID)},
@@ -138,6 +164,11 @@ type CreateCi struct {
 }
 
 func (i *InfoCMDB) CreateCi(ciTypeID int, icon string, historyID int) (r CreateCi, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	params := url.Values{
 		"argv1": {strconv.Itoa(ciTypeID)},
 		"argv2": {icon},
@@ -172,6 +203,11 @@ type GetCi struct {
 }
 
 func (i *InfoCMDB) GetCi(ciID int) (r Ci, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	params := url.Values{
 		"argv1": {strconv.Itoa(ciID)},
 	}
@@ -223,6 +259,11 @@ type GetCiAttributes struct {
 }
 
 func (i *InfoCMDB) GetCiAttributes(ciID int) (r []CiAttribute, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	params := url.Values{
 		"argv1": {strconv.Itoa(ciID)},
 	}
@@ -247,6 +288,11 @@ type CreateCiAttribute struct {
 }
 
 func (i *InfoCMDB) CreateCiAttribute() (r CreateCiAttribute, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	/*
 		params := url.Values{
@@ -279,6 +325,10 @@ type CreateCiRelation struct {
 }
 
 func (i *InfoCMDB) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName string, direction string) (err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
 
 	var directionId int
 	switch direction {
@@ -336,7 +386,13 @@ type CreateHistory struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) CreateHistory() (r CreateHistory, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -366,7 +422,13 @@ type DeleteCi struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) DeleteCi() (r DeleteCi, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -396,7 +458,13 @@ type DeleteCiAttribute struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) DeleteCiAttribute() (r DeleteCiAttribute, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -428,6 +496,11 @@ type DeleteCiRelation struct {
 }
 
 func (i *InfoCMDB) DeleteCiRelation(ciId1 int, ciId2 int, ciRelationTypeName string) (err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	ciRelationTypeId, err := i.GetCiRelationTypeIdByRelationTypeName(ciRelationTypeName)
 	if err != nil {
 		err = util_error.FunctionError(err.Error())
@@ -458,7 +531,13 @@ type DeleteCiRelationsByCiRelationTypeDirectedFrom struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) DeleteCiRelationsByCiRelationTypeDirectedFrom() (r DeleteCiRelationsByCiRelationTypeDirectedFrom, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -488,7 +567,13 @@ type DeleteCiRelationsByCiRelationTypeDirectedTo struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) DeleteCiRelationsByCiRelationTypeDirectedTo() (r DeleteCiRelationsByCiRelationTypeDirectedTo, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -518,7 +603,13 @@ type DeleteCiRelationsByCiRelationTypeDirectionList struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) DeleteCiRelationsByCiRelationTypeDirectionList() (r DeleteCiRelationsByCiRelationTypeDirectionList, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -553,6 +644,11 @@ type GetAttributeDefaultOption struct {
 }
 
 func (i *InfoCMDB) GetAttributeDefaultOption(optionId int) (r string, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	cacheKey := "GetAttributeDefaultOption_" + strconv.Itoa(optionId)
 	cached, found := i.v1.Cache.Get(cacheKey)
 	if found {
@@ -591,7 +687,13 @@ type GetAttributeDefaultOptionId struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) GetAttributeDefaultOptionId() (r GetAttributeDefaultOptionId, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -621,7 +723,13 @@ type GetAttributeGroupIdByAttributeGroupName struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) GetAttributeGroupIdByAttributeGroupName() (r GetAttributeGroupIdByAttributeGroupName, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -654,6 +762,11 @@ type GetAttributeIdByAttributeName struct {
 }
 
 func (i *InfoCMDB) GetAttributeIdByAttributeName(name string) (r int, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	cacheKey := "GetAttributeIdByAttributeName_" + name
 	cached, found := i.v1.Cache.Get(cacheKey)
 	if found {
@@ -692,7 +805,13 @@ type GetCiAttributeId struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) GetCiAttributeId(ciID int, attrID int) (r GetCiAttributeId, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -728,6 +847,11 @@ type GetCiAttributeValue struct {
 }
 
 func (i *InfoCMDB) GetCiAttributeValue(ciId int, attributeName string, valueType string) (r GetCiAttributeValue, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	attributeId, err := i.GetAttributeIdByAttributeName(attributeName)
 	if err != nil {
 		err = util_error.FunctionError(err.Error())
@@ -756,6 +880,11 @@ func (i *InfoCMDB) GetCiAttributeValue(ciId int, attributeName string, valueType
 }
 
 func (i *InfoCMDB) GetCiAttributeValueText(ciId int, attributeName string) (value string, id int, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	result, err := i.GetCiAttributeValue(ciId, attributeName, v1.ATTRIBUTE_VALUE_TYPE_TEXT)
 	if err != nil {
 		err = util_error.FunctionError(err.Error())
@@ -769,6 +898,11 @@ func (i *InfoCMDB) GetCiAttributeValueText(ciId int, attributeName string) (valu
 }
 
 func (i *InfoCMDB) GetCiAttributeValueDate(ciId int, attributeName string) (value string, id int, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	result, err := i.GetCiAttributeValue(ciId, attributeName, v1.ATTRIBUTE_VALUE_TYPE_DATE)
 	if err != nil {
 		err = util_error.FunctionError(err.Error())
@@ -782,6 +916,11 @@ func (i *InfoCMDB) GetCiAttributeValueDate(ciId int, attributeName string) (valu
 }
 
 func (i *InfoCMDB) GetCiAttributeValueDefault(ciId int, attributeName string) (value string, id int, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	result, err := i.GetCiAttributeValue(ciId, attributeName, v1.ATTRIBUTE_VALUE_TYPE_DEFAULT)
 	if err != nil {
 		err = util_error.FunctionError(err.Error())
@@ -806,6 +945,11 @@ func (i *InfoCMDB) GetCiAttributeValueDefault(ciId int, attributeName string) (v
 }
 
 func (i *InfoCMDB) GetCiAttributeValueCi(ciId int, attributeName string) (value string, id int, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	result, err := i.GetCiAttributeValue(ciId, attributeName, v1.ATTRIBUTE_VALUE_TYPE_CI)
 	if err != nil {
 		err = util_error.FunctionError(err.Error())
@@ -825,7 +969,13 @@ type GetCiIdByCiAttributeId struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) GetCiIdByCiAttributeId() (r GetCiIdByCiAttributeId, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -855,7 +1005,13 @@ type GetCiIdByCiAttributeValue struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) GetCiIdByCiAttributeValue() (r GetCiIdByCiAttributeValue, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -885,7 +1041,13 @@ type GetCiProjectMappings struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) GetCiProjectMappings() (r GetCiProjectMappings, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -920,6 +1082,11 @@ type GetCiRelationCount struct {
 }
 
 func (i *InfoCMDB) GetCiRelationCount(ciId1 int, ciId2 int, ciRelationTypeName string) (r int, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	ciRelationTypeId, err := i.GetCiRelationTypeIdByRelationTypeName(ciRelationTypeName)
 	if err != nil {
 		err = util_error.FunctionError(err.Error())
@@ -962,6 +1129,11 @@ type GetCiRelationTypeIdByRelationTypeName struct {
 }
 
 func (i *InfoCMDB) GetCiRelationTypeIdByRelationTypeName(name string) (r int, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	cacheKey := "GetCiRelationTypeIdByRelationTypeName_" + name
 	cached, found := i.v1.Cache.Get(cacheKey)
 	if found {
@@ -1001,6 +1173,11 @@ type GetCiTypeIdByCiTypeName struct {
 }
 
 func (i *InfoCMDB) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	cacheKey := "GetCiRelationTypeIdByRelationTypeName_" + name
 	cached, found := i.v1.Cache.Get(cacheKey)
 	if found {
@@ -1039,7 +1216,13 @@ type GetCiTypeOfCi struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) GetCiTypeOfCi() (r GetCiTypeOfCi, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -1074,6 +1257,11 @@ type GetListOfCiIdsByCiRelation struct {
 }
 
 func (i *InfoCMDB) GetListOfCiIdsByCiRelation(ciId int, ciRelationTypeName string, direction string) (r []int, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	ciRelationTypeId, err := i.GetCiRelationTypeIdByRelationTypeName(ciRelationTypeName)
 	if err != nil {
 		err = util_error.FunctionError(err.Error())
@@ -1124,7 +1312,13 @@ type GetNumberOfCiAttributes struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) GetNumberOfCiAttributes() (r GetNumberOfCiAttributes, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -1154,7 +1348,13 @@ type GetProjectIdByProjectName struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) GetProjectIdByProjectName() (r GetProjectIdByProjectName, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -1184,7 +1384,13 @@ type GetProjects struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) GetProjects() (r GetProjects, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -1214,7 +1420,13 @@ type GetRoleIdByRoleName struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) GetRoleIdByRoleName() (r GetRoleIdByRoleName, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -1244,7 +1456,13 @@ type GetUserIdByUsername struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) GetUserIdByUsername() (r GetUserIdByUsername, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -1274,7 +1492,13 @@ type RemoveCiProjectMapping struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) RemoveCiProjectMapping() (r RemoveCiProjectMapping, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -1304,7 +1528,13 @@ type SetAttributeRole struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) SetAttributeRole() (r SetAttributeRole, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -1334,7 +1564,13 @@ type SetCiTypeOfCi struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) SetCiTypeOfCi() (r SetCiTypeOfCi, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
@@ -1364,7 +1600,13 @@ type UpdateCiAttribute struct {
 	Status string `json:"status"`
 }
 
+
 func (i *InfoCMDB) UpdateCiAttribute() (r UpdateCiAttribute, err error) {
+
+	if err = i.v1.Login(); err != nil {
+		return
+	}
+
 	return r, v1.ErrNotImplemented // TODO FIXME
 	params := url.Values{
 		// "argv1": {strconv.Itoa(%PARAM1%)},
