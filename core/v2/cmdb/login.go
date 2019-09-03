@@ -1,6 +1,7 @@
 package cmdb
 
 import (
+	"errors"
 	"github.com/infonova/infocmdb-lib-go/core/v1/cmdb"
 	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
 	log "github.com/sirupsen/logrus"
@@ -27,7 +28,7 @@ func (i *InfoCMDB) Login() (err error) {
 	var loginResult LoginTokenReturn
 	params := map[string]string{
 		"username": i.Config.Username,
-		"password": i.Config.Password ,
+		"password": i.Config.Password,
 		"lifetime": "600",
 	}
 
@@ -37,8 +38,9 @@ func (i *InfoCMDB) Login() (err error) {
 
 	i.Client.SetHostURL(i.Config.Url)
 
-	err = i.Client.Post("/apiV2/auth/token",&loginResult,params)
+	err = i.Client.Post("/apiV2/auth/token", &loginResult, params)
 	if err != nil {
+		err = errors.New("Failed to fetch token: " + err.Error())
 		return
 	}
 
