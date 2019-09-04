@@ -38,7 +38,7 @@ func (i *InfoCMDB) Login() (err error) {
 
 	i.Client.SetHostURL(i.Config.Url)
 
-	err = i.Client.Post("/apiV2/auth/token", &loginResult, params)
+	err = i.Client.PostForm("/apiV2/auth/token", &loginResult, params)
 	if err != nil {
 		err = errors.New("Failed to fetch token: " + err.Error())
 		return
