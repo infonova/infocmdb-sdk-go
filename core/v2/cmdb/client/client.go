@@ -23,6 +23,8 @@ type ErrorReturn struct {
 	Data    interface{} `json:"data,omitempty"`
 }
 
+const MethodPostForm = "POST_FORM"
+
 func (i *Client) SetAuthToken(token string) {
 	i.resty.SetAuthToken(token)
 }
@@ -30,15 +32,25 @@ func (i *Client) SetHostURL(token string) {
 	i.resty.SetHostURL(token)
 }
 
-func (i *Client) Get(url string, out interface{}, params map[string]string) (err error) {
-	resp, err := i.resty.R().
-		SetQueryParams(params).
+func (i *Client) Execute(method string, url string, out interface{}, params map[string]string) (err error) {
+	rest := i.resty.R().
 		SetResult(&out).
-		SetError(ErrorReturn{}).
-		Get(url)
+		SetError(ErrorReturn{})
+
+	switch method {
+	case resty.MethodGet:
+		rest.SetQueryParams(params)
+	case MethodPostForm:
+		rest.SetFormData(params)
+		method = resty.MethodPost
+	default:
+		rest.SetBody(params) // json encoded body
+	}
+
+	resp, err := rest.Execute(method, url)
 
 	if err != nil {
-		err = errors.New(fmt.Sprintf("failed to send GET request to %s: ", url, err.Error()))
+		err = errors.New(fmt.Sprintf("failed to send %s request to %s: %s", method, url, err.Error()))
 		return
 	}
 
@@ -49,29 +61,30 @@ func (i *Client) Get(url string, out interface{}, params map[string]string) (err
 		return
 	}
 
-	// out will be set in resty
+	// "out" will be set in resty
 	return
 }
 
+func (i *Client) Get(url string, out interface{}, params map[string]string) (err error) {
+	return i.Execute(resty.MethodGet, url, out, params)
+}
+
 func (i *Client) Post(url string, out interface{}, params map[string]string) (err error) {
-	resp, err := i.resty.R().
-		SetQueryParams(params).
-		SetResult(out).
-		SetError(ErrorReturn{}).
-		Post(url)
+	return i.Execute(resty.MethodPost, url, out, params)
+}
 
-	if err != nil {
-		err = errors.New(fmt.Sprintf("failed to send POST request to %s: ", url, err.Error()))
-		return
-	}
+func (i *Client) PostForm(url string, out interface{}, params map[string]string) (err error) {
+	return i.Execute(MethodPostForm, url, out, params)
+}
 
-	// HTTP status code >= 400
-	if resp.IsError() {
-		errResp := resp.Error().(*ErrorReturn)
-		err = errors.New(errResp.Message)
-		return
-	}
+func (i *Client) Put(url string, out interface{}, params map[string]string) (err error) {
+	return i.Execute(resty.MethodPut, url, out, params)
+}
 
-	// out will be set in resty
-	return
+func (i *Client) Delete(url string, out interface{}, params map[string]string) (err error) {
+	return i.Execute(resty.MethodDelete, url, out, params)
+}
+
+func (i *Client) Patch(url string, out interface{}, params map[string]string) (err error) {
+	return i.Execute(resty.MethodPatch, url, out, params)
 }
