@@ -5,5 +5,5 @@ func (i *InfoCMDB) Query(query string, out interface {}, params map[string]strin
 		return
 	}
 
-	return i.Client.Post("/apiV2/query", &out, params)
+	return i.Client.Put("/apiV2/query", &out, params)
 }
