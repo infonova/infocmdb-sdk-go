@@ -35,7 +35,7 @@ func TestInfoCMDB_Query(t *testing.T) {
 				Client: client.NewClient(tt.fields.Config.Url),
 				Error:  tt.fields.Error,
 			}
-			if err := i.Query(tt.args.query, tt.args.out, tt.args.params); (err != nil) != tt.wantErr {
+			if _, err := i.Query(tt.args.query, tt.args.out, tt.args.params); (err != nil) != tt.wantErr {
 				t.Errorf("InfoCMDB.Query() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
