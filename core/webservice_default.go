@@ -65,7 +65,7 @@ func (i *InfoCMDB) GetListOfCiIdsOfCiTypeV2(ciTypeID int) (r ListOfCiIdsOfCiType
 	}
 
 	ret := GetListOfCiIdsOfCiType{}
-	err = i.v2.Query("int_getListOfCiIdsOfCiType", &ret, params)
+	_, err = i.v2.Query("int_getListOfCiIdsOfCiType", &ret, params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
