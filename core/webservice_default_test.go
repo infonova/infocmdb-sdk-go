@@ -186,3 +186,51 @@ func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
 		})
 	}
 }
+
+func TestInfoCMDB_QueryWebservice(t *testing.T) {
+	type fields struct {
+		v2 *v2.InfoCMDB
+	}
+	type args struct {
+		ws     string
+		params map[string]string
+	}
+
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantR   string
+		wantErr bool
+	}{
+		{
+			"v2 List CIs of Type 1 (demo)",
+			fields{
+				&v2.InfoCMDB{Config: v2.Config{
+					Url:      infocmdbUrl,
+					Username: "admin",
+					Password: "admin",
+					BasePath: "/app/",
+				}},
+			},
+			args{ws: "int_getCi", params: map[string]string{"argv1": "1"}},
+			`{"success":true,"message":"Query executed successfully","data":[{"ci_id":"1","ci_type_id":"1","ci_type":"demo","project":"springfield","project_id":"4"}]}`,
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			i := &InfoCMDB{
+				v2: tt.fields.v2,
+			}
+			gotR, err := i.QueryWebservice(tt.args.ws, tt.args.params)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("QueryWebservice() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotR != tt.wantR {
+				t.Errorf("QueryWebservice() gotR = %v, want %v", gotR, tt.wantR)
+			}
+		})
+	}
+}

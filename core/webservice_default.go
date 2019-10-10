@@ -13,6 +13,23 @@ import (
 	"strings"
 )
 
+// QueryWebservices allows you to call a generic webservice(arg1: ws) with the providing params
+// Return: json string
+func (i *InfoCMDB) QueryWebservice(ws string, params map[string]string) (r string, err error) {
+	if err = i.v2.Login(); err != nil {
+		return
+	}
+
+	var res interface{}
+	resp, err := i.v2.Query(ws, &res, params)
+	if err != nil {
+		log.Error("Error: ", err)
+		return "", err
+	}
+	r = resp.String()
+	return
+}
+
 type ListOfCiIdsOfCiType []struct {
 	CiID int `json:"ciid,string"`
 }
