@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	v1 "github.com/infonova/infocmdb-lib-go/core/v1/cmdb"
+	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb"
+	clientV2 "github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
 	util_error "github.com/infonova/infocmdb-lib-go/util/error"
 	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
@@ -1610,40 +1612,51 @@ func (i *InfoCMDB) SetCiTypeOfCi() (r SetCiTypeOfCi, err error) {
 
 	return
 }
+*/
 
 // UpdateCiAttribute
-// int_updateCiAttribute   updates a specific ci_attribute_row argv1 = ci_attribute-ID argv2 = column argv3 = value argv4 = history_id
+// type UpdateAttribute struct {
+// 	Mode          string `json:"mode"`
+// 	Name          string `json:"name"`
+// 	Value         string `json:"value"`
+// 	CiAttributeID int    `json:"ciAttributeId,omitempty"`
+// 	UploadID      string `json:"uploadId,omitempty"`
+// }
+//
+// type UpdateCiAttribute struct {
+// 	Ci struct {
+// 		Attributes []UpdateAttribute `json:"attributes"`
+// 	} `json:"ci"`
+// }
 type UpdateCiAttribute struct {
-	Status string `json:"status"`
+	Mode          cmdb.UpdateMode `json:"mode"`
+	Name          string          `json:"name"`
+	Value         string          `json:"value"`
+	CiAttributeID int             `json:"ciAttributeId"`
+	UploadID      string          `json:"uploadId"`
 }
 
+type UpdateCiAttributes struct {
+	Attributes []UpdateCiAttribute `json:"attributes"`
+}
+type UpdateCiAttributesRequest struct {
+	Ci UpdateCiAttributes `json:"ci"`
+}
 
-func (i *InfoCMDB) UpdateCiAttribute() (r UpdateCiAttribute, err error) {
-
-	if err = i.v1.Login(); err != nil {
+func (i *InfoCMDB) UpdateCiAttribute(ci int, ua []UpdateCiAttribute) (err error) {
+	if err = i.v2.Login(); err != nil {
 		return
 	}
 
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
+	var errResp clientV2.ResponseStatus
+	_, err = (i.v2.Client.NewRequest().
+		SetError(&errResp).
+		SetBody(UpdateCiAttributesRequest{Ci: UpdateCiAttributes{Attributes: ua}}).
+		Put(fmt.Sprintf("/apiV2/ci/%d?XDEBUG_SESSION_START=1", ci)))
 
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_updateCiAttribute", params)
 	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
+		return errors.New(errResp.Message + "\n" + errResp.Data)
 	}
 
 	return
 }
-*/
