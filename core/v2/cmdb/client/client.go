@@ -9,6 +9,12 @@ type Client struct {
 	resty *resty.Client
 }
 
+type ResponseStatus struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Data    string `json:"data"`
+}
+
 func NewClient(baseURL string) (c *Client) {
 	c = &Client{}
 	c.resty = resty.New().

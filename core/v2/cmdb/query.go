@@ -21,11 +21,11 @@ func (i *InfoCMDB) Query(query string, out interface{}, params map[string]string
 		},
 	}
 
-	req := i.Client.NewRequest().
+	resp, err = i.Client.NewRequest().
 		SetResult(out).
-		SetBody(r)
-
-	resp, err = req.Put("/apiV2/query/execute/" + query)
+		SetBody(r).
+		SetAuthToken(i.Config.ApiKey).
+		Put("/apiV2/query/execute/" + query)
 
 	return
 }
