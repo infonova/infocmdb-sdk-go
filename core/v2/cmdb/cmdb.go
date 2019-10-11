@@ -29,6 +29,15 @@ type InfoCMDB struct {
 	Error  error
 }
 
+type UpdateMode string
+
+const (
+	UpdateModeInsert UpdateMode = "insert"
+	UpdateModeUpdate UpdateMode = "update"
+	UpdateModeDelete UpdateMode = "delete"
+	UpdateModeSet    UpdateMode = "set"
+)
+
 func init() {
 	log.SetLevel(log.InfoLevel)
 	if os.Getenv("WORKFLOW_DEBUGGING") == "true" {
