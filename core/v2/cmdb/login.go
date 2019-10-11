@@ -36,14 +36,16 @@ func (i *InfoCMDB) Login() (err error) {
 		i.Client = client.NewClient(i.Config.Url)
 	}
 
-	req := i.Client.NewRequest().
+	var errResp client.ResponseStatus
+	resp, err := i.Client.NewRequest().
+		SetError(&errResp).
 		SetResult(&loginResult).
-		SetFormData(params)
+		SetFormData(params).
+		Post("/apiV2/auth/token")
 
-	_, err = req.Post("/apiV2/auth/token")
-	if err != nil {
-		err = errors.New("Failed to fetch token: " + err.Error())
-		return
+	if resp.IsError() {
+		return errors.New("Failed to fetch token: " + err.Error())
+
 	}
 
 	if loginResult.Data.Token == "" {
