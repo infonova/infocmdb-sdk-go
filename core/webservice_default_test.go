@@ -250,7 +250,7 @@ func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 		Password: "admin",
 		BasePath: "/app/",
 	}}
-	baseCiID := 13 // ci to base this tests on
+	baseCiID := 14 // ci to base this tests on
 	baseAttributeName := "emp_lastname"
 
 	tests := []struct {
@@ -271,7 +271,7 @@ func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 			"v2 Update CI Attribute",
 			fields{&cmdbConfigValid},
 			args{ci: baseCiID, ua: []UpdateCiAttribute{
-				{Mode: v2.UpdateModeSet, Name: baseAttributeName, Value: "22322"},
+				{Mode: v2.UpdateModeSet, Name: "emp_firstname", Value: "22322"},
 			}},
 			false,
 		},

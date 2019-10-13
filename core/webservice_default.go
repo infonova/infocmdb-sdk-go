@@ -1650,6 +1650,25 @@ func (i *InfoCMDB) UpdateCiAttribute(ci int, ua []UpdateCiAttribute) (err error)
 
 	var errResp clientV2.ResponseStatus
 	_, err = (i.v2.Client.NewRequest().
+		SetBody(UpdateCiAttributesRequest{Ci: UpdateCiAttributes{Attributes: ua}}).
+		SetAuthToken(i.v2.Config.ApiKey).
+		SetError(&errResp).
+		Put(fmt.Sprintf("/apiV2/ci/%d?XDEBUG_SESSION_START=1", ci)))
+
+	if err != nil || errResp.Message != "" {
+		return errors.New(errResp.Message + "\n" + errResp.Data)
+	}
+
+	return
+}
+
+func (i *InfoCMDB) ListCiByAttributeValue(ci int, ua []UpdateCiAttribute) (err error) {
+	if err = i.v2.Login(); err != nil {
+		return
+	}
+
+	var errResp clientV2.ResponseStatus
+	_, err = (i.v2.Client.NewRequest().
 		SetError(&errResp).
 		SetBody(UpdateCiAttributesRequest{Ci: UpdateCiAttributes{Attributes: ua}}).
 		Put(fmt.Sprintf("/apiV2/ci/%d?XDEBUG_SESSION_START=1", ci)))
