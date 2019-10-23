@@ -1,8 +1,8 @@
 package cmdb
 
 import (
+	"os"
 	"testing"
-
 )
 
 var yamlValidLogin = []byte(`
@@ -13,6 +13,14 @@ apiUser: admin
 apiPassword: admin
 `)
 
+var infocmdbUrl string
+
+func init() {
+	if infocmdbUrl = os.Getenv("WORKFLOW_TEST_URL"); infocmdbUrl == "" {
+		infocmdbUrl = "http://localhost"
+	}
+}
+
 func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {
 
 	type args struct {
@@ -20,41 +28,40 @@ func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {
 		out      interface{}
 	}
 
-
 	type EmployeeReturn struct {
 		Data struct {
 			Data struct {
 				AttributeList map[int]struct {
-						AttributeGroupID    string      `json:"attribute_group_id"`
-						AttributeTypeID     string      `json:"attribute_type_id"`
-						Column              string      `json:"column"`
-						Description         string      `json:"description"`
-						DisplayStyle        interface{} `json:"display_style"`
-						Hint                string      `json:"hint"`
-						Historicize         string      `json:"historicize"`
-						ID                  string      `json:"id"`
-						InputMaxlength      interface{} `json:"input_maxlength"`
-						IsActive            string      `json:"is_active"`
-						IsAutocomplete      string      `json:"is_autocomplete"`
-						IsBold              string      `json:"is_bold"`
-						IsEvent             string      `json:"is_event"`
-						IsMultiselect       string      `json:"is_multiselect"`
-						IsNumeric           string      `json:"is_numeric"`
-						IsProjectRestricted string      `json:"is_project_restricted"`
-						IsUnique            string      `json:"is_unique"`
-						IsUniqueCheck       string      `json:"is_unique_check"`
-						Name                string      `json:"name"`
-						Note                string      `json:"note"`
-						OrderNumber         string      `json:"order_number"`
-						Regex               interface{} `json:"regex"`
-						ScriptName          interface{} `json:"script_name"`
-						Tag                 string      `json:"tag"`
-						TextareaCols        interface{} `json:"textarea_cols"`
-						TextareaRows        interface{} `json:"textarea_rows"`
-						UserID              string      `json:"user_id"`
-						ValidFrom           string      `json:"valid_from"`
-						Width               interface{} `json:"width"`
-						WorkflowID          interface{} `json:"workflow_id"`
+					AttributeGroupID    string      `json:"attribute_group_id"`
+					AttributeTypeID     string      `json:"attribute_type_id"`
+					Column              string      `json:"column"`
+					Description         string      `json:"description"`
+					DisplayStyle        interface{} `json:"display_style"`
+					Hint                string      `json:"hint"`
+					Historicize         string      `json:"historicize"`
+					ID                  string      `json:"id"`
+					InputMaxlength      interface{} `json:"input_maxlength"`
+					IsActive            string      `json:"is_active"`
+					IsAutocomplete      string      `json:"is_autocomplete"`
+					IsBold              string      `json:"is_bold"`
+					IsEvent             string      `json:"is_event"`
+					IsMultiselect       string      `json:"is_multiselect"`
+					IsNumeric           string      `json:"is_numeric"`
+					IsProjectRestricted string      `json:"is_project_restricted"`
+					IsUnique            string      `json:"is_unique"`
+					IsUniqueCheck       string      `json:"is_unique_check"`
+					Name                string      `json:"name"`
+					Note                string      `json:"note"`
+					OrderNumber         string      `json:"order_number"`
+					Regex               interface{} `json:"regex"`
+					ScriptName          interface{} `json:"script_name"`
+					Tag                 string      `json:"tag"`
+					TextareaCols        interface{} `json:"textarea_cols"`
+					TextareaRows        interface{} `json:"textarea_rows"`
+					UserID              string      `json:"user_id"`
+					ValidFrom           string      `json:"valid_from"`
+					Width               interface{} `json:"width"`
+					WorkflowID          interface{} `json:"workflow_id"`
 				} `json:"attributeList"`
 				Breadcrumbs []struct {
 					CreateButtonDescription interface{} `json:"create_button_description"`
@@ -109,28 +116,39 @@ func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		Config Config
+		Config  Config
 		args    args
 		wantErr bool
 	}{
 		{
 			"query citype 1",
-			Config{Url: "http://localhost", Username: "admin", Password: "admin"},
+			Config{
+				Url:      infocmdbUrl,
+				Username: "admin",
+				Password: "admin",
+				BasePath: "/app/",
+			},
 			args{12, citypetest1},
 			false,
 		},
 		{
 			"fail query citype -1",
-			Config{Url: "http://localhost", Username: "admin", Password: "admin"},
+			Config{
+				Url:      infocmdbUrl,
+				Username: "admin",
+				Password: "admin",
+				BasePath: "/app/",
+			},
 			args{-1, citypetest1},
 			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			i := NewCMDB().LoadConfig(yamlValidLogin)
+			i := NewCMDB()
+			i.Config = tt.Config
 			if err := i.Login(); err != nil {
-				panic(err)
+				t.Logf("Login failed: %v\n", err)
 			}
 
 			var citypetest2 EmployeeReturn

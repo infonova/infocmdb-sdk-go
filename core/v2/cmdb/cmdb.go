@@ -1,16 +1,17 @@
 package cmdb
 
 import (
-	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
-	"github.com/patrickmn/go-cache"
-	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
+	"github.com/patrickmn/go-cache"
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
@@ -29,13 +30,33 @@ type InfoCMDB struct {
 	Error  error
 }
 
+type ErrorReturn struct {
+	Message string `json:"message"`
+	Success bool   `json:"success"`
+}
+
+const (
+	CI_RELATION_DIRECTION_ALL             = "all"
+	CI_RELATION_DIRECTION_DIRECTED_FROM   = "directed_from"
+	CI_RELATION_DIRECTION_DIRECTED_TO     = "directed_to"
+	CI_RELATION_DIRECTION_BIDIRECTIONAL   = "bidirectional"
+	CI_RELATION_DIRECTION_OMNIDIRECTIONAL = "omnidirectional"
+)
+
+const (
+	ATTRIBUTE_VALUE_TYPE_TEXT    = "value_text"
+	ATTRIBUTE_VALUE_TYPE_DATE    = "value_date"
+	ATTRIBUTE_VALUE_TYPE_DEFAULT = "value_default"
+	ATTRIBUTE_VALUE_TYPE_CI      = "value_ci"
+)
+
 type UpdateMode string
 
 const (
-	UpdateModeInsert UpdateMode = "insert"
-	UpdateModeUpdate UpdateMode = "update"
-	UpdateModeDelete UpdateMode = "delete"
-	UpdateModeSet    UpdateMode = "set"
+	UPDATE_MODE_INSERT UpdateMode = "insert"
+	UPDATE_MODE_UPDATE UpdateMode = "update"
+	UPDATE_MODE_DELETE UpdateMode = "delete"
+	UPDATE_MODE_SET    UpdateMode = "set"
 )
 
 func init() {
@@ -48,7 +69,7 @@ func init() {
 func (i *InfoCMDB) LoadConfigFile(configFile string) *InfoCMDB {
 	_, err := os.Stat(configFile)
 	if os.IsNotExist(err) {
-		WorkflowConfigPath := filepath.Dir(os.Getenv("WORKFLOW_CONFIG_PATH") + "/")
+		WorkflowConfigPath := os.Getenv("WORKFLOW_CONFIG_PATH")
 		log.Debugf("WORKFLOW_CONFIG_PATH: %s", WorkflowConfigPath)
 		configFile = filepath.Join(WorkflowConfigPath, configFile)
 	} else if err != nil {

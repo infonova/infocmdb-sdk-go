@@ -1,11 +1,18 @@
 package cmdb
 
 import (
+	"os"
 	"testing"
 
 	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
 	"github.com/patrickmn/go-cache"
 )
+
+func init() {
+	if infocmdbUrl = os.Getenv("WORKFLOW_TEST_URL"); infocmdbUrl == "" {
+		infocmdbUrl = "http://localhost"
+	}
+}
 
 func TestInfoCMDB_Query(t *testing.T) {
 	type fields struct {
@@ -25,7 +32,7 @@ func TestInfoCMDB_Query(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"valid", fields{Config: Config{Url: "http://localhost", Username: "admin", Password: "admin"}}, args{}, false},
+		{"valid", fields{Config: Config{Url: infocmdbUrl, Username: "admin", Password: "admin"}}, args{}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

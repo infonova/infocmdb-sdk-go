@@ -32,9 +32,7 @@ func (i *InfoCMDB) Login() (err error) {
 		"lifetime": "600",
 	}
 
-	if i.Client == nil {
-		i.Client = client.NewClient(i.Config.Url)
-	}
+	i.Client = client.NewClient(i.Config.Url)
 
 	var errResp client.ResponseStatus
 	resp, err := i.Client.NewRequest().
@@ -43,9 +41,12 @@ func (i *InfoCMDB) Login() (err error) {
 		SetFormData(params).
 		Post("/apiV2/auth/token")
 
-	if resp.IsError() {
-		return errors.New("Failed to fetch token: " + err.Error())
+	if err != nil {
+		return err
+	}
 
+	if resp.IsError() {
+		return errors.New("Failed to fetch token: " + resp.String())
 	}
 
 	if loginResult.Data.Token == "" {

@@ -1,13 +1,14 @@
 package core
 
 import (
+	"os"
+	"reflect"
+	"testing"
+
 	v1 "github.com/infonova/infocmdb-lib-go/core/v1/cmdb"
 	v2 "github.com/infonova/infocmdb-lib-go/core/v2/cmdb"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
-	"os"
-	"reflect"
-	"testing"
 )
 
 var (
@@ -41,49 +42,49 @@ func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		wantR   ListOfCiIdsOfCiType
+		wantR   ListOfCiIds
 		wantErr bool
 	}{
 		{
-			"v1 List Ci's pf Type '1' with wrong Credentials (fail)",
+			"v2 List Ci's pf Type '1' with wrong Credentials (fail)",
 			fields{
-				&v1.InfoCMDB{Config: v1.Config{
-					ApiUrl:       infocmdbUrl,
-					ApiUser:      "fail",
-					ApiPassword:  "fail",
-					CmdbBasePath: "/app/",
+				&v1.InfoCMDB{Config: v1.Config{}},
+				&v2.InfoCMDB{Config: v2.Config{
+					Url:      infocmdbUrl,
+					Username: "fail",
+					Password: "fail",
+					BasePath: "/app/",
 				}},
-				&v2.InfoCMDB{Config: v2.Config{}},
 			},
 			args{ciTypeID: 1},
 			nil,
 			true,
 		},
 		{
-			"v1 List Ci's of Type '1' (demo)",
+			"v2 List Ci's of Type '1' (demo)",
 			fields{
-				&v1.InfoCMDB{Config: v1.Config{
-					ApiUrl:       infocmdbUrl,
-					ApiUser:      "admin",
-					ApiPassword:  "admin",
-					CmdbBasePath: "/app/",
+				&v1.InfoCMDB{Config: v1.Config{}},
+				&v2.InfoCMDB{Config: v2.Config{
+					Url:      infocmdbUrl,
+					Username: "admin",
+					Password: "admin",
+					BasePath: "/app/",
 				}},
-				&v2.InfoCMDB{Config: v2.Config{}},
 			},
 			args{ciTypeID: 1},
-			ListOfCiIdsOfCiType{{1}, {2}},
+			ListOfCiIds{{1}, {2}},
 			false,
 		},
 		{
-			"v1 List Ci's of Type '-1' (error)",
+			"v2 List Ci's of Type '-1' (error)",
 			fields{
-				&v1.InfoCMDB{Config: v1.Config{
-					ApiUrl:       infocmdbUrl,
-					ApiUser:      "admin",
-					ApiPassword:  "admin",
-					CmdbBasePath: "/app/",
+				&v1.InfoCMDB{Config: v1.Config{}},
+				&v2.InfoCMDB{Config: v2.Config{
+					Url:      infocmdbUrl,
+					Username: "admin",
+					Password: "admin",
+					BasePath: "/app/",
 				}},
-				&v2.InfoCMDB{Config: v2.Config{}},
 			},
 			args{ciTypeID: -1},
 			nil,
@@ -120,7 +121,7 @@ func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		wantR   ListOfCiIdsOfCiType
+		wantR   ListOfCiIds
 		wantErr bool
 	}{
 		{
@@ -150,7 +151,7 @@ func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
 				}},
 			},
 			args{ciTypeID: 1},
-			ListOfCiIdsOfCiType{{1}, {2}},
+			ListOfCiIds{{1}, {2}},
 			false,
 		},
 		{
@@ -263,7 +264,7 @@ func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 			"v2 Delete CI Attribute - fail - requires ciattributeid",
 			fields{&cmdbConfigValid},
 			args{ci: baseCiID, ua: []UpdateCiAttribute{
-				{Mode: v2.UpdateModeDelete, Name: baseAttributeName},
+				{Mode: v2.UPDATE_MODE_DELETE, Name: baseAttributeName},
 			}},
 			true,
 		},
@@ -271,7 +272,7 @@ func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 			"v2 Update CI Attribute",
 			fields{&cmdbConfigValid},
 			args{ci: baseCiID, ua: []UpdateCiAttribute{
-				{Mode: v2.UpdateModeSet, Name: "emp_firstname", Value: "22322"},
+				{Mode: v2.UPDATE_MODE_SET, Name: "emp_firstname", Value: "22322"},
 			}},
 			false,
 		},
@@ -279,7 +280,7 @@ func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 			"v2 Update CI Attribute - wrong attribute name",
 			fields{&cmdbConfigValid},
 			args{ci: baseCiID, ua: []UpdateCiAttribute{
-				{Mode: v2.UpdateModeSet, Name: baseAttributeName + "_NOT_EXISTING", Value: "1"},
+				{Mode: v2.UPDATE_MODE_SET, Name: baseAttributeName + "_NOT_EXISTING", Value: "1"},
 			}},
 			true,
 		},
@@ -287,7 +288,7 @@ func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 			"v2 Insert CI Attribute",
 			fields{&cmdbConfigValid},
 			args{ci: baseCiID, ua: []UpdateCiAttribute{
-				{Mode: v2.UpdateModeInsert, Name: baseAttributeName, Value: "New1"},
+				{Mode: v2.UPDATE_MODE_INSERT, Name: baseAttributeName, Value: "New1"},
 			}},
 			false,
 		},
@@ -295,7 +296,7 @@ func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 			"v2 Update CI Attribute - fail - multiple attributes with the same name",
 			fields{&cmdbConfigValid},
 			args{ci: baseCiID, ua: []UpdateCiAttribute{
-				{Mode: v2.UpdateModeSet, Name: baseAttributeName, Value: "22322"},
+				{Mode: v2.UPDATE_MODE_SET, Name: baseAttributeName, Value: "22322"},
 			}},
 			true,
 		},

@@ -1,22 +1,31 @@
 package cmdb
 
 import (
+	"errors"
 	"fmt"
-	"gopkg.in/resty.v1"
 	"strconv"
+
+	"gopkg.in/resty.v1"
 )
 
 func (i *InfoCMDB) CiListByCiTypeID(ciTypeID int, out interface{}) (err error) {
-	req := i.Client.NewRequest().
+	var errReturn ErrorReturn
+	resp, err := i.Client.NewRequest().
 		SetResult(&out).
+		SetError(&errReturn).
 		SetQueryParams(map[string]string{
-			"ciTypeId": fmt.Sprintf("%d", ciTypeID),
-		})
+			"ciTypeId":             fmt.Sprintf("%d", ciTypeID),
+			"XDEBUG_SESSION_START": "1",
+		}).
+		Get("/apiV2/ci/index")
 
-	_, err = req.Get("/apiV2/ci")
-
-	fmt.Printf("Message: %v\n", out)
 	if err != nil {
+		i.AddError(err)
+		return
+	}
+
+	if resp.IsError() {
+		err = errors.New(errReturn.Message)
 		i.AddError(err)
 		return
 	}

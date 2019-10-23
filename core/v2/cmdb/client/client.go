@@ -1,7 +1,6 @@
 package client
 
 import (
-	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/models"
 	"gopkg.in/resty.v1"
 )
 
@@ -23,10 +22,7 @@ func NewClient(baseURL string) (c *Client) {
 }
 
 func (i *Client) NewRequest() *resty.Request {
-	r := i.resty.R().
-		SetError(models.ErrorReturn{})
-
-	return r
+	return i.resty.R()
 }
 
 func (i *Client) SetAuthToken(token string) {
