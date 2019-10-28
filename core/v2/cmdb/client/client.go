@@ -28,3 +28,7 @@ func (i *Client) NewRequest() *resty.Request {
 func (i *Client) SetAuthToken(token string) {
 	i.resty.SetAuthToken(token)
 }
+
+func (res ResponseStatus) Error() string {
+	return res.Message
+}

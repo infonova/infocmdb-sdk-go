@@ -25,12 +25,12 @@ func (i *InfoCMDB) QueryWebservice(ws string, params map[string]string) (r strin
 	}
 
 	var res interface{}
-	resp, err := i.v2.Query(ws, &res, params)
+	err = i.v2.Query(ws, &res, params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return "", err
 	}
-	r = resp.String()
+
 	return
 }
 
@@ -86,7 +86,7 @@ func (i *InfoCMDB) GetListOfCiIdsOfCiTypeV2(ciTypeID int) (r ListOfCiIds, err er
 	}
 
 	ret := GetListOfCiIdsOfCiType{}
-	_, err = i.v2.Query("int_getListOfCiIdsOfCiType", &ret, params)
+	err = i.v2.Query("int_getListOfCiIdsOfCiType", &ret, params)
 	if err != nil {
 		log.Error("Error: ", err)
 		return r, err
