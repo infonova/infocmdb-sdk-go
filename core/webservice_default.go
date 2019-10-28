@@ -19,16 +19,15 @@ import (
 
 // QueryWebservices allows you to call a generic webservice(arg1: ws) with the providing params
 // Return: json string
-func (i *InfoCMDB) QueryWebservice(ws string, params map[string]string) (r string, err error) {
+func (i *InfoCMDB) QueryWebservice(ws string, params map[string]string) (resp string, err error) {
 	if err = i.v2.Login(); err != nil {
 		return
 	}
 
-	var res interface{}
-	err = i.v2.Query(ws, &res, params)
+	resp, err = i.v2.QueryRaw(ws, params)
 	if err != nil {
 		log.Error("Error: ", err)
-		return "", err
+		return resp, err
 	}
 
 	return

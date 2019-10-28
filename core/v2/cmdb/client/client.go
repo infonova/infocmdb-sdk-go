@@ -22,7 +22,7 @@ func NewClient(baseURL string) (c *Client) {
 }
 
 func (i *Client) NewRequest() *resty.Request {
-	return i.resty.R()
+	return i.resty.NewRequest()
 }
 
 func (i *Client) SetAuthToken(token string) {
