@@ -1,16 +1,16 @@
 package cmdb
 
 import (
+	"testing"
+
 	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
 	utilTesting "github.com/infonova/infocmdb-lib-go/util/testing"
 	"github.com/patrickmn/go-cache"
-	"os"
-	"testing"
 )
 
 func TestInfoCMDB_Query(t *testing.T) {
-	utilTesting.LoadEnvFromFile("../../.env")
-	url := os.Getenv("WORKFLOW_TEST_URL")
+	url := utilTesting.Url
+
 	type fields struct {
 		Config Config
 		Cache  *cache.Cache
@@ -42,14 +42,14 @@ func TestInfoCMDB_Query(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			i := &InfoCMDB{
+			i := &Cmdb{
 				Config: tt.fields.Config,
 				Cache:  tt.fields.Cache,
 				Client: client.NewClient(tt.fields.Config.Url),
 				Error:  tt.fields.Error,
 			}
 			if err := i.Query(tt.args.query, tt.args.out, tt.args.params); (err != nil) != tt.wantErr {
-				t.Errorf("InfoCMDB.Query() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Cmdb.Query() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

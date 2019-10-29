@@ -32,8 +32,8 @@ func init() {
 
 func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
 	type fields struct {
-		v1 *v1.InfoCMDB
-		v2 *v2.InfoCMDB
+		v1 *v1.Cmdb
+		v2 *v2.Cmdb
 	}
 	type args struct {
 		ciTypeID int
@@ -48,8 +48,8 @@ func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
 		{
 			"v2 List Ci's pf Type '1' with wrong Credentials (fail)",
 			fields{
-				&v1.InfoCMDB{Config: v1.Config{}},
-				&v2.InfoCMDB{Config: v2.Config{
+				&v1.Cmdb{Config: v1.Config{}},
+				&v2.Cmdb{Config: v2.Config{
 					Url:      infocmdbUrl,
 					Username: "fail",
 					Password: "fail",
@@ -63,8 +63,8 @@ func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
 		{
 			"v2 List Ci's of Type '1' (demo)",
 			fields{
-				&v1.InfoCMDB{Config: v1.Config{}},
-				&v2.InfoCMDB{Config: v2.Config{
+				&v1.Cmdb{Config: v1.Config{}},
+				&v2.Cmdb{Config: v2.Config{
 					Url:      infocmdbUrl,
 					Username: "admin",
 					Password: "admin",
@@ -78,8 +78,8 @@ func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
 		{
 			"v2 List Ci's of Type '-1' (error)",
 			fields{
-				&v1.InfoCMDB{Config: v1.Config{}},
-				&v2.InfoCMDB{Config: v2.Config{
+				&v1.Cmdb{Config: v1.Config{}},
+				&v2.Cmdb{Config: v2.Config{
 					Url:      infocmdbUrl,
 					Username: "admin",
 					Password: "admin",
@@ -93,7 +93,7 @@ func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			i := &InfoCMDB{
+			i := &Client{
 				v1: tt.fields.v1,
 				v2: tt.fields.v2,
 			}
@@ -111,8 +111,8 @@ func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
 
 func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
 	type fields struct {
-		v1 *v1.InfoCMDB
-		v2 *v2.InfoCMDB
+		v1 *v1.Cmdb
+		v2 *v2.Cmdb
 	}
 	type args struct {
 		ciTypeID int
@@ -127,8 +127,8 @@ func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
 		{
 			"v2 List Ci's pf Type '1' with wrong Credentials (fail)",
 			fields{
-				&v1.InfoCMDB{Config: v1.Config{}},
-				&v2.InfoCMDB{Config: v2.Config{
+				&v1.Cmdb{Config: v1.Config{}},
+				&v2.Cmdb{Config: v2.Config{
 					Url:      infocmdbUrl,
 					Username: "false",
 					Password: "false",
@@ -142,8 +142,8 @@ func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
 		{
 			"v2 List CIs of Type 1 (demo)",
 			fields{
-				&v1.InfoCMDB{Config: v1.Config{}},
-				&v2.InfoCMDB{Config: v2.Config{
+				&v1.Cmdb{Config: v1.Config{}},
+				&v2.Cmdb{Config: v2.Config{
 					Url:      infocmdbUrl,
 					Username: "admin",
 					Password: "admin",
@@ -157,8 +157,8 @@ func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
 		{
 			"v2 List Ci's of Type '-1' (error)",
 			fields{
-				&v1.InfoCMDB{Config: v1.Config{}},
-				&v2.InfoCMDB{Config: v2.Config{
+				&v1.Cmdb{Config: v1.Config{}},
+				&v2.Cmdb{Config: v2.Config{
 					Url:      infocmdbUrl,
 					Username: "admin",
 					Password: "admin",
@@ -172,7 +172,7 @@ func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			i := &InfoCMDB{
+			i := &Client{
 				v1: tt.fields.v1,
 				v2: tt.fields.v2,
 			}
@@ -190,7 +190,7 @@ func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
 
 func TestInfoCMDB_QueryWebservice(t *testing.T) {
 	type fields struct {
-		v2 *v2.InfoCMDB
+		v2 *v2.Cmdb
 	}
 	type args struct {
 		ws     string
@@ -207,7 +207,7 @@ func TestInfoCMDB_QueryWebservice(t *testing.T) {
 		{
 			"v2 List CIs of Type 1 (demo)",
 			fields{
-				&v2.InfoCMDB{Config: v2.Config{
+				&v2.Cmdb{Config: v2.Config{
 					Url:      infocmdbUrl,
 					Username: "admin",
 					Password: "admin",
@@ -221,7 +221,7 @@ func TestInfoCMDB_QueryWebservice(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			i := &InfoCMDB{
+			i := &Client{
 				v2: tt.fields.v2,
 			}
 			gotR, err := i.QueryWebservice(tt.args.ws, tt.args.params)
@@ -238,14 +238,14 @@ func TestInfoCMDB_QueryWebservice(t *testing.T) {
 
 func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 	type fields struct {
-		v2 *v2.InfoCMDB
+		v2 *v2.Cmdb
 	}
 	type args struct {
 		ci int
 		ua []UpdateCiAttribute
 	}
 
-	cmdbConfigValid := v2.InfoCMDB{Config: v2.Config{
+	cmdbConfigValid := v2.Cmdb{Config: v2.Config{
 		Url:      infocmdbUrl,
 		Username: "admin",
 		Password: "admin",
@@ -303,7 +303,7 @@ func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			i := &InfoCMDB{
+			i := &Client{
 				v2: tt.fields.v2,
 			}
 			err := i.UpdateCiAttribute(tt.args.ci, tt.args.ua)

@@ -2,14 +2,14 @@ package testing
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
-	"log"
+	"os"
 )
 
-func LoadEnvFromFile(filename string) {
-	err := godotenv.Load(filename)
-	if err != nil {
-		log.Fatal("Error loading .env file")
+var Url = "http//localhost"
+
+func init() {
+	if url := os.Getenv("WORKFLOW_TEST_URL"); url != "" {
+		Url = url
 	}
 }
 

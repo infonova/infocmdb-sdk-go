@@ -12,7 +12,7 @@ type queryRequest struct {
 	Query queryParams `json:"query"`
 }
 
-func (i *InfoCMDB) Query(query string, out interface{}, params map[string]string) (err error) {
+func (i *Cmdb) Query(query string, out interface{}, params map[string]string) (err error) {
 	if err = i.Login(); err != nil {
 		return
 	}
@@ -23,7 +23,7 @@ func (i *InfoCMDB) Query(query string, out interface{}, params map[string]string
 		},
 	}
 
-	var respError client.ResponseStatus
+	var respError client.ResponseError
 
 	resp, err := i.Client.NewRequest().
 		SetResult(out).
@@ -32,14 +32,14 @@ func (i *InfoCMDB) Query(query string, out interface{}, params map[string]string
 		SetError(&respError).
 		Put("/apiV2/query/execute/" + query)
 
-	if resp.IsError() {
+	if resp != nil && resp.IsError() {
 		return respError
 	}
 
 	return
 }
 
-func (i *InfoCMDB) QueryRaw(query string, params map[string]string) (r string, err error) {
+func (i *Cmdb) QueryRaw(query string, params map[string]string) (r string, err error) {
 	if err = i.Login(); err != nil {
 		return
 	}
@@ -50,18 +50,20 @@ func (i *InfoCMDB) QueryRaw(query string, params map[string]string) (r string, e
 		},
 	}
 
-	var respError client.ResponseStatus
-
+	var respError client.ResponseError
 	resp, err := i.Client.NewRequest().
 		SetBody(qr).
 		SetAuthToken(i.Config.ApiKey).
 		SetError(&respError).
 		Put("/apiV2/query/execute/" + query)
 
+	if resp == nil {
+		return
+	}
+
 	if resp.IsError() {
 		return "", respError
 	}
 
-	r = resp.String()
-	return
+	return resp.String(), nil
 }

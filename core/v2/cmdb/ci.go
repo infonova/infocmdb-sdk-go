@@ -7,29 +7,24 @@ import (
 	"strconv"
 )
 
-func (i *InfoCMDB) CiListByCiTypeID(ciTypeID int, out interface{}) (err error) {
-	var respErr client.ResponseStatus
-	req, err := i.Client.NewRequest().
+func (i *Cmdb) CiListByCiTypeID(ciTypeID int, out interface{}) (err error) {
+	var respErr client.ResponseError
+	resp, err := i.Client.NewRequest().
 		SetResult(&out).
 		SetError(&respErr).
 		SetQueryParams(map[string]string{
-			"ciTypeId":             fmt.Sprintf("%d", ciTypeID),
-			"XDEBUG_SESSION_START": "1",
+			"ciTypeId": fmt.Sprintf("%d", ciTypeID),
 		}).
 		Get("/apiV2/ci/index")
 
-	if req != nil && req.IsError() {
+	if resp != nil && resp.IsError() {
 		return respErr
-	}
-
-	if err != nil {
-		return
 	}
 
 	return
 }
 
-type GetCiResponse struct {
+type GetCiDetailResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 	Data    struct {
@@ -205,24 +200,22 @@ type GetCiResponse struct {
 	} `json:"data"`
 }
 
-func (i *InfoCMDB) CiDetailByCiId(ciId int64) (resp GetCiResponse, restyRes *resty.Response, err error) {
+func (i *Cmdb) CiDetailByCiId(ciId int64) (ciDetail GetCiDetailResponse, restyRes *resty.Response, err error) {
 	if err = i.Login(); err != nil {
 		return
 	}
 
-	var respErr client.ResponseStatus
+	var respErr client.ResponseError
 
-	req := i.Client.NewRequest().
-		SetResult(&resp).
+	resp, err := i.Client.NewRequest().
+		SetResult(&ciDetail).
 		SetError(&respErr).
 		SetQueryParams(map[string]string{
 			"id": strconv.FormatInt(ciId, 10),
-		})
+		}).Get("/apiV2/ci")
 
-	restyRes, err = req.Get("/apiV2/ci")
-
-	if restyRes != nil && restyRes.IsError() {
-		return resp, restyRes, respErr
+	if resp != nil && resp.IsError() {
+		return ciDetail, restyRes, respErr
 	}
 
 	return

@@ -1,17 +1,15 @@
 package cmdb
 
 import (
-	utilTesting "github.com/infonova/infocmdb-lib-go/util/testing"
-	"os"
 	"testing"
 
 	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
+	utilTesting "github.com/infonova/infocmdb-lib-go/util/testing"
 	"github.com/patrickmn/go-cache"
 )
 
 func TestInfoCMDB_LoginWithUserPass(t *testing.T) {
-	utilTesting.LoadEnvFromFile("../../.env")
-	url := os.Getenv("WORKFLOW_TEST_URL")
+	url := utilTesting.Url
 
 	type fields struct {
 		Config Config
@@ -62,13 +60,13 @@ func TestInfoCMDB_LoginWithUserPass(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			i := new(InfoCMDB)
+			i := new(Cmdb)
 			i.Config = tt.fields.Config
 			i.Cache = tt.fields.Cache
 			i.Client = client.NewClient(i.Config.Url)
 
 			if err := i.Login(); (err != nil) != tt.wantErr {
-				t.Errorf("InfoCMDB.LoginWithUserPass() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Cmdb.LoginWithUserPass() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

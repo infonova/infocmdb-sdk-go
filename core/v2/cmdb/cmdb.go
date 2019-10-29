@@ -22,7 +22,7 @@ type Config struct {
 	BasePath string `yaml:"BasePath"`
 }
 
-type InfoCMDB struct {
+type Cmdb struct {
 	Config Config
 	Cache  *cache.Cache
 	Client *client.Client
@@ -70,47 +70,47 @@ func init() {
 	}
 }
 
-func (i *InfoCMDB) LoadConfigFile(configFile string) (*InfoCMDB, error) {
-	_, err := os.Stat(configFile)
+func (i *Cmdb) LoadConfigFile(configFile string) (err error) {
+	_, err = os.Stat(configFile)
 	if os.IsNotExist(err) {
 		WorkflowConfigPath := os.Getenv("WORKFLOW_CONFIG_PATH")
 		log.Debugf("WORKFLOW_CONFIG_PATH: %s", WorkflowConfigPath)
 		configFile = filepath.Join(WorkflowConfigPath, configFile)
 	} else if err != nil {
-		return i, err
+		return
 	}
 
 	log.Debugf("ConfigFile: %s", configFile)
 
 	_, err = os.Stat(configFile)
 	if err != nil {
-		return i, err
+		return
 	}
 
 	yamlFile, err := ioutil.ReadFile(configFile)
 	if err != nil {
-		return i, err
+		return
 	}
 
-	cmdb, err := i.LoadConfig(yamlFile)
-	return cmdb, err
+	err = i.LoadConfig(yamlFile)
+	return
 }
 
-func (i *InfoCMDB) LoadConfig(config []byte) (*InfoCMDB, error) {
-	if err := yaml.Unmarshal(config, &i.Config); err != nil {
-		return i, err
+func (i *Cmdb) LoadConfig(config []byte) (err error) {
+	if err = yaml.Unmarshal(config, &i.Config); err != nil {
+		return
 	}
 
-	err := i.applyUrlFromRedirect()
+	err = i.applyUrlFromRedirect()
 	if err != nil {
-		return i, err
+		return
 	}
 
 	i.Client = client.NewClient(i.Config.Url)
-	return i, err
+	return
 }
 
-func (i *InfoCMDB) applyUrlFromRedirect() (err error) {
+func (i *Cmdb) applyUrlFromRedirect() (err error) {
 	c := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
@@ -131,8 +131,9 @@ func (i *InfoCMDB) applyUrlFromRedirect() (err error) {
 	return
 }
 
-func NewCMDB() (i *InfoCMDB) {
-	return &InfoCMDB{
+// New returns a new Cmdb Client to access the V2 Api
+func New() (i *Cmdb) {
+	return &Cmdb{
 		Cache:  cache.New(5*time.Minute, 10*time.Minute),
 		Client: &client.Client{},
 		Logger: log.New(),

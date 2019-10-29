@@ -14,7 +14,7 @@ type LoginTokenReturn struct {
 	Success bool   `json:"success"`
 }
 
-func (i *InfoCMDB) Login() (err error) {
+func (i *Cmdb) Login() (err error) {
 
 	if i.Config.ApiKey != "" {
 		log.Debug("already logged in")
@@ -33,7 +33,7 @@ func (i *InfoCMDB) Login() (err error) {
 
 	i.Client = client.NewClient(i.Config.Url)
 
-	var errResp client.ResponseStatus
+	var errResp client.ResponseError
 	resp, err := i.Client.NewRequest().
 		SetError(&errResp).
 		SetResult(&loginResult).

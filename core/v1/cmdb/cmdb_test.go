@@ -19,7 +19,7 @@ var (
 )
 
 var (
-	mocking            = false
+	mocking        = false
 	infoCMDBConfig = []byte(`apiUrl: http://nginx/
 apiUser: admin
 apiPassword: admin
@@ -135,7 +135,7 @@ func (t *testing) getUrl() string {
 func ExampleWebservice_Webservice() {
 	t := testing{}
 
-	i, err := NewCMDB(infoCMDBConfigFile)
+	i, err := New(infoCMDBConfigFile)
 	i.Config.ApiUrl = t.getUrl()
 	if err != nil {
 		log.Error(ErrFailedToCreateInfoCMDB)
@@ -162,7 +162,7 @@ func ExampleWebservice_Webservice() {
 }
 
 func ExampleInfoCmdbGoLib_LoadConfigAbsolutePath() {
-	i := InfoCMDB{}
+	i := Cmdb{}
 	err := i.LoadConfig(infoCMDBConfig)
 	if err != nil {
 		fmt.Printf("%v\n", err)
@@ -176,7 +176,7 @@ func ExampleInfoCmdbGoLib_LoadConfigAbsolutePath() {
 }
 
 func ExampleInfoCmdbGoLib_LoadConfig() {
-	i := InfoCMDB{}
+	i := Cmdb{}
 	err := i.LoadConfig(infoCMDBConfig)
 	if err != nil {
 		fmt.Printf("%v\n", err)
@@ -190,7 +190,7 @@ func ExampleInfoCmdbGoLib_LoadConfig() {
 }
 
 func ExampleInfoCmdbGoLib_LoadConfig_Fail() {
-	i := InfoCMDB{}
+	i := Cmdb{}
 	err := i.LoadConfigFile("/test_missing.yml")
 	if err != nil {
 		fmt.Println("loading failed")
@@ -206,7 +206,7 @@ func ExampleInfoCmdbGoLib_LoadConfig_Fail() {
 func ExampleCmdbWebClient_Login() {
 	t := testing{}
 
-	i, err := NewCMDB(infoCMDBConfigFile)
+	i, err := New(infoCMDBConfigFile)
 	i.Config.ApiUrl = t.getUrl()
 	if i == nil {
 		log.Error(ErrFailedToCreateInfoCMDB)
@@ -229,7 +229,7 @@ func ExampleCmdbWebClient_Login() {
 func ExampleCmdbWebClient_LoginWithApiKey() {
 	t := testing{}
 
-	ilogin, err := NewCMDB(infoCMDBConfigFile)
+	ilogin, err := New(infoCMDBConfigFile)
 	if err != nil {
 		log.Error(err)
 		return
@@ -243,7 +243,7 @@ func ExampleCmdbWebClient_LoginWithApiKey() {
 	}
 
 	log.Debugf("Got API Key: %s", ilogin.Config.ApiKey)
-	i, err := NewCMDB(infoCMDBConfigFile)
+	i, err := New(infoCMDBConfigFile)
 	if err != nil {
 		log.Error(err)
 		return
@@ -261,7 +261,7 @@ func ExampleCmdbWebClient_LoginWithApiKey() {
 func ExampleCmdbWebClient_Post() {
 	t := testing{}
 
-	i, err := NewCMDB(infoCMDBConfigFile)
+	i, err := New(infoCMDBConfigFile)
 	if err != nil {
 		log.Error(err)
 		return
@@ -288,4 +288,3 @@ func ExampleCmdbWebClient_Post() {
 	// Output:
 	// Post:  {"status":"OK","data":[{"ciid":"1"},{"ciid":"2"}]}
 }
-

@@ -1,16 +1,13 @@
 package cmdb
 
 import (
-	utilTesting "github.com/infonova/infocmdb-lib-go/util/testing"
-	"os"
 	"testing"
+
+	utilTesting "github.com/infonova/infocmdb-lib-go/util/testing"
 )
 
 func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {
-	utilTesting.LoadEnvFromFile("../../.env")
-	url := os.Getenv("WORKFLOW_TEST_URL")
-
-	configFile := utilTesting.BuildValidConfig(url)
+	configFile := utilTesting.BuildValidConfig(utilTesting.Url)
 
 	type args struct {
 		ciTypeID int
@@ -124,17 +121,19 @@ func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			i, e := NewCMDB().LoadConfig(configFile)
+			c := New()
+			e := c.LoadConfig(configFile)
 			if e != nil {
-				panic(e)
+				t.Fatal(e)
 			}
-			if err := i.Login(); err != nil {
-				t.Logf("Login failed: %v\n", err)
+
+			if err := c.Login(); err != nil {
+				t.Fatalf("Login failed: %v\n", err)
 			}
 
 			var citypetest2 EmployeeReturn
-			if err := i.CiListByCiTypeID(tt.args.ciTypeID, &citypetest2); (err != nil) != tt.wantErr {
-				t.Errorf("InfoCMDB.CiListByCiTypeID() error = %v, wantErr %v", err, tt.wantErr)
+			if err := c.CiListByCiTypeID(tt.args.ciTypeID, &citypetest2); (err != nil) != tt.wantErr {
+				t.Fatalf("Cmdb.CiListByCiTypeID() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
