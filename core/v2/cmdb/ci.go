@@ -1,32 +1,28 @@
 package cmdb
 
 import (
-	"errors"
 	"fmt"
-	"strconv"
-
+	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
 	"gopkg.in/resty.v1"
+	"strconv"
 )
 
 func (i *InfoCMDB) CiListByCiTypeID(ciTypeID int, out interface{}) (err error) {
-	var errReturn ErrorReturn
-	resp, err := i.Client.NewRequest().
+	var respErr client.ResponseStatus
+	req, err := i.Client.NewRequest().
 		SetResult(&out).
-		SetError(&errReturn).
+		SetError(&respErr).
 		SetQueryParams(map[string]string{
 			"ciTypeId":             fmt.Sprintf("%d", ciTypeID),
 			"XDEBUG_SESSION_START": "1",
 		}).
 		Get("/apiV2/ci/index")
 
-	if err != nil {
-		i.AddError(err)
-		return
+	if req != nil && req.IsError() {
+		return respErr
 	}
 
-	if resp.IsError() {
-		err = errors.New(errReturn.Message)
-		i.AddError(err)
+	if err != nil {
 		return
 	}
 
@@ -214,13 +210,20 @@ func (i *InfoCMDB) CiDetailByCiId(ciId int64) (resp GetCiResponse, restyRes *res
 		return
 	}
 
+	var respErr client.ResponseStatus
+
 	req := i.Client.NewRequest().
 		SetResult(&resp).
+		SetError(&respErr).
 		SetQueryParams(map[string]string{
 			"id": strconv.FormatInt(ciId, 10),
 		})
 
 	restyRes, err = req.Get("/apiV2/ci")
+
+	if restyRes != nil && restyRes.IsError() {
+		return resp, restyRes, respErr
+	}
 
 	return
 }

@@ -1,6 +1,7 @@
 package cmdb
 
 import (
+	utilTesting "github.com/infonova/infocmdb-lib-go/util/testing"
 	"os"
 	"testing"
 
@@ -8,15 +9,10 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
-func getTestUrl() (url string) {
-	if url = os.Getenv("WORKFLOW_TEST_URL"); url == "" {
-		url = "http://localhost"
-	}
-
-	return
-}
-
 func TestInfoCMDB_LoginWithUserPass(t *testing.T) {
+	utilTesting.LoadEnvFromFile("../../.env")
+	url := os.Getenv("WORKFLOW_TEST_URL")
+
 	type fields struct {
 		Config Config
 		Cache  *cache.Cache
@@ -35,31 +31,31 @@ func TestInfoCMDB_LoginWithUserPass(t *testing.T) {
 	}{
 		{
 			"valid login admin//admin",
-			fields{Config: Config{Url: getTestUrl(), Username: "admin", Password: "admin"}},
+			fields{Config: Config{Url: url, Username: "admin", Password: "admin"}},
 			args{},
 			false,
 		},
 		{
 			"invalid login admin//noadmin",
-			fields{Config: Config{Url: getTestUrl(), Username: "admin", Password: "noadmin"}},
+			fields{Config: Config{Url: url, Username: "admin", Password: "noadmin"}},
 			args{},
 			true,
 		},
 		{
 			"invalid no username",
-			fields{Config: Config{Url: getTestUrl(), Username: "", Password: "noadmin"}},
+			fields{Config: Config{Url: url, Username: "", Password: "noadmin"}},
 			args{},
 			true,
 		},
 		{
 			"invalid no password",
-			fields{Config: Config{Url: getTestUrl(), Username: "admin", Password: ""}},
+			fields{Config: Config{Url: url, Username: "admin", Password: ""}},
 			args{},
 			true,
 		},
 		{
 			"invalid no data",
-			fields{Config: Config{Url: "", Username: "", Password: ""}},
+			fields{Config: Config{Url: url, Username: "", Password: ""}},
 			args{},
 			true,
 		},

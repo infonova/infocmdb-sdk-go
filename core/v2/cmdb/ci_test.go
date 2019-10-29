@@ -1,27 +1,16 @@
 package cmdb
 
 import (
+	utilTesting "github.com/infonova/infocmdb-lib-go/util/testing"
 	"os"
 	"testing"
 )
 
-var yamlValidLogin = []byte(`
-version: 1.0
-
-apiUrl: http://localhost
-apiUser: admin
-apiPassword: admin
-`)
-
-var infocmdbUrl string
-
-func init() {
-	if infocmdbUrl = os.Getenv("WORKFLOW_TEST_URL"); infocmdbUrl == "" {
-		infocmdbUrl = "http://localhost"
-	}
-}
-
 func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {
+	utilTesting.LoadEnvFromFile("../../.env")
+	url := os.Getenv("WORKFLOW_TEST_URL")
+
+	configFile := utilTesting.BuildValidConfig(url)
 
 	type args struct {
 		ciTypeID int
@@ -122,31 +111,23 @@ func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {
 	}{
 		{
 			"query citype 1",
-			Config{
-				Url:      infocmdbUrl,
-				Username: "admin",
-				Password: "admin",
-				BasePath: "/app/",
-			},
+			Config{},
 			args{12, citypetest1},
 			false,
 		},
 		{
 			"fail query citype -1",
-			Config{
-				Url:      infocmdbUrl,
-				Username: "admin",
-				Password: "admin",
-				BasePath: "/app/",
-			},
+			Config{},
 			args{-1, citypetest1},
 			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			i := NewCMDB()
-			i.Config = tt.Config
+			i, e := NewCMDB().LoadConfig(configFile)
+			if e != nil {
+				panic(e)
+			}
 			if err := i.Login(); err != nil {
 				t.Logf("Login failed: %v\n", err)
 			}
@@ -154,12 +135,6 @@ func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {
 			var citypetest2 EmployeeReturn
 			if err := i.CiListByCiTypeID(tt.args.ciTypeID, &citypetest2); (err != nil) != tt.wantErr {
 				t.Errorf("InfoCMDB.CiListByCiTypeID() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			// citypetest1 = tt.args.out.(EmployeeReturn).Message
-			// t.Logf("Out: %v\n", tt.args.out.(EmployeeReturn).Message)
-			for _, attribute := range citypetest2.Data.Data.AttributeList {
-				t.Logf("Out: %v\n", attribute.Name)
-
 			}
 		})
 	}

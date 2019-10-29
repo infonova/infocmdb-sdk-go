@@ -38,7 +38,7 @@ func (i *InfoCMDB) LoadConfig(f string) (err error) {
 	}
 
 	i.v2 = v2.NewCMDB()
-	if err = i.v2.LoadConfigFile(f).Error; err != nil {
+	if _, err := i.v2.LoadConfigFile(f); err != nil {
 		return
 	}
 

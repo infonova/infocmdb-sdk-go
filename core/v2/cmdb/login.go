@@ -1,7 +1,6 @@
 package cmdb
 
 import (
-	"errors"
 	"github.com/infonova/infocmdb-lib-go/core/v1/cmdb"
 	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
 	log "github.com/sirupsen/logrus"
@@ -45,8 +44,8 @@ func (i *InfoCMDB) Login() (err error) {
 		return err
 	}
 
-	if resp.IsError() {
-		return errors.New("Failed to fetch token: " + resp.String())
+	if resp != nil && resp.IsError() {
+		return errResp
 	}
 
 	if loginResult.Data.Token == "" {

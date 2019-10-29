@@ -70,47 +70,44 @@ func init() {
 	}
 }
 
-func (i *InfoCMDB) LoadConfigFile(configFile string) *InfoCMDB {
+func (i *InfoCMDB) LoadConfigFile(configFile string) (*InfoCMDB, error) {
 	_, err := os.Stat(configFile)
 	if os.IsNotExist(err) {
 		WorkflowConfigPath := os.Getenv("WORKFLOW_CONFIG_PATH")
 		log.Debugf("WORKFLOW_CONFIG_PATH: %s", WorkflowConfigPath)
 		configFile = filepath.Join(WorkflowConfigPath, configFile)
 	} else if err != nil {
-		i.AddError(err)
-		return i
+		return i, err
 	}
 
 	log.Debugf("ConfigFile: %s", configFile)
 
 	_, err = os.Stat(configFile)
 	if err != nil {
-		i.AddError(err)
-		return i
+		return i, err
 	}
 
 	yamlFile, err := ioutil.ReadFile(configFile)
 	if err != nil {
-		i.AddError(err)
-		return i
+		return i, err
 	}
 
-	return i.LoadConfig(yamlFile)
+	cmdb, err := i.LoadConfig(yamlFile)
+	return cmdb, err
 }
 
-func (i *InfoCMDB) LoadConfig(config []byte) *InfoCMDB {
+func (i *InfoCMDB) LoadConfig(config []byte) (*InfoCMDB, error) {
 	if err := yaml.Unmarshal(config, &i.Config); err != nil {
-		i.AddError(err)
-		return i
+		return i, err
 	}
 
 	err := i.applyUrlFromRedirect()
 	if err != nil {
-		i.AddError(err)
+		return i, err
 	}
 
 	i.Client = client.NewClient(i.Config.Url)
-	return i
+	return i, err
 }
 
 func (i *InfoCMDB) applyUrlFromRedirect() (err error) {
