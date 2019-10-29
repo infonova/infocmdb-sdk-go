@@ -7,12 +7,12 @@ import (
 	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb"
 )
 
-func (i *InfoCMDB) AttributeBasedRelation(sourceCiId int, attributeName string, ciRelationTypeName string, triggerType string, swapCiColumns bool) (relationCisAdded []int, relationCisRemoved []int, err error) {
+func (c *Client) AttributeBasedRelation(sourceCiId int, attributeName string, ciRelationTypeName string, triggerType string, swapCiColumns bool) (relationCisAdded []int, relationCisRemoved []int, err error) {
 
 	var currentCiValues []string
 	if triggerType != "ci_attribute_delete" {
 		var value string
-		value, _, err = i.GetCiAttributeValueCi(sourceCiId, attributeName)
+		value, _, err = c.GetCiAttributeValueCi(sourceCiId, attributeName)
 		if err != nil {
 			return
 		}
@@ -25,12 +25,12 @@ func (i *InfoCMDB) AttributeBasedRelation(sourceCiId int, attributeName string, 
 		destinationCiIds[i], _ = strconv.Atoi(s)
 	}
 
-	return i.CiBasedRelation(sourceCiId, destinationCiIds, ciRelationTypeName, triggerType, swapCiColumns)
+	return c.CiBasedRelation(sourceCiId, destinationCiIds, ciRelationTypeName, triggerType, swapCiColumns)
 }
 
-func (i *InfoCMDB) CiBasedRelation(srcCiId int, destCiId []int, ciRelationTypeName string, triggerType string, swapCiColumns bool) (relationCisAdded []int, relationCisRemoved []int, err error) {
+func (c *Client) CiBasedRelation(srcCiId int, destCiId []int, ciRelationTypeName string, triggerType string, swapCiColumns bool) (relationCisAdded []int, relationCisRemoved []int, err error) {
 
-	currentCiRelations, err := i.GetListOfCiIdsByCiRelation(srcCiId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_ALL)
+	currentCiRelations, err := c.GetListOfCiIdsByCiRelation(srcCiId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_ALL)
 	if err != nil {
 		return
 	}
@@ -46,9 +46,9 @@ func (i *InfoCMDB) CiBasedRelation(srcCiId int, destCiId []int, ciRelationTypeNa
 
 		if add == true {
 			if swapCiColumns == true {
-				err = i.CreateCiRelation(valueCiId, srcCiId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_OMNIDIRECTIONAL)
+				err = c.CreateCiRelation(valueCiId, srcCiId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_OMNIDIRECTIONAL)
 			} else {
-				err = i.CreateCiRelation(srcCiId, valueCiId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_OMNIDIRECTIONAL)
+				err = c.CreateCiRelation(srcCiId, valueCiId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_OMNIDIRECTIONAL)
 			}
 			if err != nil {
 				return
@@ -69,7 +69,7 @@ func (i *InfoCMDB) CiBasedRelation(srcCiId int, destCiId []int, ciRelationTypeNa
 		}
 
 		if remove == true {
-			err = i.DeleteCiRelation(srcCiId, relationCiId, ciRelationTypeName)
+			err = c.DeleteCiRelation(srcCiId, relationCiId, ciRelationTypeName)
 			if err != nil {
 				return
 			}

@@ -30,28 +30,28 @@ type Config struct {
 	CmdbBasePath string `yaml:"CmdbBasePath"`
 }
 
-type InfoCMDB struct {
+type Cmdb struct {
 	Config Config
 	Cache  *cache.Cache
 }
 
-type CI_RELATION_DIRECTION string
+type CiRelationDirection string
 
 const (
-	CI_RELATION_DIRECTION_ALL             CI_RELATION_DIRECTION = "all"
-	CI_RELATION_DIRECTION_DIRECTED_FROM                         = "directed_from"
-	CI_RELATION_DIRECTION_DIRECTED_TO                           = "directed_to"
-	CI_RELATION_DIRECTION_BIDIRECTIONAL                         = "bidirectional"
-	CI_RELATION_DIRECTION_OMNIDIRECTIONAL                       = "omnidirectional"
+	CI_RELATION_DIRECTION_ALL             CiRelationDirection = "all"
+	CI_RELATION_DIRECTION_DIRECTED_FROM                       = "directed_from"
+	CI_RELATION_DIRECTION_DIRECTED_TO                         = "directed_to"
+	CI_RELATION_DIRECTION_BIDIRECTIONAL                       = "bidirectional"
+	CI_RELATION_DIRECTION_OMNIDIRECTIONAL                     = "omnidirectional"
 )
 
-type ATTRIBUTE_VALUE_TYPE string
+type AttributeValueType string
 
 const (
-	ATTRIBUTE_VALUE_TYPE_TEXT    ATTRIBUTE_VALUE_TYPE = "value_text"
-	ATTRIBUTE_VALUE_TYPE_DATE                         = "value_date"
-	ATTRIBUTE_VALUE_TYPE_DEFAULT                      = "value_default"
-	ATTRIBUTE_VALUE_TYPE_CI                           = "value_ci"
+	ATTRIBUTE_VALUE_TYPE_TEXT    AttributeValueType = "value_text"
+	ATTRIBUTE_VALUE_TYPE_DATE                       = "value_date"
+	ATTRIBUTE_VALUE_TYPE_DEFAULT                    = "value_default"
+	ATTRIBUTE_VALUE_TYPE_CI                         = "value_ci"
 )
 
 func init() {
@@ -61,7 +61,7 @@ func init() {
 	}
 }
 
-func (i *InfoCMDB) LoadConfigFile(configFile string) (err error) {
+func (i *Cmdb) LoadConfigFile(configFile string) (err error) {
 	_, err = os.Stat(configFile)
 	if err == nil {
 		log.Debugf("ConfigFile found with given string: %s", configFile)
@@ -86,12 +86,12 @@ func (i *InfoCMDB) LoadConfigFile(configFile string) (err error) {
 	return i.LoadConfig(yamlFile)
 }
 
-func (i *InfoCMDB) LoadConfig(config []byte) (err error) {
+func (i *Cmdb) LoadConfig(config []byte) (err error) {
 	return yaml.Unmarshal(config, &i.Config)
 }
 
-func NewCMDB(config string) (i *InfoCMDB, err error) {
-	i = new(InfoCMDB)
+func New(config string) (i *Cmdb, err error) {
+	i = new(Cmdb)
 	err = i.LoadConfigFile(config)
 	if err != nil {
 		log.Error(err)
@@ -103,7 +103,7 @@ func NewCMDB(config string) (i *InfoCMDB, err error) {
 	return i, nil
 }
 
-func (i *InfoCMDB) Login() error {
+func (i *Cmdb) Login() error {
 	if i.Config.ApiKey != "" {
 		log.Debug("already logged in")
 		return nil

@@ -1,27 +1,13 @@
 package cmdb
 
 import (
-	"os"
 	"testing"
+
+	utilTesting "github.com/infonova/infocmdb-lib-go/util/testing"
 )
 
-var yamlValidLogin = []byte(`
-version: 1.0
-
-apiUrl: http://localhost
-apiUser: admin
-apiPassword: admin
-`)
-
-var infocmdbUrl string
-
-func init() {
-	if infocmdbUrl = os.Getenv("WORKFLOW_TEST_URL"); infocmdbUrl == "" {
-		infocmdbUrl = "http://localhost"
-	}
-}
-
 func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {
+	configFile := utilTesting.BuildValidConfig(utilTesting.Url)
 
 	type args struct {
 		ciTypeID int
@@ -122,44 +108,32 @@ func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {
 	}{
 		{
 			"query citype 1",
-			Config{
-				Url:      infocmdbUrl,
-				Username: "admin",
-				Password: "admin",
-				BasePath: "/app/",
-			},
+			Config{},
 			args{12, citypetest1},
 			false,
 		},
 		{
 			"fail query citype -1",
-			Config{
-				Url:      infocmdbUrl,
-				Username: "admin",
-				Password: "admin",
-				BasePath: "/app/",
-			},
+			Config{},
 			args{-1, citypetest1},
 			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			i := NewCMDB()
-			i.Config = tt.Config
-			if err := i.Login(); err != nil {
-				t.Logf("Login failed: %v\n", err)
+			c := New()
+			e := c.LoadConfig(configFile)
+			if e != nil {
+				t.Fatal(e)
+			}
+
+			if err := c.Login(); err != nil {
+				t.Fatalf("Login failed: %v\n", err)
 			}
 
 			var citypetest2 EmployeeReturn
-			if err := i.CiListByCiTypeID(tt.args.ciTypeID, &citypetest2); (err != nil) != tt.wantErr {
-				t.Errorf("InfoCMDB.CiListByCiTypeID() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			// citypetest1 = tt.args.out.(EmployeeReturn).Message
-			// t.Logf("Out: %v\n", tt.args.out.(EmployeeReturn).Message)
-			for _, attribute := range citypetest2.Data.Data.AttributeList {
-				t.Logf("Out: %v\n", attribute.Name)
-
+			if err := c.CiListByCiTypeID(tt.args.ciTypeID, &citypetest2); (err != nil) != tt.wantErr {
+				t.Fatalf("Cmdb.CiListByCiTypeID() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

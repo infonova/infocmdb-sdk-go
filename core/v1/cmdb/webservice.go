@@ -22,7 +22,7 @@ type ResultLogin struct {
 	ApiKey string `json:"apikey"`
 }
 
-func (i *InfoCMDB) LoginWithUserPass(url string, username string, password string) error {
+func (i *Cmdb) LoginWithUserPass(url string, username string, password string) error {
 
 	log.Debugf("Opening new WebClient connection. (Url: %s, Username: %s)", url, username)
 
@@ -58,7 +58,7 @@ func (i *InfoCMDB) LoginWithUserPass(url string, username string, password strin
 	return nil
 }
 
-func (i *InfoCMDB) LoginWithApiKey(url string, apikey string) error {
+func (i *Cmdb) LoginWithApiKey(url string, apikey string) error {
 	log.Debugf("Opening new WebClient connection using ApiKey. (Url: %s, ApiKey: %s)", url, apikey)
 	i.Config.ApiUrl = url
 	i.Config.ApiKey = apikey
@@ -77,7 +77,7 @@ func validWebserviceMethod(method string) (err error) {
 	return http.ErrNotSupported
 }
 
-func (i *InfoCMDB) CallWebservice(method string, service string, serviceName string, params url.Values, variable interface{}) (err error) {
+func (i *Cmdb) CallWebservice(method string, service string, serviceName string, params url.Values, variable interface{}) (err error) {
 	if err = validWebserviceMethod(method); err != nil {
 		return err
 	}
@@ -169,7 +169,7 @@ func checkResponseStatusMessage(byteBody []byte) (err error) {
 
 // Webservice queries a given webservice with all params supplied
 // Returns err != nil if query fails
-func (i *InfoCMDB) Webservice(ws string, params url.Values) (r string, err error) {
+func (i *Cmdb) Webservice(ws string, params url.Values) (r string, err error) {
 	log.Debugf("Webservice: %s, Params: %v", ws, params)
 	err = i.CallWebservice(http.MethodPost, "query", ws, params, &r)
 	if err != nil {

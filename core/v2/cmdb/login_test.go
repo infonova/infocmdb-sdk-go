@@ -1,22 +1,16 @@
 package cmdb
 
 import (
-	"os"
 	"testing"
 
 	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
+	utilTesting "github.com/infonova/infocmdb-lib-go/util/testing"
 	"github.com/patrickmn/go-cache"
 )
 
-func getTestUrl() (url string) {
-	if url = os.Getenv("WORKFLOW_TEST_URL"); url == "" {
-		url = "http://localhost"
-	}
-
-	return
-}
-
 func TestInfoCMDB_LoginWithUserPass(t *testing.T) {
+	url := utilTesting.Url
+
 	type fields struct {
 		Config Config
 		Cache  *cache.Cache
@@ -35,44 +29,44 @@ func TestInfoCMDB_LoginWithUserPass(t *testing.T) {
 	}{
 		{
 			"valid login admin//admin",
-			fields{Config: Config{Url: getTestUrl(), Username: "admin", Password: "admin"}},
+			fields{Config: Config{Url: url, Username: "admin", Password: "admin"}},
 			args{},
 			false,
 		},
 		{
 			"invalid login admin//noadmin",
-			fields{Config: Config{Url: getTestUrl(), Username: "admin", Password: "noadmin"}},
+			fields{Config: Config{Url: url, Username: "admin", Password: "noadmin"}},
 			args{},
 			true,
 		},
 		{
 			"invalid no username",
-			fields{Config: Config{Url: getTestUrl(), Username: "", Password: "noadmin"}},
+			fields{Config: Config{Url: url, Username: "", Password: "noadmin"}},
 			args{},
 			true,
 		},
 		{
 			"invalid no password",
-			fields{Config: Config{Url: getTestUrl(), Username: "admin", Password: ""}},
+			fields{Config: Config{Url: url, Username: "admin", Password: ""}},
 			args{},
 			true,
 		},
 		{
 			"invalid no data",
-			fields{Config: Config{Url: "", Username: "", Password: ""}},
+			fields{Config: Config{Url: url, Username: "", Password: ""}},
 			args{},
 			true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			i := new(InfoCMDB)
+			i := new(Cmdb)
 			i.Config = tt.fields.Config
 			i.Cache = tt.fields.Cache
 			i.Client = client.NewClient(i.Config.Url)
 
 			if err := i.Login(); (err != nil) != tt.wantErr {
-				t.Errorf("InfoCMDB.LoginWithUserPass() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Cmdb.LoginWithUserPass() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

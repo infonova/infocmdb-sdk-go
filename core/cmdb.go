@@ -15,9 +15,9 @@ type Config struct {
 	CmdbBasePath string `yaml:"CmdbBasePath"`
 }
 
-type InfoCMDB struct {
-	v1 *v1.InfoCMDB
-	v2 *v2.InfoCMDB
+type Client struct {
+	v1 *v1.Cmdb
+	v2 *v2.Cmdb
 }
 
 func init() {
@@ -27,18 +27,18 @@ func init() {
 	}
 }
 
-func NewCMDB() *InfoCMDB {
-	return new(InfoCMDB)
+func NewClient() *Client {
+	return new(Client)
 }
 
-func (i *InfoCMDB) LoadConfig(f string) (err error) {
-	i.v1, err = v1.NewCMDB(f)
+func (c *Client) LoadConfig(f string) (err error) {
+	c.v1, err = v1.New(f)
 	if err != nil {
 		return
 	}
 
-	i.v2 = v2.NewCMDB()
-	if err = i.v2.LoadConfigFile(f).Error; err != nil {
+	c.v2 = v2.New()
+	if err = c.v2.LoadConfigFile(f); err != nil {
 		return
 	}
 

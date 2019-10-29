@@ -1,7 +1,6 @@
 package cmdb
 
 import (
-	"errors"
 	"github.com/infonova/infocmdb-lib-go/core/v1/cmdb"
 	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
 	log "github.com/sirupsen/logrus"
@@ -15,7 +14,7 @@ type LoginTokenReturn struct {
 	Success bool   `json:"success"`
 }
 
-func (i *InfoCMDB) Login() (err error) {
+func (i *Cmdb) Login() (err error) {
 
 	if i.Config.ApiKey != "" {
 		log.Debug("already logged in")
@@ -34,7 +33,7 @@ func (i *InfoCMDB) Login() (err error) {
 
 	i.Client = client.NewClient(i.Config.Url)
 
-	var errResp client.ResponseStatus
+	var errResp client.ResponseError
 	resp, err := i.Client.NewRequest().
 		SetError(&errResp).
 		SetResult(&loginResult).
@@ -45,8 +44,8 @@ func (i *InfoCMDB) Login() (err error) {
 		return err
 	}
 
-	if resp.IsError() {
-		return errors.New("Failed to fetch token: " + resp.String())
+	if resp != nil && resp.IsError() {
+		return errResp
 	}
 
 	if loginResult.Data.Token == "" {

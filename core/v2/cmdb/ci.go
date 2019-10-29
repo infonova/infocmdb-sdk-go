@@ -1,39 +1,30 @@
 package cmdb
 
 import (
-	"errors"
 	"fmt"
-	"strconv"
-
+	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
 	"gopkg.in/resty.v1"
+	"strconv"
 )
 
-func (i *InfoCMDB) CiListByCiTypeID(ciTypeID int, out interface{}) (err error) {
-	var errReturn ErrorReturn
+func (i *Cmdb) CiListByCiTypeID(ciTypeID int, out interface{}) (err error) {
+	var respErr client.ResponseError
 	resp, err := i.Client.NewRequest().
 		SetResult(&out).
-		SetError(&errReturn).
+		SetError(&respErr).
 		SetQueryParams(map[string]string{
-			"ciTypeId":             fmt.Sprintf("%d", ciTypeID),
-			"XDEBUG_SESSION_START": "1",
+			"ciTypeId": fmt.Sprintf("%d", ciTypeID),
 		}).
 		Get("/apiV2/ci/index")
 
-	if err != nil {
-		i.AddError(err)
-		return
-	}
-
-	if resp.IsError() {
-		err = errors.New(errReturn.Message)
-		i.AddError(err)
-		return
+	if resp != nil && resp.IsError() {
+		return respErr
 	}
 
 	return
 }
 
-type GetCiResponse struct {
+type GetCiDetailResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 	Data    struct {
@@ -209,18 +200,23 @@ type GetCiResponse struct {
 	} `json:"data"`
 }
 
-func (i *InfoCMDB) CiDetailByCiId(ciId int64) (resp GetCiResponse, restyRes *resty.Response, err error) {
+func (i *Cmdb) CiDetailByCiId(ciId int64) (ciDetail GetCiDetailResponse, restyRes *resty.Response, err error) {
 	if err = i.Login(); err != nil {
 		return
 	}
 
-	req := i.Client.NewRequest().
-		SetResult(&resp).
+	var respErr client.ResponseError
+
+	resp, err := i.Client.NewRequest().
+		SetResult(&ciDetail).
+		SetError(&respErr).
 		SetQueryParams(map[string]string{
 			"id": strconv.FormatInt(ciId, 10),
-		})
+		}).Get("/apiV2/ci")
 
-	restyRes, err = req.Get("/apiV2/ci")
+	if resp != nil && resp.IsError() {
+		return ciDetail, restyRes, respErr
+	}
 
 	return
 }
