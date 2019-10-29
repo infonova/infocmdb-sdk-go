@@ -4,8 +4,7 @@ import (
 	util_error "github.com/infonova/infocmdb-lib-go/util/error"
 )
 
-
-func (i *InfoCMDB) AddError(err error) error {
+func (i *InfoCMDB) AddError(err error) {
 	if err != nil {
 		errorMessage := util_error.FunctionError(err.Error())
 		i.Logger.Error(errorMessage)
@@ -18,9 +17,7 @@ func (i *InfoCMDB) AddError(err error) error {
 
 		i.Error = err
 	}
-	return err
 }
-
 
 // GetErrors
 func (i *InfoCMDB) GetErrors() []error {

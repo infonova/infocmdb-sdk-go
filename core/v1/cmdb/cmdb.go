@@ -2,13 +2,14 @@ package cmdb
 
 import (
 	"errors"
-	"github.com/patrickmn/go-cache"
-	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/patrickmn/go-cache"
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -19,19 +20,6 @@ var (
 	ErrNoResult                = errors.New("query returned no result")
 	ErrTooManyResults          = errors.New("query returned to many results, expected one")
 	ErrWebserviceResponseNotOk = errors.New("webservice response was not ok")
-)
-
-const (
-	ATTRIBUTE_VALUE_TYPE_TEXT    = "value_text"
-	ATTRIBUTE_VALUE_TYPE_DATE    = "value_date"
-	ATTRIBUTE_VALUE_TYPE_DEFAULT = "value_default"
-	ATTRIBUTE_VALUE_TYPE_CI      = "value_ci"
-
-	CI_RELATION_DIRECTION_ALL             = "all"
-	CI_RELATION_DIRECTION_DIRECTED_FROM   = "directed_from"
-	CI_RELATION_DIRECTION_DIRECTED_TO     = "directed_to"
-	CI_RELATION_DIRECTION_BIDIRECTIONAL   = "bidirectional"
-	CI_RELATION_DIRECTION_OMNIDIRECTIONAL = "omnidirectional"
 )
 
 type Config struct {
@@ -47,6 +35,25 @@ type InfoCMDB struct {
 	Cache  *cache.Cache
 }
 
+type CI_RELATION_DIRECTION string
+
+const (
+	CI_RELATION_DIRECTION_ALL             CI_RELATION_DIRECTION = "all"
+	CI_RELATION_DIRECTION_DIRECTED_FROM                         = "directed_from"
+	CI_RELATION_DIRECTION_DIRECTED_TO                           = "directed_to"
+	CI_RELATION_DIRECTION_BIDIRECTIONAL                         = "bidirectional"
+	CI_RELATION_DIRECTION_OMNIDIRECTIONAL                       = "omnidirectional"
+)
+
+type ATTRIBUTE_VALUE_TYPE string
+
+const (
+	ATTRIBUTE_VALUE_TYPE_TEXT    ATTRIBUTE_VALUE_TYPE = "value_text"
+	ATTRIBUTE_VALUE_TYPE_DATE                         = "value_date"
+	ATTRIBUTE_VALUE_TYPE_DEFAULT                      = "value_default"
+	ATTRIBUTE_VALUE_TYPE_CI                           = "value_ci"
+)
+
 func init() {
 	log.SetLevel(log.InfoLevel)
 	if os.Getenv("WORKFLOW_DEBUGGING") == "true" {
@@ -59,7 +66,7 @@ func (i *InfoCMDB) LoadConfigFile(configFile string) (err error) {
 	if err == nil {
 		log.Debugf("ConfigFile found with given string: %s", configFile)
 	} else {
-		WorkflowConfigPath := filepath.Dir(os.Getenv("WORKFLOW_CONFIG_PATH") + "/")
+		WorkflowConfigPath := filepath.Dir(os.Getenv("WORKFLOW_CONFIG_PATH"))
 		log.Debugf("WORKFLOW_CONFIG_PATH: %s", WorkflowConfigPath)
 		configFile = filepath.Join(WorkflowConfigPath, configFile)
 	}
