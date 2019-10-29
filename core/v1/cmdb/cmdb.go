@@ -35,6 +35,25 @@ type InfoCMDB struct {
 	Cache  *cache.Cache
 }
 
+type CI_RELATION_DIRECTION string
+
+const (
+	CI_RELATION_DIRECTION_ALL             CI_RELATION_DIRECTION = "all"
+	CI_RELATION_DIRECTION_DIRECTED_FROM                         = "directed_from"
+	CI_RELATION_DIRECTION_DIRECTED_TO                           = "directed_to"
+	CI_RELATION_DIRECTION_BIDIRECTIONAL                         = "bidirectional"
+	CI_RELATION_DIRECTION_OMNIDIRECTIONAL                       = "omnidirectional"
+)
+
+type ATTRIBUTE_VALUE_TYPE string
+
+const (
+	ATTRIBUTE_VALUE_TYPE_TEXT    ATTRIBUTE_VALUE_TYPE = "value_text"
+	ATTRIBUTE_VALUE_TYPE_DATE                         = "value_date"
+	ATTRIBUTE_VALUE_TYPE_DEFAULT                      = "value_default"
+	ATTRIBUTE_VALUE_TYPE_CI                           = "value_ci"
+)
+
 func init() {
 	log.SetLevel(log.InfoLevel)
 	if os.Getenv("WORKFLOW_DEBUGGING") == "true" {
