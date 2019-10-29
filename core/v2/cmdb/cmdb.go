@@ -35,28 +35,32 @@ type ErrorReturn struct {
 	Success bool   `json:"success"`
 }
 
-const (
-	CI_RELATION_DIRECTION_ALL             = "all"
-	CI_RELATION_DIRECTION_DIRECTED_FROM   = "directed_from"
-	CI_RELATION_DIRECTION_DIRECTED_TO     = "directed_to"
-	CI_RELATION_DIRECTION_BIDIRECTIONAL   = "bidirectional"
-	CI_RELATION_DIRECTION_OMNIDIRECTIONAL = "omnidirectional"
-)
+type CiRelationDirection string
 
 const (
-	ATTRIBUTE_VALUE_TYPE_TEXT    = "value_text"
-	ATTRIBUTE_VALUE_TYPE_DATE    = "value_date"
-	ATTRIBUTE_VALUE_TYPE_DEFAULT = "value_default"
-	ATTRIBUTE_VALUE_TYPE_CI      = "value_ci"
+	CI_RELATION_DIRECTION_ALL             CiRelationDirection = "all"
+	CI_RELATION_DIRECTION_DIRECTED_FROM                       = "directed_from"
+	CI_RELATION_DIRECTION_DIRECTED_TO                         = "directed_to"
+	CI_RELATION_DIRECTION_BIDIRECTIONAL                       = "bidirectional"
+	CI_RELATION_DIRECTION_OMNIDIRECTIONAL                     = "omnidirectional"
+)
+
+type AttributeValueType string
+
+const (
+	ATTRIBUTE_VALUE_TYPE_TEXT    AttributeValueType = "value_text"
+	ATTRIBUTE_VALUE_TYPE_DATE                       = "value_date"
+	ATTRIBUTE_VALUE_TYPE_DEFAULT                    = "value_default"
+	ATTRIBUTE_VALUE_TYPE_CI                         = "value_ci"
 )
 
 type UpdateMode string
 
 const (
 	UPDATE_MODE_INSERT UpdateMode = "insert"
-	UPDATE_MODE_UPDATE UpdateMode = "update"
-	UPDATE_MODE_DELETE UpdateMode = "delete"
-	UPDATE_MODE_SET    UpdateMode = "set"
+	UPDATE_MODE_UPDATE            = "update"
+	UPDATE_MODE_DELETE            = "delete"
+	UPDATE_MODE_SET               = "set"
 )
 
 func init() {
