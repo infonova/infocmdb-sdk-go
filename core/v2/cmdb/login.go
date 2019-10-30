@@ -31,7 +31,7 @@ func (i *Cmdb) Login() (err error) {
 		"lifetime": "600",
 	}
 
-	i.Client = client.NewClient(i.Config.Url)
+	i.Client = client.New(i.Config.Url)
 
 	var errResp client.ResponseError
 	resp, err := i.Client.NewRequest().

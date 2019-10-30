@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-var Url = "http//localhost"
+var Url = "http://localhost"
 
 func init() {
 	if url := os.Getenv("WORKFLOW_TEST_URL"); url != "" {

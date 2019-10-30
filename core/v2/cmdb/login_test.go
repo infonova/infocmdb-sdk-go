@@ -63,7 +63,7 @@ func TestInfoCMDB_LoginWithUserPass(t *testing.T) {
 			i := new(Cmdb)
 			i.Config = tt.fields.Config
 			i.Cache = tt.fields.Cache
-			i.Client = client.NewClient(i.Config.Url)
+			i.Client = client.New(i.Config.Url)
 
 			if err := i.Login(); (err != nil) != tt.wantErr {
 				t.Errorf("Cmdb.LoginWithUserPass() error = %v, wantErr %v", err, tt.wantErr)

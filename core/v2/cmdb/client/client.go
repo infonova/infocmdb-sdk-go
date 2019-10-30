@@ -20,19 +20,19 @@ type ResponseError struct {
 	Response
 }
 
-func NewClient(baseURL string) (c *Client) {
+func New(baseURL string) (c *Client) {
 	c = &Client{}
 	c.resty = resty.New().
 		SetHostURL(baseURL)
 	return
 }
 
-func (i *Client) NewRequest() *resty.Request {
-	return i.resty.NewRequest()
+func (c *Client) NewRequest() *resty.Request {
+	return c.resty.NewRequest()
 }
 
-func (i *Client) SetAuthToken(token string) {
-	i.resty.SetAuthToken(token)
+func (c *Client) SetAuthToken(token string) {
+	c.resty.SetAuthToken(token)
 }
 
 func (res ResponseError) Error() string {
