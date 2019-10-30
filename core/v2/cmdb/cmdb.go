@@ -106,7 +106,7 @@ func (i *Cmdb) LoadConfig(config []byte) (err error) {
 		return
 	}
 
-	i.Client = client.NewClient(i.Config.Url)
+	i.Client = client.New(i.Config.Url)
 	return
 }
 

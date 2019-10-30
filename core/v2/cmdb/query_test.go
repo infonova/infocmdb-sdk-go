@@ -45,7 +45,7 @@ func TestInfoCMDB_Query(t *testing.T) {
 			i := &Cmdb{
 				Config: tt.fields.Config,
 				Cache:  tt.fields.Cache,
-				Client: client.NewClient(tt.fields.Config.Url),
+				Client: client.New(tt.fields.Config.Url),
 				Error:  tt.fields.Error,
 			}
 			if err := i.Query(tt.args.query, tt.args.out, tt.args.params); (err != nil) != tt.wantErr {
