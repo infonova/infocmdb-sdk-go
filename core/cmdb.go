@@ -15,6 +15,7 @@ type Config struct {
 	CmdbBasePath string `yaml:"CmdbBasePath"`
 }
 
+// Client combines connectivity methods for version 1 and 2 of the cmdb
 type Client struct {
 	v1 *v1.Cmdb
 	v2 *v2.Cmdb
@@ -27,10 +28,12 @@ func init() {
 	}
 }
 
+// NewClient returns a new cmdb client
 func NewClient() *Client {
 	return new(Client)
 }
 
+// LoadConfig from file in yaml format
 func (c *Client) LoadConfig(f string) (err error) {
 	c.v1, err = v1.New(f)
 	if err != nil {

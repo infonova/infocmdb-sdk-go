@@ -1661,20 +1661,6 @@ func (i *Cmdb) SetCiTypeOfCi() (r SetCiTypeOfCi, err error) {
 }
 */
 
-// UpdateCiAttribute
-// type UpdateAttribute struct {
-// 	Mode          string `json:"mode"`
-// 	Name          string `json:"name"`
-// 	Value         string `json:"value"`
-// 	CiAttributeID int    `json:"ciAttributeId,omitempty"`
-// 	UploadID      string `json:"uploadId,omitempty"`
-// }
-//
-// type UpdateCiAttribute struct {
-// 	Ci struct {
-// 		Attributes []UpdateAttribute `json:"attributes"`
-// 	} `json:"ci"`
-// }
 type UpdateCiAttribute struct {
 	Mode          v2.UpdateMode `json:"mode"`
 	Name          string        `json:"name"`
@@ -1687,6 +1673,7 @@ type UpdateCiAttributes struct {
 	Attributes []UpdateCiAttribute `json:"attributes"`
 }
 
+//
 type UpdateCiAttributesRequest struct {
 	Ci UpdateCiAttributes `json:"ci"`
 }
