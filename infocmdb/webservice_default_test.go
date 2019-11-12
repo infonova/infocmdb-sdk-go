@@ -1,4 +1,4 @@
-package core
+package infocmdb
 
 import (
 	"os"

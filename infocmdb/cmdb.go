@@ -1,4 +1,4 @@
-package core
+package infocmdb
 
 import (
 	v1 "github.com/infonova/infocmdb-lib-go/core/v1/cmdb"
