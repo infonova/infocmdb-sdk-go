@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb"
+	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/cmdb"
 )
 
 func (c *Client) AttributeBasedRelation(sourceCiId int, attributeName string, ciRelationTypeName string, triggerType string, swapCiColumns bool) (relationCisAdded []int, relationCisRemoved []int, err error) {

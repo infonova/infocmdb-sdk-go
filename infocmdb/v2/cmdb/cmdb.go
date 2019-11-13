@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
+	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/cmdb/client"
 	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"

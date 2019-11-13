@@ -8,11 +8,11 @@ import (
 	"strconv"
 	"strings"
 
-	v1 "github.com/infonova/infocmdb-lib-go/core/v1/cmdb"
-	v2 "github.com/infonova/infocmdb-lib-go/core/v2/cmdb"
-	clientV2 "github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
+	v1 "github.com/infonova/infocmdb-sdk-go/infocmdb/v1/cmdb"
+	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/cmdb"
+	clientV2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/cmdb/client"
 
-	utilError "github.com/infonova/infocmdb-lib-go/util/error"
+	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
 	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 )
