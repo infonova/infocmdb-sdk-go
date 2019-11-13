@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	v1 "github.com/infonova/infocmdb-lib-go/core/v1/cmdb"
-	v2 "github.com/infonova/infocmdb-lib-go/core/v2/cmdb"
+	v1 "github.com/infonova/infocmdb-sdk-go/infocmdb/v1/cmdb"
+	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/cmdb"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 )

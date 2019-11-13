@@ -3,7 +3,7 @@ package cmdb
 import (
 	"testing"
 
-	utilTesting "github.com/infonova/infocmdb-lib-go/util/testing"
+	utilTesting "github.com/infonova/infocmdb-sdk-go/util/testing"
 )
 
 func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {

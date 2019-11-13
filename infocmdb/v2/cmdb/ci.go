@@ -2,7 +2,7 @@ package cmdb
 
 import (
 	"fmt"
-	"github.com/infonova/infocmdb-lib-go/core/v2/cmdb/client"
+	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/cmdb/client"
 	"gopkg.in/resty.v1"
 	"strconv"
 )
