@@ -129,6 +129,7 @@ func (i *Cmdb) CallWebservice(method string, service string, serviceName string,
 
 	err = checkResponseStatusMessage(byteBody)
 	if err != nil {
+		err = errors.New(err.Error() + ": " + string(byteBody))
 		return err
 	}
 
@@ -140,8 +141,7 @@ func (i *Cmdb) CallWebservice(method string, service string, serviceName string,
 
 	err = json.Unmarshal([]byte(byteBody), &variable)
 	if err != nil {
-		log.Error("Error: ", err)
-		log.Error(string(byteBody))
+		err = errors.New(err.Error() + ": " + string(byteBody))
 		return err
 	}
 	return nil
