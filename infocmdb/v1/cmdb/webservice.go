@@ -129,6 +129,7 @@ func (i *Cmdb) CallWebservice(method string, service string, serviceName string,
 
 	err = checkResponseStatusMessage(byteBody)
 	if err != nil {
+		err = errors.New(err.Error() + ": " + string(byteBody))
 		return err
 	}
 
