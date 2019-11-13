@@ -1,4 +1,4 @@
-module github.com/infonova/infocmdb-lib-go
+module github.com/infonova/infocmdb-sdk-go
 
 go 1.13
 
