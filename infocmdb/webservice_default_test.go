@@ -42,7 +42,7 @@ func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		wantR   ListOfCiIds
+		wantR   CiIds
 		wantErr bool
 	}{
 		{
@@ -72,7 +72,7 @@ func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
 				}},
 			},
 			args{ciTypeID: 1},
-			ListOfCiIds{{1}, {2}},
+			CiIds{1, 2},
 			false,
 		},
 		{
@@ -121,7 +121,7 @@ func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		wantR   ListOfCiIds
+		wantR   CiIds
 		wantErr bool
 	}{
 		{
@@ -151,7 +151,7 @@ func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
 				}},
 			},
 			args{ciTypeID: 1},
-			ListOfCiIds{{1}, {2}},
+			CiIds{1, 2},
 			false,
 		},
 		{

@@ -47,20 +47,20 @@ func (c *Client) Query(ws string, out interface{}, params map[string]string) (er
 	return
 }
 
-type ListOfCiIds []struct {
-	CiID int `json:"ciid,string"`
-}
+type CiIds []int
 
 type GetListOfCiIdsOfCiType struct {
-	Status string      `json:"status"`
-	Data   ListOfCiIds `json:"data"`
+	Status string `json:"status"`
+	Data   []struct {
+		CiID int `json:"ciid,string"`
+	} `json:"data"`
 }
 
 type ResponseId struct {
 	Id int `json:"id,string"`
 }
 
-func (c *Client) GetListOfCiIdsOfCiType(ciTypeID int) (r ListOfCiIds, err error) {
+func (c *Client) GetListOfCiIdsOfCiType(ciTypeID int) (ciIds CiIds, err error) {
 
 	if err = c.v2.Login(); err != nil {
 		return
@@ -78,13 +78,17 @@ func (c *Client) GetListOfCiIdsOfCiType(ciTypeID int) (r ListOfCiIds, err error)
 	err = c.v2.Query("int_getListOfCiIdsOfCiType", &ret, params)
 	if err != nil {
 		log.Error("Error: ", err)
-		return r, err
+		return ciIds, err
 	}
-	r = ret.Data
+
+	for _, ciIdOfCiType := range ret.Data {
+		ciIds = append(ciIds, ciIdOfCiType.CiID)
+	}
+
 	return
 }
 
-func (c *Client) GetListOfCiIdsOfCiTypeV2(ciTypeID int) (r ListOfCiIds, err error) {
+func (c *Client) GetListOfCiIdsOfCiTypeV2(ciTypeID int) (ciIds CiIds, err error) {
 
 	if err = c.v2.Login(); err != nil {
 		return
@@ -102,13 +106,17 @@ func (c *Client) GetListOfCiIdsOfCiTypeV2(ciTypeID int) (r ListOfCiIds, err erro
 	err = c.v2.Query("int_getListOfCiIdsOfCiType", &ret, params)
 	if err != nil {
 		log.Error("Error: ", err)
-		return r, err
+		return ciIds, err
 	}
-	r = ret.Data
+
+	for _, ciIdOfCiType := range ret.Data {
+		ciIds = append(ciIds, ciIdOfCiType.CiID)
+	}
+
 	return
 }
 
-func (c *Client) GetListOfCiIdsOfCiTypeName(ciTypeName string) (r ListOfCiIds, err error) {
+func (c *Client) GetListOfCiIdsOfCiTypeName(ciTypeName string) (ciIds CiIds, err error) {
 
 	if err = c.v2.Login(); err != nil {
 		return
@@ -120,16 +128,18 @@ func (c *Client) GetListOfCiIdsOfCiTypeName(ciTypeName string) (r ListOfCiIds, e
 		return
 	}
 
-	r, err = c.GetListOfCiIdsOfCiType(ciTypeId)
+	ciIds, err = c.GetListOfCiIdsOfCiType(ciTypeId)
 	return
 }
 
 type GetListOfCiIdsByAttributeValue struct {
-	Status string      `json:"status"`
-	Data   ListOfCiIds `json:"data"`
+	Status string `json:"status"`
+	Data   []struct {
+		CiID int `json:"ciid,string"`
+	} `json:"data"`
 }
 
-func (c *Client) GetListOfCiIdsByAttributeValue(att, value string, field v1.AttributeValueType) (r ListOfCiIds, err error) {
+func (c *Client) GetListOfCiIdsByAttributeValue(att, value string, field v1.AttributeValueType) (ciIds CiIds, err error) {
 
 	if err = c.v2.Login(); err != nil {
 		return
@@ -150,9 +160,13 @@ func (c *Client) GetListOfCiIdsByAttributeValue(att, value string, field v1.Attr
 	err = c.v1.CallWebservice(http.MethodPost, "query", "int_getCiIdByCiAttributeValue", params, &ret)
 	if err != nil {
 		log.Error("Error: ", err)
-		return r, err
+		return ciIds, err
 	}
-	r = ret.Data
+
+	for _, ciIdOfCiType := range ret.Data {
+		ciIds = append(ciIds, ciIdOfCiType.CiID)
+	}
+
 	return
 }
 
