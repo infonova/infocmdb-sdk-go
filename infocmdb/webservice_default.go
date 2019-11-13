@@ -133,13 +133,12 @@ func (c *Client) GetListOfCiIdsOfCiTypeName(ciTypeName string) (ciIds CiIds, err
 }
 
 type GetListOfCiIdsByAttributeValue struct {
-	Status string `json:"status"`
-	Data   []struct {
-		CiID int `json:"ciid,string"`
+	Data []struct {
+		CiID int `json:"ci_id,string"`
 	} `json:"data"`
 }
 
-func (c *Client) GetListOfCiIdsByAttributeValue(att, value string, field v1.AttributeValueType) (ciIds CiIds, err error) {
+func (c *Client) GetListOfCiIdsByAttributeValue(att, value string, field v2.AttributeValueType) (ciIds CiIds, err error) {
 
 	if err = c.v2.Login(); err != nil {
 		return
@@ -150,21 +149,21 @@ func (c *Client) GetListOfCiIdsByAttributeValue(att, value string, field v1.Attr
 		return nil, err
 	}
 
-	params := url.Values{
-		"argv1": {strconv.Itoa(attId)},
-		"argv2": {value},
-		"argv3": {string(field)},
+	params := map[string]string{
+		"argv1": strconv.Itoa(attId),
+		"argv2": value,
+		"argv3": string(field),
 	}
 
 	ret := GetListOfCiIdsByAttributeValue{}
-	err = c.v1.CallWebservice(http.MethodPost, "query", "int_getCiIdByCiAttributeValue", params, &ret)
+	err = c.v2.Query("int_getCiIdByCiAttributeValue", &ret, params)
 	if err != nil {
-		log.Error("Error: ", err)
-		return ciIds, err
+		err = utilError.FunctionError(err.Error())
+		return
 	}
 
-	for _, ciIdOfCiType := range ret.Data {
-		ciIds = append(ciIds, ciIdOfCiType.CiID)
+	for _, ciId := range ret.Data {
+		ciIds = append(ciIds, ciId.CiID)
 	}
 
 	return
