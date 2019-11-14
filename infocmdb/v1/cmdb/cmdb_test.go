@@ -136,11 +136,12 @@ func ExampleWebservice_Webservice() {
 	t := testing{}
 
 	i, err := New(infoCMDBConfigFile)
-	i.Config.ApiUrl = t.getUrl()
 	if err != nil {
 		log.Error(ErrFailedToCreateInfoCMDB)
 		return
 	}
+
+	i.Config.ApiUrl = t.getUrl()
 
 	err = i.Login()
 	if err != nil {
@@ -207,12 +208,12 @@ func ExampleCmdbWebClient_Login() {
 	t := testing{}
 
 	i, err := New(infoCMDBConfigFile)
-	i.Config.ApiUrl = t.getUrl()
 	if i == nil {
 		log.Error(ErrFailedToCreateInfoCMDB)
 		return
 	}
 
+	i.Config.ApiUrl = t.getUrl()
 	i.Config.ApiKey = ""
 
 	err = i.Login()
