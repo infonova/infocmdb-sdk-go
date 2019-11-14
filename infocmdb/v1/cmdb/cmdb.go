@@ -13,7 +13,6 @@ import (
 )
 
 var (
-	ErrArgumentsMissing        = errors.New("arguments missing")
 	ErrFailedToCreateInfoCMDB  = errors.New("failed to create infocmdb object")
 	ErrNoCredentials           = errors.New("must provide credentials")
 	ErrNotImplemented          = errors.New("not implemented")
