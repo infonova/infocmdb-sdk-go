@@ -66,7 +66,7 @@ func (i *Cmdb) LoadConfigFile(configFile string) (err error) {
 	if err == nil {
 		log.Debugf("ConfigFile found with given string: %s", configFile)
 	} else {
-		WorkflowConfigPath := filepath.Dir(os.Getenv("WORKFLOW_CONFIG_PATH"))
+		WorkflowConfigPath := os.Getenv("WORKFLOW_CONFIG_PATH")
 		log.Debugf("WORKFLOW_CONFIG_PATH: %s", WorkflowConfigPath)
 		configFile = filepath.Join(WorkflowConfigPath, configFile)
 	}
