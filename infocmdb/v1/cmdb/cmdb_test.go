@@ -116,16 +116,14 @@ func (t *testing) MockServer() *httptest.Server {
 }
 
 func (t *testing) getUrl() string {
-	var testingURL string
+	testingURL := os.Getenv("WORKFLOW_TEST_URL")
 	if mocking {
-		mockService := t.MockServer()
-		testingURL = mockService.URL
-	} else {
-		testingURL = os.Getenv("WORKFLOW_TEST_URL")
+		ts := t.MockServer()
+		testingURL = ts.URL
+	}
 
-		if testingURL == "" {
-			log.Fatal(ErrTestingInfocmdbUrlMissing)
-		}
+	if testingURL == "" {
+		log.Fatal(ErrTestingInfocmdbUrlMissing)
 	}
 
 	log.Debugf("Testing-URL: %s", testingURL)
