@@ -1,38 +1,37 @@
-package cmdb
+package infocmdb
 
 import (
+	"errors"
 	"io/ioutil"
-	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/cmdb/client"
 	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
 
+var (
+	ErrFailedToCreateInfoCMDB  = errors.New("failed to create infocmdb object")
+	ErrNoCredentials           = errors.New("must provide credentials")
+	ErrNotImplemented          = errors.New("not implemented")
+	ErrNoResult                = errors.New("query returned no result")
+	ErrTooManyResults          = errors.New("query returned to many results, expected one")
+	ErrWebserviceResponseNotOk = errors.New("webservice response was not ok")
+)
+
 type Config struct {
-	Url      string `yaml:"apiUrl"`
-	Username string `yaml:"apiUser"`
-	Password string `yaml:"apiPassword"`
-	ApiKey   string
-	BasePath string `yaml:"BasePath"`
+	ApiUrl       string `yaml:"apiUrl"`
+	ApiUser      string `yaml:"apiUser"`
+	ApiPassword  string `yaml:"apiPassword"`
+	ApiKey       string
+	CmdbBasePath string `yaml:"CmdbBasePath"`
 }
 
 type Cmdb struct {
 	Config Config
 	Cache  *cache.Cache
-	Client *client.Client
-	Logger *log.Logger
-	Error  error
-}
-
-type ErrorReturn struct {
-	Message string `json:"message"`
-	Success bool   `json:"success"`
 }
 
 type CiRelationDirection string
@@ -54,15 +53,6 @@ const (
 	ATTRIBUTE_VALUE_TYPE_CI                         = "value_ci"
 )
 
-type UpdateMode string
-
-const (
-	UPDATE_MODE_INSERT UpdateMode = "insert"
-	UPDATE_MODE_UPDATE            = "update"
-	UPDATE_MODE_DELETE            = "delete"
-	UPDATE_MODE_SET               = "set"
-)
-
 func init() {
 	log.SetLevel(log.InfoLevel)
 	if os.Getenv("WORKFLOW_DEBUGGING") == "true" {
@@ -72,12 +62,12 @@ func init() {
 
 func (i *Cmdb) LoadConfigFile(configFile string) (err error) {
 	_, err = os.Stat(configFile)
-	if os.IsNotExist(err) {
+	if err == nil {
+		log.Debugf("ConfigFile found with given string: %s", configFile)
+	} else {
 		WorkflowConfigPath := os.Getenv("WORKFLOW_CONFIG_PATH")
 		log.Debugf("WORKFLOW_CONFIG_PATH: %s", WorkflowConfigPath)
 		configFile = filepath.Join(WorkflowConfigPath, configFile)
-	} else if err != nil {
-		return
 	}
 
 	log.Debugf("ConfigFile: %s", configFile)
@@ -92,50 +82,34 @@ func (i *Cmdb) LoadConfigFile(configFile string) (err error) {
 		return
 	}
 
-	err = i.LoadConfig(yamlFile)
-	return
+	return i.LoadConfig(yamlFile)
 }
 
 func (i *Cmdb) LoadConfig(config []byte) (err error) {
-	if err = yaml.Unmarshal(config, &i.Config); err != nil {
-		return
-	}
-
-	err = i.applyUrlFromRedirect()
-	if err != nil {
-		return
-	}
-
-	i.Client = client.New(i.Config.Url)
-	return
+	return yaml.Unmarshal(config, &i.Config)
 }
 
-func (i *Cmdb) applyUrlFromRedirect() (err error) {
-	c := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-	}
-	resp, err := c.Get(i.Config.Url)
+func New(config string) (i *Cmdb, err error) {
+	i = new(Cmdb)
+	err = i.LoadConfigFile(config)
 	if err != nil {
-		return
+		log.Error(err)
+		return nil, err
 	}
 
-	for name, header := range resp.Header {
-		if name == "Location" && len(header) > 0 {
-			baseUrl, _ := url.Parse(header[0])
-			i.Config.Url = baseUrl.Scheme + "://" + baseUrl.Host + "/"
-		}
-	}
+	i.Cache = cache.New(5*time.Minute, 10*time.Minute)
 
-	return
+	return i, nil
 }
 
-// New returns a new Cmdb Client to access the V2 Api
-func New() (i *Cmdb) {
-	return &Cmdb{
-		Cache:  cache.New(5*time.Minute, 10*time.Minute),
-		Client: &client.Client{},
-		Logger: log.New(),
+func (i *Cmdb) Login() error {
+	if i.Config.ApiKey != "" {
+		log.Debug("already logged in")
+		return nil
 	}
+
+	if i.Config.ApiUser == "" {
+		return ErrNoCredentials
+	}
+	return i.LoginWithUserPass(i.Config.ApiUrl, i.Config.ApiUser, i.Config.ApiPassword)
 }

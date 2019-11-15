@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	v1 "github.com/infonova/infocmdb-sdk-go/infocmdb/v1/cmdb"
-	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/cmdb"
-	clientV2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/cmdb/client"
+	v1 "github.com/infonova/infocmdb-sdk-go/infocmdb/v1/infocmdb"
+	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
+	clientV2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb/client"
 
 	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
 	"github.com/patrickmn/go-cache"

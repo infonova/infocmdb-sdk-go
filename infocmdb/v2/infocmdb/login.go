@@ -1,8 +1,8 @@
-package cmdb
+package infocmdb
 
 import (
-	"github.com/infonova/infocmdb-sdk-go/infocmdb/v1/cmdb"
-	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/cmdb/client"
+	"github.com/infonova/infocmdb-sdk-go/infocmdb/v1/infocmdb"
+	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb/client"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -21,7 +21,7 @@ func (i *Cmdb) Login() (err error) {
 		return nil
 	}
 	if i.Config.Username == "" || i.Config.Password == "" {
-		return cmdb.ErrNoCredentials
+		return infocmdb.ErrNoCredentials
 	}
 
 	var loginResult LoginTokenReturn
@@ -49,7 +49,7 @@ func (i *Cmdb) Login() (err error) {
 	}
 
 	if loginResult.Data.Token == "" {
-		return cmdb.ErrLoginFailed
+		return infocmdb.ErrLoginFailed
 	}
 
 	i.Config.ApiKey = loginResult.Data.Token
