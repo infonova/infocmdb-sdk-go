@@ -14,8 +14,8 @@ package infocmdb
 // This api properly handles all permission checks and access to native functions.
 
 import (
-	v1 "github.com/infonova/infocmdb-sdk-go/infocmdb/v1/cmdb"
-	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/cmdb"
+	v1 "github.com/infonova/infocmdb-sdk-go/infocmdb/v1/infocmdb"
+	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
