@@ -1,4 +1,4 @@
-package cmdb
+package infocmdb
 
 import (
 	"testing"

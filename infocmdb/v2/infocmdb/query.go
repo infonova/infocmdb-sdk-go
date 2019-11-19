@@ -1,7 +1,7 @@
-package cmdb
+package infocmdb
 
 import (
-	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/cmdb/client"
+	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb/client"
 )
 
 type queryParams struct {

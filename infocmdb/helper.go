@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/cmdb"
+	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
 )
 
 func (c *Client) AttributeBasedRelation(sourceCiId int, attributeName string, ciRelationTypeName string, triggerType string, swapCiColumns bool) (relationCisAdded []int, relationCisRemoved []int, err error) {
@@ -30,7 +30,7 @@ func (c *Client) AttributeBasedRelation(sourceCiId int, attributeName string, ci
 
 func (c *Client) CiBasedRelation(srcCiId int, destCiId []int, ciRelationTypeName string, triggerType string, swapCiColumns bool) (relationCisAdded []int, relationCisRemoved []int, err error) {
 
-	currentCiRelations, err := c.GetListOfCiIdsByCiRelation(srcCiId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_ALL)
+	currentCiRelations, err := c.GetListOfCiIdsByCiRelation(srcCiId, ciRelationTypeName, infocmdb.CI_RELATION_DIRECTION_ALL)
 	if err != nil {
 		return
 	}
@@ -46,9 +46,9 @@ func (c *Client) CiBasedRelation(srcCiId int, destCiId []int, ciRelationTypeName
 
 		if add == true {
 			if swapCiColumns == true {
-				err = c.CreateCiRelation(valueCiId, srcCiId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_OMNIDIRECTIONAL)
+				err = c.CreateCiRelation(valueCiId, srcCiId, ciRelationTypeName, infocmdb.CI_RELATION_DIRECTION_OMNIDIRECTIONAL)
 			} else {
-				err = c.CreateCiRelation(srcCiId, valueCiId, ciRelationTypeName, cmdb.CI_RELATION_DIRECTION_OMNIDIRECTIONAL)
+				err = c.CreateCiRelation(srcCiId, valueCiId, ciRelationTypeName, infocmdb.CI_RELATION_DIRECTION_OMNIDIRECTIONAL)
 			}
 			if err != nil {
 				return
