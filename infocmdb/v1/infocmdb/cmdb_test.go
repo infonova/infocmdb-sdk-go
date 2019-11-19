@@ -15,7 +15,7 @@ import (
 type testing struct{}
 
 var (
-	ErrTestingInfocmdbUrlMissing = "WORKFLOW_TEST_URL must be provided or mocking enabled(INFOCMDB_WORKFLOW_TEST_MOCKING=true)"
+	ErrTestingInfocmdbUrlMissing = "WORKFLOW_TEST_URL must be provided or mocking enabled(WORKFLOW_TEST_MOCKING=true)"
 )
 
 var (
@@ -28,13 +28,19 @@ CmdbBasePath: /app/`)
 )
 
 func init() {
-	if err := godotenv.Load("../../.env"); err != nil {
-		log.Fatalf("failed to load env: %v", err)
-	}
-
 	if os.Getenv("WORKFLOW_TEST_MOCKING") == "true" {
 		mocking = true
 		log.Debug("Mocking enabled")
+	}
+
+	err := godotenv.Load("../../.env")
+
+	if err != nil {
+		if mocking {
+			log.Infof("ignoring failure to load env due to enabled mocking, error: %v", err)
+		} else {
+			log.Fatalf("failed to load env: %v", err)
+		}
 	}
 }
 
