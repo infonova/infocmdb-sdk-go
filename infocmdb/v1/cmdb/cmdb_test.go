@@ -31,8 +31,16 @@ func init() {
 	if os.Getenv("WORKFLOW_TEST_MOCKING") == "true" {
 		mocking = true
 		log.Debug("Mocking enabled")
-	} else if err := godotenv.Load("../../.env"); err != nil {
-		log.Fatalf("failed to load env: %v", err)
+	}
+
+	err := godotenv.Load("../../.env")
+
+	if err != nil {
+		if mocking {
+			log.Infof("ignoring failure to load env due to enabled mocking, error: %v", err)
+		} else {
+			log.Fatalf("failed to load env: %v", err)
+		}
 	}
 }
 
