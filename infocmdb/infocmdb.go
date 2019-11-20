@@ -20,6 +20,8 @@ import (
 	"os"
 )
 
+// Client configuration values.
+// Usually taken from data/configs/workflows/infocmdb.yml
 type Config struct {
 	ApiUrl       string `yaml:"apiUrl"`
 	ApiUser      string `yaml:"apiUser"`
