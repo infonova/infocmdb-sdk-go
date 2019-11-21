@@ -17,6 +17,7 @@ import (
 	v1 "github.com/infonova/infocmdb-sdk-go/infocmdb/v1/infocmdb"
 	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
 	log "github.com/sirupsen/logrus"
+	easy "github.com/t-tomalak/logrus-easy-formatter"
 	"os"
 )
 
@@ -37,6 +38,10 @@ type Client struct {
 }
 
 func init() {
+	// Time is omitted in the log message, because it is already shown in the workflow log in a separate column
+	log.SetFormatter(&easy.Formatter{
+		LogFormat: "[%lvl%] %msg%\n",
+	})
 	log.SetLevel(log.InfoLevel)
 	if os.Getenv("WORKFLOW_DEBUGGING") == "true" {
 		log.SetLevel(log.DebugLevel)
