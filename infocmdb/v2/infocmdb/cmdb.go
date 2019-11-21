@@ -66,14 +66,13 @@ const (
 func (i *Cmdb) LoadConfigFile(configFile string) (err error) {
 	_, err = os.Stat(configFile)
 	if os.IsNotExist(err) {
-		WorkflowConfigPath := os.Getenv("WORKFLOW_CONFIG_PATH")
-		log.Debugf("WORKFLOW_CONFIG_PATH: %s", WorkflowConfigPath)
-		configFile = filepath.Join(WorkflowConfigPath, configFile)
+		workflowConfigPath := os.Getenv("WORKFLOW_CONFIG_PATH")
+		configFile = filepath.Join(workflowConfigPath, configFile)
 	} else if err != nil {
 		return
 	}
 
-	log.Debugf("ConfigFile: %s", configFile)
+	log.Debugf("Loading workflow config file for v2 client: %s", configFile)
 
 	_, err = os.Stat(configFile)
 	if err != nil {
@@ -90,6 +89,9 @@ func (i *Cmdb) LoadConfigFile(configFile string) (err error) {
 }
 
 func (i *Cmdb) LoadConfig(config []byte) (err error) {
+	log.Tracef("Config file content:\n%s", config)
+
+	err = yaml.Unmarshal(config, &i.Config)
 	if err = yaml.Unmarshal(config, &i.Config); err != nil {
 		return
 	}
@@ -99,6 +101,7 @@ func (i *Cmdb) LoadConfig(config []byte) (err error) {
 		return
 	}
 
+	log.Debugf("Config: %+v", i.Config)
 	i.Client = client.New(i.Config.Url)
 	return
 }
