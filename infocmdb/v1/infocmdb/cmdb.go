@@ -97,7 +97,7 @@ func New(config string) (i *Cmdb, err error) {
 
 func (i *Cmdb) Login() error {
 	if i.Config.ApiKey != "" {
-		log.Debug("already logged in")
+		log.Trace("already logged in")
 		return nil
 	}
 

@@ -17,7 +17,7 @@ type LoginTokenReturn struct {
 func (i *Cmdb) Login() (err error) {
 
 	if i.Config.ApiKey != "" {
-		log.Debug("already logged in")
+		log.Trace("already logged in")
 		return nil
 	}
 	if i.Config.Username == "" || i.Config.Password == "" {
