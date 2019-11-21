@@ -2,6 +2,7 @@ package infocmdb
 
 import (
 	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb/client"
+	log "github.com/sirupsen/logrus"
 )
 
 type queryParams struct {
@@ -13,6 +14,8 @@ type queryRequest struct {
 }
 
 func (i *Cmdb) Query(query string, out interface{}, params map[string]string) (err error) {
+	log.Debugf("Querying webservice %v with params %v", query, params)
+
 	if err = i.Login(); err != nil {
 		return
 	}
@@ -33,9 +36,11 @@ func (i *Cmdb) Query(query string, out interface{}, params map[string]string) (e
 		Put("/apiV2/query/execute/" + query)
 
 	if resp != nil && resp.IsError() {
+		log.Debugf("Error result: %v", respError)
 		return respError
 	}
 
+	log.Debugf("Result: %v", out)
 	return
 }
 

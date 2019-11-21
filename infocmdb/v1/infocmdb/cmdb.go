@@ -53,24 +53,16 @@ const (
 	ATTRIBUTE_VALUE_TYPE_CI                         = "value_ci"
 )
 
-func init() {
-	log.SetLevel(log.InfoLevel)
-	if os.Getenv("WORKFLOW_DEBUGGING") == "true" {
-		log.SetLevel(log.DebugLevel)
-	}
-}
-
 func (i *Cmdb) LoadConfigFile(configFile string) (err error) {
 	_, err = os.Stat(configFile)
 	if err == nil {
 		log.Debugf("ConfigFile found with given string: %s", configFile)
 	} else {
-		WorkflowConfigPath := os.Getenv("WORKFLOW_CONFIG_PATH")
-		log.Debugf("WORKFLOW_CONFIG_PATH: %s", WorkflowConfigPath)
-		configFile = filepath.Join(WorkflowConfigPath, configFile)
+		workflowConfigPath := os.Getenv("WORKFLOW_CONFIG_PATH")
+		configFile = filepath.Join(workflowConfigPath, configFile)
 	}
 
-	log.Debugf("ConfigFile: %s", configFile)
+	log.Debugf("Loading workflow config file for v1 client: %s", configFile)
 
 	_, err = os.Stat(configFile)
 	if err != nil {
@@ -86,7 +78,15 @@ func (i *Cmdb) LoadConfigFile(configFile string) (err error) {
 }
 
 func (i *Cmdb) LoadConfig(config []byte) (err error) {
-	return yaml.Unmarshal(config, &i.Config)
+	log.Tracef("Config file content:\n%s", config)
+
+	err = yaml.Unmarshal(config, &i.Config)
+	if err != nil {
+		return
+	}
+
+	log.Debugf("Config: %+v", i.Config)
+	return
 }
 
 func New(config string) (i *Cmdb, err error) {
@@ -104,7 +104,7 @@ func New(config string) (i *Cmdb, err error) {
 
 func (i *Cmdb) Login() error {
 	if i.Config.ApiKey != "" {
-		log.Debug("already logged in")
+		log.Trace("already logged in")
 		return nil
 	}
 
