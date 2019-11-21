@@ -63,13 +63,6 @@ const (
 	UPDATE_MODE_SET               = "set"
 )
 
-func init() {
-	log.SetLevel(log.InfoLevel)
-	if os.Getenv("WORKFLOW_DEBUGGING") == "true" {
-		log.SetLevel(log.DebugLevel)
-	}
-}
-
 func (i *Cmdb) LoadConfigFile(configFile string) (err error) {
 	_, err = os.Stat(configFile)
 	if os.IsNotExist(err) {
