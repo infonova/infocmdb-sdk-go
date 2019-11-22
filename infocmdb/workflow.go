@@ -91,15 +91,19 @@ func parseParams() (params WorkflowParams, err error) {
 type PreconditionType string
 
 const (
+	TYPE_CI_TYPE   = "ci type"
 	TYPE_ATTRIBUTE = "attribute"
 	TYPE_RELATION  = "relation"
 )
 
-// "Things" that a workflow requires.
-type Preconditions []struct {
+// Single workflow requirement.
+type Precondition struct {
 	Type PreconditionType
 	Name string
 }
+
+// List of workflow requirements.
+type Preconditions []Precondition
 
 // Executes an existence check test for every supplied precondition.
 func (w Workflow) TestPreconditions(t *testing.T, preconditions Preconditions) {
@@ -113,16 +117,26 @@ func (w Workflow) TestPreconditions(t *testing.T, preconditions Preconditions) {
 		testName := fmt.Sprintf("%v \"%v\" exists", precondition.Type, precondition.Name)
 
 		t.Run(testName, func(t *testing.T) {
-			switch precondition.Type {
-			case TYPE_ATTRIBUTE:
-				if _, err := cmdb.GetAttributeIdByAttributeName(precondition.Name); err != nil {
-					t.Error(err)
-				}
-			case TYPE_RELATION:
-				if _, err := cmdb.GetCiRelationTypeIdByRelationTypeName(precondition.Name); err != nil {
-					t.Error(err)
-				}
-			}
+			testPrecondition(t, cmdb, precondition)
 		})
+	}
+}
+
+func testPrecondition(t *testing.T, cmdb *Client, precondition Precondition) {
+	switch precondition.Type {
+	case TYPE_CI_TYPE:
+		if _, err := cmdb.GetCiTypeIdByCiTypeName(precondition.Name); err != nil {
+			t.Error(err)
+		}
+
+	case TYPE_ATTRIBUTE:
+		if _, err := cmdb.GetAttributeIdByAttributeName(precondition.Name); err != nil {
+			t.Error(err)
+		}
+
+	case TYPE_RELATION:
+		if _, err := cmdb.GetCiRelationTypeIdByRelationTypeName(precondition.Name); err != nil {
+			t.Error(err)
+		}
 	}
 }
