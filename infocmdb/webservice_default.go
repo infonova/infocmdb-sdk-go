@@ -55,14 +55,14 @@ func (c *Client) Query(ws string, out interface{}, params map[string]string) (er
 
 type CiIds []int
 
-type GetListOfCiIdsOfCiType struct {
+type getListOfCiIdsOfCiType struct {
 	Status string `json:"status"`
 	Data   []struct {
 		CiID int `json:"ciid,string"`
 	} `json:"data"`
 }
 
-type ResponseId struct {
+type responseId struct {
 	Id int `json:"id,string"`
 }
 
@@ -80,7 +80,7 @@ func (c *Client) GetListOfCiIdsOfCiType(ciTypeID int) (ciIds CiIds, err error) {
 		"argv1": strconv.Itoa(ciTypeID),
 	}
 
-	ret := GetListOfCiIdsOfCiType{}
+	ret := getListOfCiIdsOfCiType{}
 	err = c.v2.Query("int_getListOfCiIdsOfCiType", &ret, params)
 	if err != nil {
 		log.Error("Error: ", err)
@@ -108,7 +108,7 @@ func (c *Client) GetListOfCiIdsOfCiTypeV2(ciTypeID int) (ciIds CiIds, err error)
 		"argv1": strconv.Itoa(ciTypeID),
 	}
 
-	ret := GetListOfCiIdsOfCiType{}
+	ret := getListOfCiIdsOfCiType{}
 	err = c.v2.Query("int_getListOfCiIdsOfCiType", &ret, params)
 	if err != nil {
 		log.Error("Error: ", err)
@@ -138,7 +138,7 @@ func (c *Client) GetListOfCiIdsOfCiTypeName(ciTypeName string) (ciIds CiIds, err
 	return
 }
 
-type GetListOfCiIdsByAttributeValue struct {
+type getListOfCiIdsByAttributeValue struct {
 	Data []struct {
 		CiID int `json:"ci_id,string"`
 	} `json:"data"`
@@ -161,7 +161,7 @@ func (c *Client) GetListOfCiIdsByAttributeValue(att, value string, field v2.Attr
 		"argv3": string(field),
 	}
 
-	ret := GetListOfCiIdsByAttributeValue{}
+	ret := getListOfCiIdsByAttributeValue{}
 	err = c.v2.Query("int_getCiIdByCiAttributeValue", &ret, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
@@ -175,11 +175,6 @@ func (c *Client) GetListOfCiIdsByAttributeValue(att, value string, field v2.Attr
 	return
 }
 
-// // Templates for others
-type AddCiProjectMapping struct {
-	Status string `json:"status"`
-}
-
 // AddCiProjectMapping
 // int_addCiProjectMapping     add project-mapping to a ci
 //
@@ -188,7 +183,7 @@ type AddCiProjectMapping struct {
 // from dual
 // where not exists(select id from ci_project where ci_id = :argv1: and project_id = :argv2:)
 
-func (c *Client) AddCiProjectMapping(ciID int, projectID int, historyID int) (r AddCiProjectMapping, err error) {
+func (c *Client) AddCiProjectMapping(ciID int, projectID int, historyID int) (err error) {
 
 	if err = c.v2.Login(); err != nil {
 		return
@@ -200,11 +195,8 @@ func (c *Client) AddCiProjectMapping(ciID int, projectID int, historyID int) (r 
 		"argv3": {strconv.Itoa(historyID)},
 	}
 
-	err = c.v1.CallWebservice(http.MethodPost, "query", "int_addCiProjectMapping", params, &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
+	err = c.v1.CallWebservice(http.MethodPost, "query", "int_addCiProjectMapping", params, nil)
+	log.Error("Error: ", err)
 
 	return
 }
@@ -269,7 +261,7 @@ func (c *Client) CreateCi(ciTypeID int, icon string, historyID int) (r CreateCi,
 	return
 }
 
-// GetCi
+// getCi
 // int_getCi   Retrieve all informations about a ci
 type Ci struct {
 	CiID               int    `json:"ci_id,string"`
@@ -280,7 +272,7 @@ type Ci struct {
 	Projects           []string
 	ProjectIDs         []int
 }
-type GetCi struct {
+type getCi struct {
 	Status string `json:"status"`
 	Data   []struct {
 		Ci
@@ -297,7 +289,7 @@ func (c *Client) GetCi(ciID int) (r Ci, err error) {
 		"argv1": {strconv.Itoa(ciID)},
 	}
 
-	jsonRet := GetCi{}
+	jsonRet := getCi{}
 	err = c.v1.CallWebservice(http.MethodPost, "query", "int_getCi", params, &jsonRet)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
@@ -324,7 +316,7 @@ func (c *Client) GetCi(ciID int) (r Ci, err error) {
 	return
 }
 
-// GetCiAttributes
+// getCiAttributes
 // int_getCiAttributes     get all attributes for given ci (:argv1:)
 
 type CiAttribute struct {
@@ -338,7 +330,7 @@ type CiAttribute struct {
 	ModifiedAt           string `json:"modified_at"`
 }
 
-type GetCiAttributes struct {
+type getCiAttributes struct {
 	Status string        `json:"status"`
 	Data   []CiAttribute `json:"data"`
 }
@@ -353,7 +345,7 @@ func (c *Client) GetCiAttributes(ciID int) (r []CiAttribute, err error) {
 		"argv1": {strconv.Itoa(ciID)},
 	}
 
-	jsonRet := GetCiAttributes{}
+	jsonRet := getCiAttributes{}
 	err = c.v1.CallWebservice(http.MethodPost, "query", "int_getCiAttributes", params, &jsonRet)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
@@ -363,49 +355,9 @@ func (c *Client) GetCiAttributes(ciID int) (r []CiAttribute, err error) {
 	return
 }
 
-// CreateCiAttribute
-// int_createCiAttribute   creates a ci_attribute-row
-type CreateCiAttribute struct {
-	Status      string `json:"status"`
-	CiID        int    `json:"ci_id"`
-	AttributeID int    `json:"attribute_id"`
-	HistoryID   int    `json:"history_id"`
-}
-
-func (c *Client) CreateCiAttribute() (r CreateCiAttribute, err error) {
-
-	if err = c.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	/*
-		params := url.Values{
-			// "argv1": {strconv.Itoa(%PARAM1%)},
-			// "argv2": {strconv.Itoa(%PARAM2%)},
-			// "argv3": {strconv.Itoa(%PARAM3%)},
-			// "argv4": {strconv.Itoa(%PARAM4%)},
-		}
-
-		ret, err := c.v1.CallWebservice(http.MethodPost,"query", "int_createCiAttribute", params)
-		if err != nil {
-			log.Error("Error: ", err)
-			return r, err
-		}
-
-		err = json.Unmarshal([]byte(ret), &r)
-		if err != nil {
-			log.Error("Error: ", err)
-			return r, err
-		}
-
-		return
-	*/
-}
-
-// CreateCiRelation
+// createCiRelation
 // int_createCiRelation    inserts a relation: argv1 = ci_id_1 argv2 = ci_id_2 argv3 = ci_relation_type_id argv4 = direction
-type CreateCiRelation struct {
+type createCiRelation struct {
 	Status string `json:"status"`
 }
 
@@ -451,7 +403,7 @@ func (c *Client) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName strin
 			"argv4": {strconv.Itoa(directionId)},
 		}
 
-		jsonRet := CreateCiRelation{}
+		jsonRet := createCiRelation{}
 		err = c.v1.CallWebservice(http.MethodPost, "query", "int_createCiRelation", params, &jsonRet)
 		if err != nil {
 			err = utilError.FunctionError(err.Error())
@@ -463,120 +415,9 @@ func (c *Client) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName strin
 	return
 }
 
-/*
-
-// CreateHistory
-// int_createHistory   creates an History-ID
-type CreateHistory struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) CreateHistory() (r CreateHistory, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_createHistory", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// DeleteCi
-// int_deleteCi    delete a CI with all dependencies
-type DeleteCi struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) DeleteCi() (r DeleteCi, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_deleteCi", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// DeleteCiAttribute
-// int_deleteCiAttribute   delete a ci_attribute-row by id
-type DeleteCiAttribute struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) DeleteCiAttribute() (r DeleteCiAttribute, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_deleteCiAttribute", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-*/
-
-// DeleteCiRelation
+// deleteCiRelation
 // int_deleteCiRelation    delete a specific ci-relation
-type DeleteCiRelation struct {
+type deleteCiRelation struct {
 	Status string `json:"status"`
 }
 
@@ -598,7 +439,7 @@ func (c *Client) DeleteCiRelation(ciId1 int, ciId2 int, ciRelationTypeName strin
 		"argv3": {strconv.Itoa(ciRelationTypeId)},
 	}
 
-	jsonRet := DeleteCiRelation{}
+	jsonRet := deleteCiRelation{}
 	err = c.v1.CallWebservice(http.MethodPost, "query", "int_deleteCiRelation", params, &jsonRet)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
@@ -609,119 +450,9 @@ func (c *Client) DeleteCiRelation(ciId1 int, ciId2 int, ciRelationTypeName strin
 	return
 }
 
-/*
-// DeleteCiRelationsByCiRelationTypeDirectedFrom
-// int_deleteCiRelationsByCiRelationTypeDirectedFrom  deletes all ci-relations with a specific relation-type of a specific CI (direction: from CI)
-type DeleteCiRelationsByCiRelationTypeDirectedFrom struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) DeleteCiRelationsByCiRelationTypeDirectedFrom() (r DeleteCiRelationsByCiRelationTypeDirectedFrom, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_deleteCiRelationsByCiRelationTypeDirectedFrom", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// DeleteCiRelationsByCiRelationTypeDirectedTo
-// int_deleteCiRelationsByCiRelationTypeDirectedTo    deletes all ci-relations with a specific relation-type of a specific CI (direction: to CI)
-type DeleteCiRelationsByCiRelationTypeDirectedTo struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) DeleteCiRelationsByCiRelationTypeDirectedTo() (r DeleteCiRelationsByCiRelationTypeDirectedTo, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_deleteCiRelationsByCiRelationTypeDirectedTo", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// DeleteCiRelationsByCiRelationTypeDirectionList
-// int_deleteCiRelationsByCiRelationTypeDirectionList     deletes all ci-relations with a specific relation-type of a specific CI
-type DeleteCiRelationsByCiRelationTypeDirectionList struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) DeleteCiRelationsByCiRelationTypeDirectionList() (r DeleteCiRelationsByCiRelationTypeDirectionList, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_deleteCiRelationsByCiRelationTypeDirectionList", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-*/
-
-// GetAttributeDefaultOption
+// getAttributeDefaultOption
 // int_getAttributeDefaultOption   returns the value of an option
-type GetAttributeDefaultOption struct {
+type getAttributeDefaultOption struct {
 	Status string `json:"status"`
 	Data   []struct {
 		Value string `json:"v"`
@@ -744,7 +475,7 @@ func (c *Client) GetAttributeDefaultOption(optionId int) (r string, err error) {
 		"argv1": {strconv.Itoa(optionId)},
 	}
 
-	jsonRet := GetAttributeDefaultOption{}
+	jsonRet := getAttributeDefaultOption{}
 	err = c.v1.CallWebservice(http.MethodPost, "query", "int_getAttributeDefaultOption", params, &jsonRet)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
@@ -765,85 +496,11 @@ func (c *Client) GetAttributeDefaultOption(optionId int) (r string, err error) {
 	return
 }
 
-/*
-// GetAttributeDefaultOptionId
-// int_getAttributeDefaultOptionId     return the id of a specific attribute and value
-type GetAttributeDefaultOptionId struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) GetAttributeDefaultOptionId() (r GetAttributeDefaultOptionId, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getAttributeDefaultOptionId", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// GetAttributeGroupIdByAttributeGroupName
-// int_getAttributeGroupIdByAttributeGroupName     returns the id of an attribute group
-type GetAttributeGroupIdByAttributeGroupName struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) GetAttributeGroupIdByAttributeGroupName() (r GetAttributeGroupIdByAttributeGroupName, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getAttributeGroupIdByAttributeGroupName", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-*/
-
 // GetAttributeIdByAttributeName
 // int_getAttributeIdByAttributeName   returns the id of an attribute
-type GetAttributeIdByAttributeNameRet struct {
+type getAttributeIdByAttributeNameRet struct {
 	Status string       `json:"status"`
-	Data   []ResponseId `json:"data"`
+	Data   []responseId `json:"data"`
 }
 
 func (c *Client) GetAttributeIdByAttributeName(name string) (r int, err error) {
@@ -862,7 +519,7 @@ func (c *Client) GetAttributeIdByAttributeName(name string) (r int, err error) {
 		"argv1": {name},
 	}
 
-	response := GetAttributeIdByAttributeNameRet{}
+	response := getAttributeIdByAttributeNameRet{}
 	err = c.v1.CallWebservice(http.MethodPost, "query", "int_getAttributeIdByAttributeName", params, &response)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
@@ -882,44 +539,6 @@ func (c *Client) GetAttributeIdByAttributeName(name string) (r int, err error) {
 
 	return
 }
-
-/*
-// GetCiAttributeId
-// int_getCiAttributeId    returns the id of the first ci_attribute-row with the specific ci_id and attribute_id
-type GetCiAttributeId struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) GetCiAttributeId(ciID int, attrID int) (r GetCiAttributeId, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getCiAttributeId", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-*/
 
 // GetCiAttributeValue
 // int_getCiAttributeValue     get the value of a ci_attribute entry by ci_id and attribute_id
@@ -1047,119 +666,9 @@ func (c *Client) GetCiAttributeValueCi(ciId int, attributeName string) (value st
 	return
 }
 
-/*
-// GetCiIdByCiAttributeId
-// int_getCiIdByCiAttributeId  returns the ciid of a specific ci_attribute-row
-type GetCiIdByCiAttributeId struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) GetCiIdByCiAttributeId() (r GetCiIdByCiAttributeId, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getCiIdByCiAttributeId", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// GetCiIdByCiAttributeValue
-// int_getCiIdByCiAttributeValue   returns the ci_id by a specific attribute_id and value
-type GetCiIdByCiAttributeValue struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) GetCiIdByCiAttributeValue() (r GetCiIdByCiAttributeValue, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getCiIdByCiAttributeValue", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// GetCiProjectMappings
-// int_getCiProjectMappings    Get all Projects for a given CI
-type GetCiProjectMappings struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) GetCiProjectMappings() (r GetCiProjectMappings, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getCiProjectMappings", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-*/
-
-// GetCiRelationCount
+// getCiRelationCount
 // int_getCiRelationCount  returns the number of relations with the given parameters
-type GetCiRelationCount struct {
+type getCiRelationCount struct {
 	Status string `json:"status"`
 	Data   []struct {
 		Count int `json:"c,string"`
@@ -1184,7 +693,7 @@ func (c *Client) GetCiRelationCount(ciId1 int, ciId2 int, ciRelationTypeName str
 		"argv3": {strconv.Itoa(ciRelationTypeId)},
 	}
 
-	jsonRet := GetCiRelationCount{}
+	jsonRet := getCiRelationCount{}
 	err = c.v1.CallWebservice(http.MethodPost, "query", "int_getCiRelationCount", params, &jsonRet)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
@@ -1206,11 +715,11 @@ func (c *Client) GetCiRelationCount(ciId1 int, ciId2 int, ciRelationTypeName str
 
 }
 
-// GetCiRelationTypeIdByRelationTypeName
+// getCiRelationTypeIdByRelationTypeName
 // int_getCiRelationTypeIdByRelationTypeName   returns the id of a relation-type
-type GetCiRelationTypeIdByRelationTypeName struct {
+type getCiRelationTypeIdByRelationTypeName struct {
 	Status string       `json:"status"`
-	Data   []ResponseId `json:"data"`
+	Data   []responseId `json:"data"`
 }
 
 func (c *Client) GetCiRelationTypeIdByRelationTypeName(name string) (r int, err error) {
@@ -1229,7 +738,7 @@ func (c *Client) GetCiRelationTypeIdByRelationTypeName(name string) (r int, err 
 		"argv1": name,
 	}
 
-	jsonRet := GetCiRelationTypeIdByRelationTypeName{}
+	jsonRet := getCiRelationTypeIdByRelationTypeName{}
 	err = c.v2.Query("int_getCiRelationTypeIdByRelationTypeName", &jsonRet, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
@@ -1250,11 +759,11 @@ func (c *Client) GetCiRelationTypeIdByRelationTypeName(name string) (r int, err 
 	return
 }
 
-// GetCiTypeIdByCiTypeName
+// getCiTypeIdByCiTypeName
 // int_getCiTypeIdByCiTypeName     returns the id for the CI-Type
-type GetCiTypeIdByCiTypeName struct {
+type getCiTypeIdByCiTypeName struct {
 	Status string       `json:"status"`
-	Data   []ResponseId `json:"data"`
+	Data   []responseId `json:"data"`
 }
 
 func (c *Client) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
@@ -1273,7 +782,7 @@ func (c *Client) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
 		"argv1": {name},
 	}
 
-	response := GetCiTypeIdByCiTypeName{}
+	response := getCiTypeIdByCiTypeName{}
 	err = c.v1.CallWebservice(http.MethodPost, "query", "int_getCiTypeIdByCiTypeName", params, &response)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
@@ -1294,54 +803,16 @@ func (c *Client) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
 	return
 }
 
-/*
-// GetCiTypeOfCi
-// int_getCiTypeOfCi   returns the ci-type of a CI
-type GetCiTypeOfCi struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) GetCiTypeOfCi() (r GetCiTypeOfCi, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getCiTypeOfCi", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-*/
-
 // GetListOfCiIdsByCiRelationDirectionList
 // int_getListOfCiIdsByCiRelationDirectionList    returns all related CI-IDs of a specific relation-type
-type GetListOfCiIdsByCiRelation struct {
+type getListOfCiIdsByCiRelation struct {
 	Status string `json:"status"`
 	Data   []struct {
 		CiId int `json:"ci_id,string"`
 	} `json:"data"`
 }
 
-func (c *Client) GetListOfCiIdsByCiRelation(ciId int, ciRelationTypeName string, direction v2.CiRelationDirection) (r []int, err error) {
+func (c *Client) GetListOfCiIdsByCiRelation(ciId int, ciRelationTypeName string, direction v2.CiRelationDirection) (r CiIds, err error) {
 
 	if err = c.v2.Login(); err != nil {
 		return
@@ -1375,7 +846,7 @@ func (c *Client) GetListOfCiIdsByCiRelation(ciId int, ciRelationTypeName string,
 		params["argv3"] = "0,4"
 	}
 
-	jsonRet := GetListOfCiIdsByCiRelation{}
+	jsonRet := getListOfCiIdsByCiRelation{}
 	err = c.v2.Query(webservice, &jsonRet, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
@@ -1390,296 +861,6 @@ func (c *Client) GetListOfCiIdsByCiRelation(ciId int, ciRelationTypeName string,
 	return
 }
 
-/*
-// GetNumberOfCiAttributes
-// int_getNumberOfCiAttributes     returns the number of values for a specific attribute of a CI
-type GetNumberOfCiAttributes struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) GetNumberOfCiAttributes() (r GetNumberOfCiAttributes, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getNumberOfCiAttributes", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// GetProjectIdByProjectName
-// int_getProjectIdByProjectName   returns the id of the project with the given name
-type GetProjectIdByProjectName struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) GetProjectIdByProjectName() (r GetProjectIdByProjectName, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getProjectIdByProjectName", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// GetProjects
-// int_getProjects     Retrieve all CMDB Projects
-type GetProjects struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) GetProjects() (r GetProjects, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getProjects", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// GetRoleIdByRoleName
-// int_getRoleIdByRoleName     returns the id of a role
-type GetRoleIdByRoleName struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) GetRoleIdByRoleName() (r GetRoleIdByRoleName, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getRoleIdByRoleName", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// GetUserIdByUsername
-// int_getUserIdByUsername     returns the ID of a infoCMDB-User
-type GetUserIdByUsername struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) GetUserIdByUsername() (r GetUserIdByUsername, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_getUserIdByUsername", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// RemoveCiProjectMapping
-// int_removeCiProjectMapping  removes a ci project mapping
-type RemoveCiProjectMapping struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) RemoveCiProjectMapping() (r RemoveCiProjectMapping, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_removeCiProjectMapping", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// SetAttributeRole
-// int_setAttributeRole    set permisson for an attribute
-type SetAttributeRole struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) SetAttributeRole() (r SetAttributeRole, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_setAttributeRole", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
-// SetCiTypeOfCi
-// int_setCiTypeOfCi   set the ci_type of a CI
-type SetCiTypeOfCi struct {
-	Status string `json:"status"`
-}
-
-
-func (i *Cmdb) SetCiTypeOfCi() (r SetCiTypeOfCi, err error) {
-
-	if err = i.v2.Login(); err != nil {
-		return
-	}
-
-	return r, v1.ErrNotImplemented // TODO FIXME
-	params := url.Values{
-		// "argv1": {strconv.Itoa(%PARAM1%)},
-		// "argv2": {strconv.Itoa(%PARAM2%)},
-		// "argv3": {strconv.Itoa(%PARAM3%)},
-		// "argv4": {strconv.Itoa(%PARAM4%)},
-	}
-
-	ret, err := i.v1.CallWebservice(http.MethodPost,"query", "int_setCiTypeOfCi", params)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	err = json.Unmarshal([]byte(ret), &r)
-	if err != nil {
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-*/
-
 type UpdateCiAttribute struct {
 	Mode          v2.UpdateMode `json:"mode"`
 	Name          string        `json:"name"`
@@ -1688,13 +869,13 @@ type UpdateCiAttribute struct {
 	UploadID      string        `json:"uploadId"`
 }
 
-type UpdateCiAttributes struct {
+type updateCiAttributes struct {
 	Attributes []UpdateCiAttribute `json:"attributes"`
 }
 
 //
-type UpdateCiAttributesRequest struct {
-	Ci UpdateCiAttributes `json:"ci"`
+type updateCiAttributesRequest struct {
+	Ci updateCiAttributes `json:"ci"`
 }
 
 func (c *Client) UpdateCiAttribute(ci int, ua []UpdateCiAttribute) (err error) {
@@ -1704,7 +885,7 @@ func (c *Client) UpdateCiAttribute(ci int, ua []UpdateCiAttribute) (err error) {
 
 	var errResp clientV2.ResponseError
 	resp, err := c.v2.Client.NewRequest().
-		SetBody(UpdateCiAttributesRequest{Ci: UpdateCiAttributes{Attributes: ua}}).
+		SetBody(updateCiAttributesRequest{Ci: updateCiAttributes{Attributes: ua}}).
 		SetAuthToken(c.v2.Config.ApiKey).
 		SetError(&errResp).
 		Put(fmt.Sprintf("/apiV2/ci/%d", ci))
@@ -1728,7 +909,7 @@ func (c *Client) ListCiByAttributeValue(ci int, ua []UpdateCiAttribute) (err err
 	var errResp clientV2.ResponseError
 	resp, err := c.v2.Client.NewRequest().
 		SetError(&errResp).
-		SetBody(UpdateCiAttributesRequest{Ci: UpdateCiAttributes{Attributes: ua}}).
+		SetBody(updateCiAttributesRequest{Ci: updateCiAttributes{Attributes: ua}}).
 		Put(fmt.Sprintf("/apiV2/ci/%d", ci))
 
 	if err != nil {
