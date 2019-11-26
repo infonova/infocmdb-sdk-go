@@ -1,6 +1,7 @@
 package infocmdb
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -34,6 +35,15 @@ type ErrorReturn struct {
 	Message string `json:"message"`
 	Success bool   `json:"success"`
 }
+
+var (
+	ErrFailedToCreateInfoCMDB  = errors.New("failed to create infocmdb object")
+	ErrNoCredentials           = errors.New("must provide credentials")
+	ErrNotImplemented          = errors.New("not implemented")
+	ErrNoResult                = errors.New("query returned no result")
+	ErrTooManyResults          = errors.New("query returned to many results, expected one")
+	ErrWebserviceResponseNotOk = errors.New("webservice response was not ok")
+)
 
 type CiRelationDirection string
 
