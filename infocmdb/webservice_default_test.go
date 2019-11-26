@@ -364,7 +364,7 @@ func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 	}
 	type args struct {
 		ci int
-		ua []UpdateCiAttribute
+		ua []v2.UpdateCiAttribute
 	}
 
 	cmdbConfigValid := v2.Cmdb{Config: v2.Config{
@@ -385,7 +385,7 @@ func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 		{
 			"v2 Delete CI Attribute - fail - requires ciattributeid",
 			fields{&cmdbConfigValid},
-			args{ci: baseCiID, ua: []UpdateCiAttribute{
+			args{ci: baseCiID, ua: []v2.UpdateCiAttribute{
 				{Mode: v2.UPDATE_MODE_DELETE, Name: baseAttributeName},
 			}},
 			true,
@@ -393,7 +393,7 @@ func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 		{
 			"v2 Update CI Attribute",
 			fields{&cmdbConfigValid},
-			args{ci: baseCiID, ua: []UpdateCiAttribute{
+			args{ci: baseCiID, ua: []v2.UpdateCiAttribute{
 				{Mode: v2.UPDATE_MODE_SET, Name: "emp_firstname", Value: "22322"},
 			}},
 			false,
@@ -401,7 +401,7 @@ func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 		{
 			"v2 Update CI Attribute - wrong attribute name",
 			fields{&cmdbConfigValid},
-			args{ci: baseCiID, ua: []UpdateCiAttribute{
+			args{ci: baseCiID, ua: []v2.UpdateCiAttribute{
 				{Mode: v2.UPDATE_MODE_SET, Name: baseAttributeName + "_NOT_EXISTING", Value: "1"},
 			}},
 			true,
@@ -409,7 +409,7 @@ func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 		{
 			"v2 Insert CI Attribute",
 			fields{&cmdbConfigValid},
-			args{ci: baseCiID, ua: []UpdateCiAttribute{
+			args{ci: baseCiID, ua: []v2.UpdateCiAttribute{
 				{Mode: v2.UPDATE_MODE_INSERT, Name: baseAttributeName, Value: "New1"},
 			}},
 			false,
@@ -417,7 +417,7 @@ func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 		{
 			"v2 Update CI Attribute - fail - multiple attributes with the same name",
 			fields{&cmdbConfigValid},
-			args{ci: baseCiID, ua: []UpdateCiAttribute{
+			args{ci: baseCiID, ua: []v2.UpdateCiAttribute{
 				{Mode: v2.UPDATE_MODE_SET, Name: baseAttributeName, Value: "22322"},
 			}},
 			true,
