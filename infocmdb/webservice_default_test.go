@@ -221,11 +221,11 @@ func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
 			}
 			gotR, err := i.GetListOfCiIdsOfCiType(tt.args.ciTypeID)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GetListOfCiIdsOfCiType() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("getListOfCiIdsOfCiType() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(gotR, tt.wantR) {
-				t.Errorf("GetListOfCiIdsOfCiType() gotR = %v, want %v", gotR, tt.wantR)
+				t.Errorf("getListOfCiIdsOfCiType() gotR = %v, want %v", gotR, tt.wantR)
 			}
 		})
 	}
@@ -300,11 +300,11 @@ func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
 			}
 			gotR, err := i.GetListOfCiIdsOfCiTypeV2(tt.args.ciTypeID)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GetListOfCiIdsOfCiType() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("getListOfCiIdsOfCiType() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(gotR, tt.wantR) {
-				t.Errorf("GetListOfCiIdsOfCiType() gotR = %v, want %v", gotR, tt.wantR)
+				t.Errorf("getListOfCiIdsOfCiType() gotR = %v, want %v", gotR, tt.wantR)
 			}
 		})
 	}
