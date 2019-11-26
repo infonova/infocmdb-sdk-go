@@ -196,7 +196,10 @@ func (c *Client) AddCiProjectMapping(ciID int, projectID int, historyID int) (er
 	}
 
 	err = c.v1.CallWebservice(http.MethodPost, "query", "int_addCiProjectMapping", params, nil)
-	log.Error("Error: ", err)
+	if err != nil {
+		log.Error("Error: ", err)
+		return
+	}
 
 	return
 }
