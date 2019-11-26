@@ -3,8 +3,6 @@ package infocmdb
 import (
 	"errors"
 	"fmt"
-	"net/http"
-	"net/url"
 	"strconv"
 	"strings"
 
@@ -12,7 +10,7 @@ import (
 	clientV2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb/client"
 
 	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
-	"github.com/patrickmn/go-cache"
+	utilCache "github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -188,13 +186,13 @@ func (c *Client) AddCiProjectMapping(ciID int, projectID int, historyID int) (er
 		return
 	}
 
-	params := url.Values{
-		"argv1": {strconv.Itoa(ciID)},
-		"argv2": {strconv.Itoa(projectID)},
-		"argv3": {strconv.Itoa(historyID)},
+	params := map[string]string{
+		"argv1": strconv.Itoa(ciID),
+		"argv2": strconv.Itoa(projectID),
+		"argv3": strconv.Itoa(historyID),
 	}
 
-	err = c.v1.CallWebservice(http.MethodPost, "query", "int_addCiProjectMapping", params, nil)
+	err = c.v2.Query("int_addCiProjectMapping", nil, params)
 	if err != nil {
 		log.Error("Error: ", err)
 	}
@@ -215,12 +213,12 @@ func (c *Client) CreateAttribute(ciID int, attrID int) (r CreateAttribute, err e
 		return
 	}
 
-	params := url.Values{
-		"argv1": {strconv.Itoa(ciID)},
-		"argv2": {strconv.Itoa(attrID)},
+	params := map[string]string{
+		"argv1": strconv.Itoa(ciID),
+		"argv2": strconv.Itoa(attrID),
 	}
 
-	err = c.v1.CallWebservice(http.MethodPost, "query", "int_createCiAttribute", params, &r)
+	err = c.v2.Query("int_createCiAttribute", &r, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		log.Error("Error: ", err)
@@ -247,13 +245,13 @@ func (c *Client) CreateCi(ciTypeID int, icon string, historyID int) (r CreateCi,
 		return
 	}
 
-	params := url.Values{
-		"argv1": {strconv.Itoa(ciTypeID)},
-		"argv2": {icon},
-		"argv3": {strconv.Itoa(historyID)},
+	params := map[string]string{
+		"argv1": strconv.Itoa(ciTypeID),
+		"argv2": icon,
+		"argv3": strconv.Itoa(historyID),
 	}
 
-	err = c.v1.CallWebservice(http.MethodPost, "query", "int_createCi", params, &r)
+	err = c.v2.Query("int_createCi", &r, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		log.Error("Error: ", err)
@@ -286,12 +284,12 @@ func (c *Client) GetCi(ciID int) (r Ci, err error) {
 		return
 	}
 
-	params := url.Values{
-		"argv1": {strconv.Itoa(ciID)},
+	params := map[string]string{
+		"argv1": strconv.Itoa(ciID),
 	}
 
 	jsonRet := getCi{}
-	err = c.v1.CallWebservice(http.MethodPost, "query", "int_getCi", params, &jsonRet)
+	err = c.v2.Query("int_getCi", &jsonRet, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		log.Debugf("Error: %v", err)
@@ -342,12 +340,12 @@ func (c *Client) GetCiAttributes(ciID int) (r []CiAttribute, err error) {
 		return
 	}
 
-	params := url.Values{
-		"argv1": {strconv.Itoa(ciID)},
+	params := map[string]string{
+		"argv1": strconv.Itoa(ciID),
 	}
 
 	jsonRet := getCiAttributes{}
-	err = c.v1.CallWebservice(http.MethodPost, "query", "int_getCiAttributes", params, &jsonRet)
+	err = c.v2.Query("int_getCiAttributes", &jsonRet, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		log.Error("Error: ", err)
@@ -397,15 +395,15 @@ func (c *Client) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName strin
 			return
 		}
 
-		params := url.Values{
-			"argv1": {strconv.Itoa(ciId1)},
-			"argv2": {strconv.Itoa(ciId2)},
-			"argv3": {strconv.Itoa(ciRelationTypeId)},
-			"argv4": {strconv.Itoa(directionId)},
+		params := map[string]string{
+			"argv1": strconv.Itoa(ciId1),
+			"argv2": strconv.Itoa(ciId2),
+			"argv3": strconv.Itoa(ciRelationTypeId),
+			"argv4": strconv.Itoa(directionId),
 		}
 
 		jsonRet := createCiRelation{}
-		err = c.v1.CallWebservice(http.MethodPost, "query", "int_createCiRelation", params, &jsonRet)
+		err = c.v2.Query("int_createCiRelation", &jsonRet, params)
 		if err != nil {
 			err = utilError.FunctionError(err.Error())
 			log.Error("Error: ", err)
@@ -434,14 +432,14 @@ func (c *Client) DeleteCiRelation(ciId1 int, ciId2 int, ciRelationTypeName strin
 		return
 	}
 
-	params := url.Values{
-		"argv1": {strconv.Itoa(ciId1)},
-		"argv2": {strconv.Itoa(ciId2)},
-		"argv3": {strconv.Itoa(ciRelationTypeId)},
+	params := map[string]string{
+		"argv1": strconv.Itoa(ciId1),
+		"argv2": strconv.Itoa(ciId2),
+		"argv3": strconv.Itoa(ciRelationTypeId),
 	}
 
 	jsonRet := deleteCiRelation{}
-	err = c.v1.CallWebservice(http.MethodPost, "query", "int_deleteCiRelation", params, &jsonRet)
+	err = c.v2.Query("int_deleteCiRelation", &jsonRet, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		log.Error("Error: ", err)
@@ -472,12 +470,12 @@ func (c *Client) GetAttributeDefaultOption(optionId int) (r string, err error) {
 		return cached.(string), nil
 	}
 
-	params := url.Values{
-		"argv1": {strconv.Itoa(optionId)},
+	params := map[string]string{
+		"argv1": strconv.Itoa(optionId),
 	}
 
 	jsonRet := getAttributeDefaultOption{}
-	err = c.v1.CallWebservice(http.MethodPost, "query", "int_getAttributeDefaultOption", params, &jsonRet)
+	err = c.v2.Query("int_getAttributeDefaultOption", &jsonRet, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		log.Error("Error: ", err)
@@ -489,7 +487,7 @@ func (c *Client) GetAttributeDefaultOption(optionId int) (r string, err error) {
 		err = utilError.FunctionError(strconv.Itoa(optionId) + " - " + v2.ErrNoResult.Error())
 	case 1:
 		r = jsonRet.Data[0].Value
-		c.v1.Cache.Set(cacheKey, r, cache.DefaultExpiration)
+		c.v1.Cache.Set(cacheKey, r, utilCache.DefaultExpiration)
 	default:
 		err = utilError.FunctionError(strconv.Itoa(optionId) + " - " + v2.ErrTooManyResults.Error())
 	}
@@ -516,12 +514,12 @@ func (c *Client) GetAttributeIdByAttributeName(name string) (r int, err error) {
 		return cached.(int), nil
 	}
 
-	params := url.Values{
-		"argv1": {name},
+	params := map[string]string{
+		"argv1": name,
 	}
 
 	response := getAttributeIdByAttributeNameRet{}
-	err = c.v1.CallWebservice(http.MethodPost, "query", "int_getAttributeIdByAttributeName", params, &response)
+	err = c.v2.Query("int_getAttributeIdByAttributeName", &response, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		log.Error("Error: ", err)
@@ -533,7 +531,7 @@ func (c *Client) GetAttributeIdByAttributeName(name string) (r int, err error) {
 		err = utilError.FunctionError(name + " - " + v2.ErrNoResult.Error())
 	case 1:
 		r = response.Data[0].Id
-		c.v1.Cache.Set(cacheKey, r, cache.DefaultExpiration)
+		c.v1.Cache.Set(cacheKey, r, utilCache.DefaultExpiration)
 	default:
 		err = utilError.FunctionError(name + " - " + v2.ErrTooManyResults.Error())
 	}
@@ -563,13 +561,13 @@ func (c *Client) GetCiAttributeValue(ciId int, attributeName string, valueType v
 		return
 	}
 
-	params := url.Values{
-		"argv1": {strconv.Itoa(ciId)},
-		"argv2": {strconv.Itoa(attributeId)},
-		"argv3": {string(valueType)},
+	params := map[string]string{
+		"argv1": strconv.Itoa(ciId),
+		"argv2": strconv.Itoa(attributeId),
+		"argv3": string(valueType),
 	}
 
-	err = c.v1.CallWebservice(http.MethodPost, "query", "int_getCiAttributeValue", params, &r)
+	err = c.v2.Query("int_getCiAttributeValue", &r, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		log.Error("Error: ", err)
@@ -688,14 +686,14 @@ func (c *Client) GetCiRelationCount(ciId1 int, ciId2 int, ciRelationTypeName str
 		return
 	}
 
-	params := url.Values{
-		"argv1": {strconv.Itoa(ciId1)},
-		"argv2": {strconv.Itoa(ciId2)},
-		"argv3": {strconv.Itoa(ciRelationTypeId)},
+	params := map[string]string{
+		"argv1": strconv.Itoa(ciId1),
+		"argv2": strconv.Itoa(ciId2),
+		"argv3": strconv.Itoa(ciRelationTypeId),
 	}
 
 	jsonRet := getCiRelationCount{}
-	err = c.v1.CallWebservice(http.MethodPost, "query", "int_getCiRelationCount", params, &jsonRet)
+	err = c.v2.Query("int_getCiRelationCount", &jsonRet, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		log.Error("Error: ", err)
@@ -752,7 +750,7 @@ func (c *Client) GetCiRelationTypeIdByRelationTypeName(name string) (r int, err 
 		err = utilError.FunctionError(name + " - " + v2.ErrNoResult.Error())
 	case 1:
 		r = jsonRet.Data[0].Id
-		c.v1.Cache.Set(cacheKey, r, cache.DefaultExpiration)
+		c.v1.Cache.Set(cacheKey, r, utilCache.DefaultExpiration)
 	default:
 		err = utilError.FunctionError(name + " - " + v2.ErrTooManyResults.Error())
 	}
@@ -779,12 +777,12 @@ func (c *Client) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
 		return cached.(int), nil
 	}
 
-	params := url.Values{
-		"argv1": {name},
+	params := map[string]string{
+		"argv1": name,
 	}
 
 	response := getCiTypeIdByCiTypeName{}
-	err = c.v1.CallWebservice(http.MethodPost, "query", "int_getCiTypeIdByCiTypeName", params, &response)
+	err = c.v2.Query("int_getCiTypeIdByCiTypeName", &response, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		log.Error("Error: ", err)
@@ -796,7 +794,7 @@ func (c *Client) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
 		err = utilError.FunctionError(name + " - " + v2.ErrNoResult.Error())
 	case 1:
 		r = response.Data[0].Id
-		c.v1.Cache.Set(cacheKey, r, cache.DefaultExpiration)
+		c.v1.Cache.Set(cacheKey, r, utilCache.DefaultExpiration)
 	default:
 		err = utilError.FunctionError(name + " - " + v2.ErrTooManyResults.Error())
 	}
