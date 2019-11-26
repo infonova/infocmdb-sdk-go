@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	v1 "github.com/infonova/infocmdb-sdk-go/infocmdb/v1/infocmdb"
 	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
 	clientV2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb/client"
 
@@ -196,7 +195,9 @@ func (c *Client) AddCiProjectMapping(ciID int, projectID int, historyID int) (er
 	}
 
 	err = c.v1.CallWebservice(http.MethodPost, "query", "int_addCiProjectMapping", params, nil)
-	log.Error("Error: ", err)
+	if err != nil {
+		log.Error("Error: ", err)
+	}
 
 	return
 }
@@ -299,11 +300,11 @@ func (c *Client) GetCi(ciID int) (r Ci, err error) {
 
 	switch len(jsonRet.Data) {
 	case 0:
-		err = utilError.FunctionError(strconv.Itoa(ciID) + " - " + v1.ErrNoResult.Error())
+		err = utilError.FunctionError(strconv.Itoa(ciID) + " - " + v2.ErrNoResult.Error())
 	case 1:
 		r = jsonRet.Data[0].Ci
 	default:
-		err = utilError.FunctionError(strconv.Itoa(ciID) + " - " + v1.ErrTooManyResults.Error())
+		err = utilError.FunctionError(strconv.Itoa(ciID) + " - " + v2.ErrTooManyResults.Error())
 	}
 
 	r.Projects = strings.Split(r.ProjectsAsString, ",") // not safe :-/
@@ -361,7 +362,7 @@ type createCiRelation struct {
 	Status string `json:"status"`
 }
 
-func (c *Client) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName string, direction v1.CiRelationDirection) (err error) {
+func (c *Client) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName string, direction v2.CiRelationDirection) (err error) {
 
 	if err = c.v2.Login(); err != nil {
 		return
@@ -369,13 +370,13 @@ func (c *Client) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName strin
 
 	var directionId int
 	switch direction {
-	case v1.CI_RELATION_DIRECTION_DIRECTED_FROM:
+	case v2.CI_RELATION_DIRECTION_DIRECTED_FROM:
 		directionId = 1
-	case v1.CI_RELATION_DIRECTION_DIRECTED_TO:
+	case v2.CI_RELATION_DIRECTION_DIRECTED_TO:
 		directionId = 2
-	case v1.CI_RELATION_DIRECTION_BIDIRECTIONAL:
+	case v2.CI_RELATION_DIRECTION_BIDIRECTIONAL:
 		directionId = 3
-	case v1.CI_RELATION_DIRECTION_OMNIDIRECTIONAL:
+	case v2.CI_RELATION_DIRECTION_OMNIDIRECTIONAL:
 		directionId = 4
 	default:
 		err = errors.New(fmt.Sprintf("Invalid direction '%s'", direction))
@@ -485,12 +486,12 @@ func (c *Client) GetAttributeDefaultOption(optionId int) (r string, err error) {
 
 	switch len(jsonRet.Data) {
 	case 0:
-		err = utilError.FunctionError(strconv.Itoa(optionId) + " - " + v1.ErrNoResult.Error())
+		err = utilError.FunctionError(strconv.Itoa(optionId) + " - " + v2.ErrNoResult.Error())
 	case 1:
 		r = jsonRet.Data[0].Value
 		c.v1.Cache.Set(cacheKey, r, cache.DefaultExpiration)
 	default:
-		err = utilError.FunctionError(strconv.Itoa(optionId) + " - " + v1.ErrTooManyResults.Error())
+		err = utilError.FunctionError(strconv.Itoa(optionId) + " - " + v2.ErrTooManyResults.Error())
 	}
 
 	return
@@ -529,12 +530,12 @@ func (c *Client) GetAttributeIdByAttributeName(name string) (r int, err error) {
 
 	switch len(response.Data) {
 	case 0:
-		err = utilError.FunctionError(name + " - " + v1.ErrNoResult.Error())
+		err = utilError.FunctionError(name + " - " + v2.ErrNoResult.Error())
 	case 1:
 		r = response.Data[0].Id
 		c.v1.Cache.Set(cacheKey, r, cache.DefaultExpiration)
 	default:
-		err = utilError.FunctionError(name + " - " + v1.ErrTooManyResults.Error())
+		err = utilError.FunctionError(name + " - " + v2.ErrTooManyResults.Error())
 	}
 
 	return
@@ -550,7 +551,7 @@ type GetCiAttributeValue struct {
 	} `json:"data"`
 }
 
-func (c *Client) GetCiAttributeValue(ciId int, attributeName string, valueType v1.AttributeValueType) (r GetCiAttributeValue, err error) {
+func (c *Client) GetCiAttributeValue(ciId int, attributeName string, valueType v2.AttributeValueType) (r GetCiAttributeValue, err error) {
 
 	if err = c.v2.Login(); err != nil {
 		return
@@ -576,7 +577,7 @@ func (c *Client) GetCiAttributeValue(ciId int, attributeName string, valueType v
 	}
 
 	if len(r.Data) == 0 {
-		err = utilError.FunctionError(strconv.Itoa(ciId) + ", " + attributeName + " - " + v1.ErrNoResult.Error())
+		err = utilError.FunctionError(strconv.Itoa(ciId) + ", " + attributeName + " - " + v2.ErrNoResult.Error())
 		return
 	}
 
@@ -589,7 +590,7 @@ func (c *Client) GetCiAttributeValueText(ciId int, attributeName string) (value 
 		return
 	}
 
-	result, err := c.GetCiAttributeValue(ciId, attributeName, v1.ATTRIBUTE_VALUE_TYPE_TEXT)
+	result, err := c.GetCiAttributeValue(ciId, attributeName, v2.ATTRIBUTE_VALUE_TYPE_TEXT)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		return
@@ -607,7 +608,7 @@ func (c *Client) GetCiAttributeValueDate(ciId int, attributeName string) (value 
 		return
 	}
 
-	result, err := c.GetCiAttributeValue(ciId, attributeName, v1.ATTRIBUTE_VALUE_TYPE_DATE)
+	result, err := c.GetCiAttributeValue(ciId, attributeName, v2.ATTRIBUTE_VALUE_TYPE_DATE)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		return
@@ -625,7 +626,7 @@ func (c *Client) GetCiAttributeValueDefault(ciId int, attributeName string) (val
 		return
 	}
 
-	result, err := c.GetCiAttributeValue(ciId, attributeName, v1.ATTRIBUTE_VALUE_TYPE_DEFAULT)
+	result, err := c.GetCiAttributeValue(ciId, attributeName, v2.ATTRIBUTE_VALUE_TYPE_DEFAULT)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		return
@@ -654,7 +655,7 @@ func (c *Client) GetCiAttributeValueCi(ciId int, attributeName string) (value st
 		return
 	}
 
-	result, err := c.GetCiAttributeValue(ciId, attributeName, v1.ATTRIBUTE_VALUE_TYPE_CI)
+	result, err := c.GetCiAttributeValue(ciId, attributeName, v2.ATTRIBUTE_VALUE_TYPE_CI)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		return
@@ -704,11 +705,11 @@ func (c *Client) GetCiRelationCount(ciId1 int, ciId2 int, ciRelationTypeName str
 	errPrefix := strconv.Itoa(ciId1) + ", " + strconv.Itoa(ciId2) + ", " + ciRelationTypeName + "(" + strconv.Itoa(ciRelationTypeId) + ")" + " - "
 	switch len(jsonRet.Data) {
 	case 0:
-		err = utilError.FunctionError(errPrefix + v1.ErrNoResult.Error())
+		err = utilError.FunctionError(errPrefix + v2.ErrNoResult.Error())
 	case 1:
 		r = jsonRet.Data[0].Count
 	default:
-		err = utilError.FunctionError(errPrefix + v1.ErrTooManyResults.Error())
+		err = utilError.FunctionError(errPrefix + v2.ErrTooManyResults.Error())
 	}
 
 	return
@@ -748,12 +749,12 @@ func (c *Client) GetCiRelationTypeIdByRelationTypeName(name string) (r int, err 
 
 	switch len(jsonRet.Data) {
 	case 0:
-		err = utilError.FunctionError(name + " - " + v1.ErrNoResult.Error())
+		err = utilError.FunctionError(name + " - " + v2.ErrNoResult.Error())
 	case 1:
 		r = jsonRet.Data[0].Id
 		c.v1.Cache.Set(cacheKey, r, cache.DefaultExpiration)
 	default:
-		err = utilError.FunctionError(name + " - " + v1.ErrTooManyResults.Error())
+		err = utilError.FunctionError(name + " - " + v2.ErrTooManyResults.Error())
 	}
 
 	return
@@ -792,12 +793,12 @@ func (c *Client) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
 
 	switch len(response.Data) {
 	case 0:
-		err = utilError.FunctionError(name + " - " + v1.ErrNoResult.Error())
+		err = utilError.FunctionError(name + " - " + v2.ErrNoResult.Error())
 	case 1:
 		r = response.Data[0].Id
 		c.v1.Cache.Set(cacheKey, r, cache.DefaultExpiration)
 	default:
-		err = utilError.FunctionError(name + " - " + v1.ErrTooManyResults.Error())
+		err = utilError.FunctionError(name + " - " + v2.ErrTooManyResults.Error())
 	}
 
 	return
