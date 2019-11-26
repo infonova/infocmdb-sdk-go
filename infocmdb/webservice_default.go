@@ -7,8 +7,6 @@ import (
 	"strings"
 
 	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
-	clientV2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb/client"
-
 	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
 	utilCache "github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
@@ -860,64 +858,6 @@ func (c *Client) GetListOfCiIdsByCiRelation(ciId int, ciRelationTypeName string,
 	return
 }
 
-type UpdateCiAttribute struct {
-	Mode          v2.UpdateMode `json:"mode"`
-	Name          string        `json:"name"`
-	Value         string        `json:"value"`
-	CiAttributeID int           `json:"ciAttributeId"`
-	UploadID      string        `json:"uploadId"`
-}
-
-type updateCiAttributes struct {
-	Attributes []UpdateCiAttribute `json:"attributes"`
-}
-
-//
-type updateCiAttributesRequest struct {
-	Ci updateCiAttributes `json:"ci"`
-}
-
-func (c *Client) UpdateCiAttribute(ci int, ua []UpdateCiAttribute) (err error) {
-	if err = c.v2.Login(); err != nil {
-		return
-	}
-
-	var errResp clientV2.ResponseError
-	resp, err := c.v2.Client.NewRequest().
-		SetBody(updateCiAttributesRequest{Ci: updateCiAttributes{Attributes: ua}}).
-		SetAuthToken(c.v2.Config.ApiKey).
-		SetError(&errResp).
-		Put(fmt.Sprintf("/apiV2/ci/%d", ci))
-
-	if err != nil {
-		return err
-	}
-
-	if resp.IsError() {
-		return errors.New(errResp.Message + "\n" + errResp.Data)
-	}
-
-	return
-}
-
-func (c *Client) ListCiByAttributeValue(ci int, ua []UpdateCiAttribute) (err error) {
-	if err = c.v2.Login(); err != nil {
-		return
-	}
-
-	var errResp clientV2.ResponseError
-	resp, err := c.v2.Client.NewRequest().
-		SetError(&errResp).
-		SetBody(updateCiAttributesRequest{Ci: updateCiAttributes{Attributes: ua}}).
-		Put(fmt.Sprintf("/apiV2/ci/%d", ci))
-
-	if err != nil {
-		return err
-	}
-
-	if resp.IsError() {
-		return errors.New(errResp.Message + "\n" + errResp.Data)
-	}
-
-	return
+func (c *Client) UpdateCiAttribute(ci int, ua []v2.UpdateCiAttribute) (err error) {
+	return c.v2.UpdateCiAttribute(ci, ua)
 }
