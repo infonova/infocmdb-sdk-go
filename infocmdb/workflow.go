@@ -2,6 +2,7 @@ package infocmdb
 
 import (
 	"encoding/json"
+	"errors"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
@@ -73,7 +74,7 @@ func (w Workflow) Run(workflowFunc WorkflowFunc) {
 // Parses the workflow parameters from the first process argument.
 func parseParams() (params WorkflowParams, err error) {
 	if len(os.Args) < 2 {
-		log.Fatal("Missing json encoded WorkflowParams as first program argument")
+		return params, errors.New("missing json encoded WorkflowParams as first program argument")
 	}
 
 	jsonParam := os.Args[1]
