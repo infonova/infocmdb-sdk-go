@@ -26,7 +26,7 @@ func (i *Cmdb) LoginWithUserPass(url string, username string, password string) e
 
 	log.Debugf("Opening new WebClient connection. (Url: %s, Username: %s)", url, username)
 
-	reqURL := fmt.Sprintf("%s/api/login/username/%s/password/%s/timeout/21600/method/json", url, username, password)
+	reqURL := fmt.Sprintf("%s/api/login/username/%s/password/%s/timeout/600/method/json", url, username, password)
 
 	resp, err := http.Get(reqURL)
 	if err != nil {

@@ -1,6 +1,7 @@
 package infocmdb
 
 import (
+	"errors"
 	"fmt"
 	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb/client"
 	"gopkg.in/resty.v1"
@@ -216,6 +217,47 @@ func (i *Cmdb) CiDetailByCiId(ciId int64) (ciDetail GetCiDetailResponse, restyRe
 
 	if resp != nil && resp.IsError() {
 		return ciDetail, restyRes, respErr
+	}
+
+	return
+}
+
+
+type UpdateCiAttribute struct {
+	Mode          UpdateMode `json:"mode"`
+	Name          string        `json:"name"`
+	Value         string        `json:"value"`
+	CiAttributeID int           `json:"ciAttributeId"`
+	UploadID      string        `json:"uploadId"`
+}
+
+type updateCiAttributes struct {
+	Attributes []UpdateCiAttribute `json:"attributes"`
+}
+
+//
+type updateCiAttributesRequest struct {
+	Ci updateCiAttributes `json:"ci"`
+}
+
+func (i *Cmdb) UpdateCiAttribute(ci int, ua []UpdateCiAttribute) (err error) {
+	if err = i.Login(); err != nil {
+		return
+	}
+
+	var errResp client.ResponseError
+	resp, err := i.Client.NewRequest().
+		SetBody(updateCiAttributesRequest{Ci: updateCiAttributes{Attributes: ua}}).
+		SetAuthToken(i.Config.ApiKey).
+		SetError(&errResp).
+		Put(fmt.Sprintf("/apiV2/ci/%d", ci))
+
+	if err != nil {
+		return err
+	}
+
+	if resp.IsError() {
+		return errors.New(errResp.Message + "\n" + errResp.Data)
 	}
 
 	return

@@ -7,7 +7,44 @@ import (
 )
 
 func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {
-	configFile := utilTesting.BuildValidConfig(utilTesting.Url)
+	ut := utilTesting.New()
+	configFile := utilTesting.BuildValidConfig(ut.GetUrl())
+	ut.AddMocking(utilTesting.Mocking{
+		RequestString: "GET##/apiV2/ci/index?ciTypeId=12##",
+		ReturnString:  `{
+    "success": true,
+    "message": "success",
+    "data": {
+        "data": {
+            "ciList": [
+                {
+                    "id": "436",
+                    "ci_project_ids": "831,832",
+                    "emp_ad_username": "cornelia.blank",
+                    "emp_ad_usernameID": "3362",
+                    "emp_client_os_family": "Windows",
+                    "emp_client_os_familyID": "3360",
+                    "emp_client_win_version": "",
+                    "emp_client_win_versionID": "",
+                    "emp_client_linux_distro": "Linux Mint",
+                    "emp_client_linux_distroID": "3363",
+                    "emp_staff_number": "91651",
+                    "emp_staff_numberID": "3356",
+                    "emp_firstname": "Cornelia",
+                    "emp_firstnameID": "3357",
+                    "emp_lastname": "Blank",
+                    "emp_lastnameID": "3358",
+                    "emp_email_address": "cornelia.blank@example.com",
+                    "emp_email_addressID": "3359",
+                    "color": null,
+                    "ci_type_id": "12",
+                    "ci_type_name": "emp_germany_berlin"
+                }
+            ]
+        }
+    }
+}`,
+	})
 
 	type args struct {
 		ciTypeID int

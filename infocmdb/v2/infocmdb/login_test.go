@@ -9,7 +9,7 @@ import (
 )
 
 func TestInfoCMDB_LoginWithUserPass(t *testing.T) {
-	url := utilTesting.Url
+	url := utilTesting.New().GetUrl()
 
 	type fields struct {
 		Config Config
@@ -35,13 +35,13 @@ func TestInfoCMDB_LoginWithUserPass(t *testing.T) {
 		},
 		{
 			"invalid login admin//noadmin",
-			fields{Config: Config{Url: url, Username: "admin", Password: "noadmin"}},
+			fields{Config: Config{Url: url, Username: "admin", Password: "fail"}},
 			args{},
 			true,
 		},
 		{
 			"invalid no username",
-			fields{Config: Config{Url: url, Username: "", Password: "noadmin"}},
+			fields{Config: Config{Url: url, Username: "", Password: "fail"}},
 			args{},
 			true,
 		},
