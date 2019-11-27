@@ -86,7 +86,12 @@ func (t *Testing) SetupMocking() (*Testing) {
 	})
 
 	t.AddMocking(Mocking{
-		RequestString: `POST##/apiV2/auth/token##lifetime=600&password=false&username=false`,
+		RequestString: `POST##/apiV2/auth/token##lifetime=600&password=false&username=admin`,
+		StatusCode:    http.StatusBadRequest,
+	})
+
+	t.AddMocking(Mocking{
+		RequestString: `POST##/apiV2/auth/token##lifetime=600&password=fail&username=admin`,
 		StatusCode:    http.StatusBadRequest,
 	})
 
