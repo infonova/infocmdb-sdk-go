@@ -8,10 +8,9 @@ import (
 
 func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {
 	ut := utilTesting.New()
-	configFile := utilTesting.BuildValidConfig(ut.GetUrl())
 	ut.AddMocking(utilTesting.Mocking{
 		RequestString: "GET##/apiV2/ci/index?ciTypeId=12##",
-		ReturnString:  `{
+		ReturnString: `{
     "success": true,
     "message": "success",
     "data": {
@@ -159,10 +158,7 @@ func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := New()
-			e := c.LoadConfig(configFile)
-			if e != nil {
-				t.Fatal(e)
-			}
+			ut.SetValidConfig(&c.Config)
 
 			if err := c.Login(); err != nil {
 				t.Fatalf("Login failed: %v\n", err)
