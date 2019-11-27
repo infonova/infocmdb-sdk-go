@@ -46,6 +46,11 @@ func New() (*Testing) {
 func (t *Testing) SetupMocking() (*Testing) {
 	t.mockings = make(map[string]mockingResponse)
 
+	t.AddMocking(Mocking{
+		RequestString: `GET##/##`,
+		ReturnString:  ``,
+	})
+
 	// apiV1
 
 	t.AddMocking(Mocking{
@@ -60,6 +65,12 @@ func (t *Testing) SetupMocking() (*Testing) {
 	t.AddMocking(Mocking{
 		RequestString: `PUT##/apiV2/query/execute/int_getCiAttributeId##{"query":{"params":{"argv1":"428","argv2":"29"}}}`,
 		ReturnString:  `{"status":"OK","data":[{}]}`,
+	})
+
+	t.AddMocking(Mocking{
+		RequestString: `GET##/apiV2/ci/index?ciTypeId=-1##`,
+		ReturnString:  `{"success":false,"message":"Internal Server Error","data":null}`,
+		StatusCode:    http.StatusInternalServerError,
 	})
 
 
@@ -184,15 +195,15 @@ func (t *Testing) newMockServer() *httptest.Server {
 			}
 			return
 		} else {
-			fmt.Printf("Didn't Mock:\n''''''\n%s\n''''''\n", mockString)
+			log.Fatalf("Didn't Mock:\n''''''\n%s\n''''''\n", mockString)
 		}
 		// you can reassign the body if you need to parse it as multipart
 		r.Body = ioutil.NopCloser(bytes.NewReader(body))
 		body, _ = ioutil.ReadAll(r.Body)
 		values, _ := url.ParseQuery(string(body))
 
-		fmt.Printf("Method: %s, Url: %s, Data: %s\n", r.Method, backendUrl, body)
-		fmt.Printf("%v\n", values)
+		log.Fatalf("Method: %s, Url: %s, Data: %s\n", r.Method, backendUrl, body)
+		log.Fatalf("%v\n", values)
 
 		req, err := http.NewRequest(r.Method, backendUrl, bytes.NewBufferString(values.Encode()))
 		if err != nil {
@@ -215,7 +226,7 @@ func (t *Testing) newMockServer() *httptest.Server {
 			http.Error(w, err.Error(), http.StatusBadGateway)
 			return
 		}
-		fmt.Printf("Mocking:\n''''''\n%s\n''''''\n", string(respBody))
+		log.Fatalf("Mocking:\n''''''\n%s\n''''''\n", string(respBody))
 		w.Write(respBody)
 	}))
 }
