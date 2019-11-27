@@ -2,17 +2,14 @@ package infocmdb
 
 import (
 	"errors"
-	"io/ioutil"
+	"github.com/infonova/infocmdb-sdk-go/infocmdb/config"
 	"net/http"
 	"net/url"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb/client"
 	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
@@ -73,36 +70,9 @@ const (
 	UPDATE_MODE_SET               = "set"
 )
 
-func (i *Cmdb) LoadConfigFile(configFile string) (err error) {
-	_, err = os.Stat(configFile)
-	if os.IsNotExist(err) {
-		workflowConfigPath := os.Getenv("WORKFLOW_CONFIG_PATH")
-		configFile = filepath.Join(workflowConfigPath, configFile)
-	} else if err != nil {
-		return
-	}
-
-	log.Debugf("Loading workflow config file for v2 client: %s", configFile)
-
-	_, err = os.Stat(configFile)
+func (i *Cmdb) LoadConfigFile(path string) (err error) {
+	err = config.LoadYamlConfig(path, &i.Config)
 	if err != nil {
-		return
-	}
-
-	yamlFile, err := ioutil.ReadFile(configFile)
-	if err != nil {
-		return
-	}
-
-	err = i.LoadConfig(yamlFile)
-	return
-}
-
-func (i *Cmdb) LoadConfig(config []byte) (err error) {
-	log.Tracef("Config file content:\n%s", config)
-
-	err = yaml.Unmarshal(config, &i.Config)
-	if err = yaml.Unmarshal(config, &i.Config); err != nil {
 		return
 	}
 
@@ -111,7 +81,7 @@ func (i *Cmdb) LoadConfig(config []byte) (err error) {
 		return
 	}
 
-	log.Debugf("Config: %+v", i.Config)
+	log.Debugf("Config after applied url from redirect: %+v", i.Config)
 	i.Client = client.New(i.Config.Url)
 	return
 }
