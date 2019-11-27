@@ -2,14 +2,11 @@ package infocmdb
 
 import (
 	"errors"
-	"io/ioutil"
-	"os"
-	"path/filepath"
+	"github.com/infonova/infocmdb-sdk-go/infocmdb/config"
 	"time"
 
 	"github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -53,39 +50,8 @@ const (
 	ATTRIBUTE_VALUE_TYPE_CI                         = "value_ci"
 )
 
-func (i *Cmdb) LoadConfigFile(configFile string) (err error) {
-	_, err = os.Stat(configFile)
-	if err == nil {
-		log.Debugf("ConfigFile found with given string: %s", configFile)
-	} else {
-		workflowConfigPath := os.Getenv("WORKFLOW_CONFIG_PATH")
-		configFile = filepath.Join(workflowConfigPath, configFile)
-	}
-
-	log.Debugf("Loading workflow config file for v1 client: %s", configFile)
-
-	_, err = os.Stat(configFile)
-	if err != nil {
-		return
-	}
-
-	yamlFile, err := ioutil.ReadFile(configFile)
-	if err != nil {
-		return
-	}
-
-	return i.LoadConfig(yamlFile)
-}
-
-func (i *Cmdb) LoadConfig(config []byte) (err error) {
-	log.Tracef("Config file content:\n%s", config)
-
-	err = yaml.Unmarshal(config, &i.Config)
-	if err != nil {
-		return
-	}
-
-	log.Debugf("Config: %+v", i.Config)
+func (i *Cmdb) LoadConfigFile(path string) (err error) {
+	err = config.LoadYamlConfig(path, &i.Config)
 	return
 }
 

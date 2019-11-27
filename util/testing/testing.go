@@ -3,6 +3,7 @@ package testing
 import (
 	"bytes"
 	"fmt"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -21,7 +22,7 @@ type Testing struct {
 	url           string
 }
 
-func New() (*Testing) {
+func New() *Testing {
 	t := Testing{}
 	if os.Getenv("WORKFLOW_TEST_MOCKING") == "true" {
 		t.mocking = true
@@ -43,7 +44,7 @@ func New() (*Testing) {
 	return &t
 }
 
-func (t *Testing) SetupMocking() (*Testing) {
+func (t *Testing) SetupMocking() *Testing {
 	t.mockings = make(map[string]mockingResponse)
 
 	t.AddMocking(Mocking{
@@ -72,7 +73,6 @@ func (t *Testing) SetupMocking() (*Testing) {
 		ReturnString:  `{"success":false,"message":"Internal Server Error","data":null}`,
 		StatusCode:    http.StatusInternalServerError,
 	})
-
 
 	// apiV2
 	t.AddMocking(Mocking{
@@ -165,7 +165,7 @@ type mockingResponse struct {
 	StatusCode   int
 }
 
-func (t *Testing) AddMocking(m Mocking) (*Testing) {
+func (t *Testing) AddMocking(m Mocking) *Testing {
 	t.mockings[m.RequestString] = mockingResponse{
 		ReturnString: m.ReturnString,
 		ContentType:  m.ContentType,
@@ -236,10 +236,14 @@ func (t *Testing) newMockServer() *httptest.Server {
 	}))
 }
 
-func BuildValidConfig(url string) []byte {
-	return []byte(fmt.Sprintf(`version: 1.0
+func (t *Testing) SetValidConfig(config interface{}) {
+	configBytes := []byte(fmt.Sprintf(`version: 1.0
 apiUrl: %v
 apiUser: admin
 apiPassword: admin
-`, url))
+`, t.GetUrl()))
+	err := yaml.Unmarshal(configBytes, config)
+	if err != nil {
+		log.Fatalf("failed to build valid config: %v", err)
+	}
 }
