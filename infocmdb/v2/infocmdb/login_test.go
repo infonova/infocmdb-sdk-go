@@ -9,7 +9,7 @@ import (
 )
 
 func TestInfoCMDB_LoginWithUserPass(t *testing.T) {
-	url := utilTesting.Url
+	url := utilTesting.New().GetUrl()
 
 	type fields struct {
 		Config Config

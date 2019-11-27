@@ -1,158 +1,17 @@
 package infocmdb
 
 import (
-	"bytes"
-	"fmt"
-	v1 "github.com/infonova/infocmdb-sdk-go/infocmdb/v1/infocmdb"
-	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
-	"github.com/joho/godotenv"
-	log "github.com/sirupsen/logrus"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"net/url"
-	"os"
 	"reflect"
 	"testing"
+
+	v1 "github.com/infonova/infocmdb-sdk-go/infocmdb/v1/infocmdb"
+	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
+
+	utilTesting "github.com/infonova/infocmdb-sdk-go/util/testing"
 )
-
-var (
-	mocking     bool
-	infocmdbUrl string
-)
-
-func init() {
-	if os.Getenv("WORKFLOW_TEST_MOCKING") == "true" {
-		mocking = true
-		log.Debug("Mocking enabled")
-	} else if err := godotenv.Load("../../.env"); err != nil {
-		log.Fatalf("failed to load env: %v", err)
-	}
-
-	err := godotenv.Load("../../.env")
-
-	if err != nil {
-		if mocking {
-			log.Infof("ignoring failure to load env due to enabled mocking, error: %v", err)
-		} else {
-			log.Fatalf("failed to load env: %v", err)
-		}
-	}
-
-	infocmdbUrl = getUrl()
-}
-
-func newMockServer() *httptest.Server {
-	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		infocmdbUrl := os.Getenv("WORKFLOW_TEST_URL") + r.URL.String()
-		mockString := fmt.Sprintf("%s##%s##%s", r.Method, r.URL.String(), string(body))
-		switch mockString {
-		case `POST##/apiV2/auth/token##lifetime=600&password=fail&username=fail`:
-			w.Header()["Content-Type"] = []string{"application/json;charset=UTF-8"}
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		case `POST##/apiV2/auth/token##lifetime=600&password=false&username=false`:
-			w.Header()["Content-Type"] = []string{"application/json;charset=UTF-8"}
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		case `POST##/apiV2/auth/token##lifetime=600&password=admin&username=admin`:
-			w.Header()["Content-Type"] = []string{"application/json;charset=UTF-8"}
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{"success":true,"message":"mocked","data":{"token":"mocked"}}`))
-			return
-		case `PUT##/apiV2/query/execute/int_getListOfCiIdsOfCiType##{"query":{"params":{"argv1":"1"}}}`:
-			w.Header()["Content-Type"] = []string{"application/json;charset=UTF-8"}
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{"status":"OK","data":[{"ciid":"1"},{"ciid":"2"}]}`))
-			return
-		case `PUT##/apiV2/query/execute/int_getCi##{"query":{"params":{"argv1":"1"}}}`:
-			w.Header()["Content-Type"] = []string{"application/json;charset=UTF-8"}
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{"success":true,"message":"Query executed successfully","data":[{"ci_id":"1","ci_type_id":"1","ci_type":"demo","project":"springfield","project_id":"4"}]}`))
-			return
-		case `PUT##/apiV2/ci/14##{"ci":{"attributes":[{"mode":"set","name":"emp_firstname","value":"22322","ciAttributeId":0,"uploadId":""}]}}`:
-			w.Header()["Content-Type"] = []string{"application/json;charset=UTF-8"}
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{"success":true,"message":"Query executed successfully","data":[]}`))
-			return
-		case `PUT##/apiV2/ci/14##{"ci":{"attributes":[{"mode":"insert","name":"emp_lastname","value":"New1","ciAttributeId":0,"uploadId":""}]}}`:
-			w.Header()["Content-Type"] = []string{"application/json;charset=UTF-8"}
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`{"success":true,"message":"Query executed successfully","data":[]}`))
-			return
-		case `PUT##/apiV2/ci/14##{"ci":{"attributes":[{"mode":"delete","name":"emp_lastname","value":"","ciAttributeId":0,"uploadId":""}]}}`:
-			w.Header()["Content-Type"] = []string{"application/json;charset=UTF-8"}
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		case `PUT##/apiV2/ci/14##{"ci":{"attributes":[{"mode":"set","name":"emp_lastname_NOT_EXISTING","value":"1","ciAttributeId":0,"uploadId":""}]}}`:
-			w.Header()["Content-Type"] = []string{"application/json;charset=UTF-8"}
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		case `PUT##/apiV2/ci/14##{"ci":{"attributes":[{"mode":"set","name":"emp_lastname","value":"22322","ciAttributeId":0,"uploadId":""}]}}`:
-			w.Header()["Content-Type"] = []string{"application/json;charset=UTF-8"}
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		default:
-			fmt.Printf("Didn't Mock:\n''''''\n%s\n''''''\n", mockString)
-		}
-		// you can reassign the body if you need to parse it as multipart
-		r.Body = ioutil.NopCloser(bytes.NewReader(body))
-		body, _ = ioutil.ReadAll(r.Body)
-		values, _ := url.ParseQuery(string(body))
-
-		fmt.Printf("Method: %s, Url: %s, Data: %s\n", r.Method, infocmdbUrl, body)
-		fmt.Printf("%v\n", values)
-
-		// req, err := http.NewRequest(r.Method, infocmdbUrl, bytes.NewReader(body))
-		req, err := http.NewRequest(r.Method, infocmdbUrl, bytes.NewBufferString(values.Encode()))
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadGateway)
-			return
-		}
-
-		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-		// req.PostForm = values
-
-		httpClient := &http.Client{}
-		resp, err := httpClient.Do(req)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadGateway)
-			return
-		}
-		defer resp.Body.Close()
-
-		w.WriteHeader(resp.StatusCode)
-		respBody, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadGateway)
-			return
-		}
-		fmt.Printf("Mocking:\n''''''\n%s\n''''''\n", string(respBody))
-		w.Write(respBody)
-	}))
-}
-
-func getUrl() string {
-	testingURL := os.Getenv("WORKFLOW_TEST_URL")
-	if mocking {
-		ts := newMockServer()
-		testingURL = ts.URL
-	}
-
-	if testingURL == "" {
-		log.Fatal("WORKFLOW_TEST_URL must be provided or mocking enabled(WORKFLOW_TEST_MOCKING=true)")
-	}
-
-	log.Debugf("Testing-URL: %s", testingURL)
-	return testingURL
-}
 
 func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
+	infocmdbUrl := utilTesting.New().GetUrl()
 	type fields struct {
 		v1 *v1.Cmdb
 		v2 *v2.Cmdb
@@ -232,6 +91,7 @@ func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
 }
 
 func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
+	infocmdbUrl := utilTesting.New().GetUrl()
 	type fields struct {
 		v1 *v1.Cmdb
 		v2 *v2.Cmdb
@@ -311,6 +171,7 @@ func TestInfoCMDB_GetListOfCiIdsOfCiTypeV2(t *testing.T) {
 }
 
 func TestInfoCMDB_QueryWebservice(t *testing.T) {
+	infocmdbUrl := utilTesting.New().GetUrl()
 	type fields struct {
 		v2 *v2.Cmdb
 	}
@@ -359,6 +220,7 @@ func TestInfoCMDB_QueryWebservice(t *testing.T) {
 }
 
 func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
+	infocmdbUrl := utilTesting.New().GetUrl()
 	type fields struct {
 		v2 *v2.Cmdb
 	}
