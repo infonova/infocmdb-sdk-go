@@ -222,20 +222,18 @@ func (i *Cmdb) CiDetailByCiId(ciId int64) (ciDetail GetCiDetailResponse, restyRe
 	return
 }
 
-
 type UpdateCiAttribute struct {
 	Mode          UpdateMode `json:"mode"`
-	Name          string        `json:"name"`
-	Value         string        `json:"value"`
-	CiAttributeID int           `json:"ciAttributeId"`
-	UploadID      string        `json:"uploadId"`
+	Name          string     `json:"name"`
+	Value         string     `json:"value"`
+	CiAttributeID int        `json:"ciAttributeId"`
+	UploadID      string     `json:"uploadId"`
 }
 
 type updateCiAttributes struct {
 	Attributes []UpdateCiAttribute `json:"attributes"`
 }
 
-//
 type updateCiAttributesRequest struct {
 	Ci updateCiAttributes `json:"ci"`
 }

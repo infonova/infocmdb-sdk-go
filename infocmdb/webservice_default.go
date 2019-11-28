@@ -861,3 +861,7 @@ func (c *Client) GetListOfCiIdsByCiRelation(ciId int, ciRelationTypeName string,
 func (c *Client) UpdateCiAttribute(ci int, ua []v2.UpdateCiAttribute) (err error) {
 	return c.v2.UpdateCiAttribute(ci, ua)
 }
+
+func (c *Client) GetWorkflowContext(workflowInstanceId int) (workflowContext *v2.WorkflowContext, err error) {
+	return c.v2.GetWorkflowContext(workflowInstanceId)
+}
