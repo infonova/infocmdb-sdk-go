@@ -103,7 +103,7 @@ type Attribute struct {
 	ParentAttributeGroup string `json:"parent_attribute_group"`
 	ValueText            string `json:"value_text"`
 	ValueDate            string `json:"value_date"`
-	ValueCi              int    `json:"value_ci"`
+	ValueCi              string `json:"value_ci"`
 	CiAttributeID        string `json:"ciAttributeId"`
 	Initial              string `json:"initial"`
 	ValueNote            string `json:"valueNote"`
