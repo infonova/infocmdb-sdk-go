@@ -49,13 +49,19 @@ type Data struct {
 	New *CiDetail `json:"new"`
 }
 type CiDetail struct {
-	Relations  []Relation                `json:"relations"`
+	//Relations  map[int]Relation          `json:"relations"`
 	Projects   map[int]Project           `json:"projects"`
 	CiTypeID   string                    `json:"ciTypeId"`
 	CiTypeName string                    `json:"ciTypeName"`
 	Attributes map[int]map[int]Attribute `json:"attributes"`
 }
 type Relation struct {
+	CiId1            string  `json:"ci_id_1"`
+	CiId2            string  `json:"ci_id_2"`
+	RelationTypeId   string  `json:"relation_type_id"`
+	Direction        string  `json:"direction"`
+	RelationTypeName string  `json:"relation_type_name"`
+	DirectionName    *string `json:"direction_name"`
 }
 type Project struct {
 	ID                 string `json:"id"`

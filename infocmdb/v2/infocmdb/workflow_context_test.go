@@ -30,7 +30,7 @@ func TestUnmarshalWorkflowContext(t *testing.T) {
 				TriggerType: "ci_create",
 				Data: Data{
 					New: &CiDetail{
-						Relations: []Relation{},
+						//Relations: map[int]Relation{},
 						Projects: map[int]Project{
 							1: {
 								ID:                 "1",
@@ -116,7 +116,7 @@ func TestUnmarshalWorkflowContext(t *testing.T) {
 				TriggerType: "ci_create",
 				Data: Data{
 					New: &CiDetail{
-						Relations: []Relation{},
+						//Relations: map[int]Relation{},
 						Projects: map[int]Project{
 							1: {
 								ID:                 "1",
@@ -290,7 +290,7 @@ func TestUnmarshalWorkflowContext(t *testing.T) {
 				TriggerType: "ci_update",
 				Data: Data{
 					Old: &CiDetail{
-						Relations: []Relation{},
+						//Relations: map[int]Relation{},
 						Projects: map[int]Project{
 							1: {
 								ID:                 "1",
@@ -355,7 +355,7 @@ func TestUnmarshalWorkflowContext(t *testing.T) {
 						},
 					},
 					New: &CiDetail{
-						Relations: []Relation{},
+						//Relations: map[int]Relation{},
 						Projects: map[int]Project{
 							1: {
 								ID:                 "1",
@@ -441,7 +441,7 @@ func TestUnmarshalWorkflowContext(t *testing.T) {
 				TriggerType: "ci_delete",
 				Data: Data{
 					Old: &CiDetail{
-						Relations: []Relation{},
+						//Relations: map[int]Relation{},
 						Projects: map[int]Project{
 							1: {
 								ID:                 "1",
@@ -500,6 +500,104 @@ func TestUnmarshalWorkflowContext(t *testing.T) {
 									Initial:              "1",
 									ValueNote:            "",
 									HistoryID:            "8",
+									ValueDefault:         "",
+								},
+							},
+						},
+					},
+				},
+				UserID: "1",
+			},
+			wantErr: false,
+		},
+		{
+			name:    "ci_delete project",
+			ctxData: `{"Environment":{"APPLICATION_ENV":"development","APPLICATION_PATH":"/app/application","APPLICATION_URL":"http://infocmdb.local/","APPLICATION_DATA":"/app/data","APPLICATION_PUBLIC":"/app/public/","WORKFLOW_CONFIG_PATH":"/app/data/configs/workflows","WORKFLOW_DEBUGGING":"false"},"ciid":14145,"triggerType":"ci_delete","data":{"old":{"relations":{"22362":{"ci_id_1":"1037","ci_id_2":"14145","relation_type_id":"6","direction":"4","relation_type_name":"project__jfrog","direction_name":null},"22363":{"ci_id_1":"11903","ci_id_2":"14145","relation_type_id":"10","direction":"4","relation_type_name":"project__github_org","direction_name":null},"22364":{"ci_id_1":"11894","ci_id_2":"14145","relation_type_id":"10","direction":"4","relation_type_name":"project__github_org","direction_name":null},"22365":{"ci_id_1":"11799","ci_id_2":"14145","relation_type_id":"7","direction":"4","relation_type_name":"project__responsible1","direction_name":null},"22366":{"ci_id_1":"9776","ci_id_2":"14145","relation_type_id":"8","direction":"4","relation_type_name":"project__responsible2","direction_name":null}},"projects":{"1":{"id":"1","name":"General","description":"General","note":"General","order_number":"10","is_active":"1","user_id":"1","valid_from":"2019-07-08 08:38:11","ci_project_valid_from":"2019-12-03 13:12:12","ci_project_history_id":"461812"},"22":{"id":"22","name":"T2","description":"t2","note":"t2","order_number":"10","is_active":"1","user_id":"1","valid_from":"2019-12-03 13:44:25","ci_project_valid_from":"2019-12-03 13:44:25","ci_project_history_id":"461874"}},"ciTypeId":"8","ciTypeName":"project","attributes":{"11":{"167946":{"id":"11","name":"project_name","description":"Name","note":"","hint":"","attribute_type_id":"1","attribute_group_id":"9","order_number":"10","column":"1","is_unique":"1","is_numeric":"0","is_bold":"0","is_event":"0","is_unique_check":"1","is_autocomplete":"0","is_multiselect":"0","is_project_restricted":"0","regex":"","workflow_id":null,"script_name":null,"tag":"","input_maxlength":"0","textarea_cols":"30","textarea_rows":"3","is_active":"1","user_id":"1","valid_from":"2019-12-03 13:12:12","historicize":"1","display_style":null,"attributeTypeName":"input","attribute_group":"Project","parent_attribute_group":"0","value_text":"T2","value_date":null,"value_ci":null,"ciAttributeId":"167946","initial":"1","valueNote":null,"history_id":"461811","value_default":null}}}}},"user_id":"1"}`,
+			wantCtx: &WorkflowContext{
+				Environment: map[string]string{
+					"APPLICATION_ENV":      "development",
+					"APPLICATION_PATH":     "/app/application",
+					"APPLICATION_URL":      "http://infocmdb.local/",
+					"APPLICATION_DATA":     "/app/data",
+					"APPLICATION_PUBLIC":   "/app/public/",
+					"WORKFLOW_CONFIG_PATH": "/app/data/configs/workflows",
+					"WORKFLOW_DEBUGGING":   "false",
+				},
+				Ciid:        14145,
+				TriggerType: "ci_delete",
+				Data: Data{
+					Old: &CiDetail{
+						//Relations: map[int]Relation{},
+						Projects: map[int]Project{
+							1: {
+								ID:                 "1",
+								Name:               "General",
+								Description:        "General",
+								Note:               "General",
+								OrderNumber:        "10",
+								IsActive:           "1",
+								UserID:             "1",
+								ValidFrom:          "2019-07-08 08:38:11",
+								CiProjectValidFrom: "2019-12-03 13:12:12",
+								CiProjectHistoryID: "461812",
+							},
+							22: {
+								ID:                 "22",
+								Name:               "T2",
+								Description:        "t2",
+								Note:               "t2",
+								OrderNumber:        "10",
+								IsActive:           "1",
+								UserID:             "1",
+								ValidFrom:          "2019-12-03 13:44:25",
+								CiProjectValidFrom: "2019-12-03 13:44:25",
+								CiProjectHistoryID: "461874",
+							},
+						},
+						CiTypeID:   "8",
+						CiTypeName: "project",
+						Attributes: map[int]map[int]Attribute{
+							11: {
+								167946: Attribute{
+									ID:                   "11",
+									Name:                 "project_name",
+									Description:          "Name",
+									Note:                 "",
+									Hint:                 "",
+									AttributeTypeID:      "1",
+									AttributeGroupID:     "9",
+									OrderNumber:          "10",
+									Column:               "1",
+									IsUnique:             "1",
+									IsNumeric:            "0",
+									IsBold:               "0",
+									IsEvent:              "0",
+									IsUniqueCheck:        "1",
+									IsAutocomplete:       "0",
+									IsMultiselect:        "0",
+									IsProjectRestricted:  "0",
+									Regex:                "",
+									WorkflowID:           0,
+									ScriptName:           "",
+									Tag:                  "",
+									InputMaxlength:       "0",
+									TextareaCols:         "30",
+									TextareaRows:         "3",
+									IsActive:             "1",
+									UserID:               "1",
+									ValidFrom:            "2019-12-03 13:12:12",
+									Historicize:          "1",
+									DisplayStyle:         "",
+									AttributeTypeName:    "input",
+									AttributeGroup:       "Project",
+									ParentAttributeGroup: "0",
+									ValueText:            "T2",
+									ValueDate:            "",
+									ValueCi:              "",
+									CiAttributeID:        "167946",
+									Initial:              "1",
+									ValueNote:            "",
+									HistoryID:            "461811",
 									ValueDefault:         "",
 								},
 							},
