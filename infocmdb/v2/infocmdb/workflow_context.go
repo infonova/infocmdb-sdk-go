@@ -3,6 +3,7 @@ package infocmdb
 import (
 	"encoding/json"
 	"errors"
+	log "github.com/sirupsen/logrus"
 	"strconv"
 )
 
@@ -103,7 +104,7 @@ type Attribute struct {
 	ParentAttributeGroup string `json:"parent_attribute_group"`
 	ValueText            string `json:"value_text"`
 	ValueDate            string `json:"value_date"`
-	ValueCi              int    `json:"value_ci"`
+	ValueCi              string `json:"value_ci"`
 	CiAttributeID        string `json:"ciAttributeId"`
 	Initial              string `json:"initial"`
 	ValueNote            string `json:"valueNote"`
@@ -130,6 +131,20 @@ func (ciDetail *CiDetail) GetFirstAttributeValueTextByName(name string) (string,
 	}
 
 	return attribute.ValueText, true
+}
+
+func (ciDetail *CiDetail) GetFirstAttributeValueCiByName(name string) (int, bool) {
+	attribute := ciDetail.GetFirstAttributeByName(name)
+	if attribute == nil {
+		return 0, false
+	}
+
+	ciId, err := strconv.Atoi(attribute.ValueCi)
+	if err != nil {
+		log.Fatalf("failed to convert ValueCi of \"%s\" to int: %s", name, err.Error())
+	}
+
+	return ciId, true
 }
 
 type getWorkflowContextResponse struct {
