@@ -1,7 +1,6 @@
 package infocmdb
 
 import (
-	"errors"
 	"fmt"
 	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb/client"
 	"gopkg.in/resty.v1"
@@ -255,7 +254,7 @@ func (i *Cmdb) UpdateCiAttribute(ci int, ua []UpdateCiAttribute) (err error) {
 	}
 
 	if resp.IsError() {
-		return errors.New(errResp.Message + "\n" + errResp.Data)
+		return errResp
 	}
 
 	return
