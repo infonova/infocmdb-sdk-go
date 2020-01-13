@@ -1,6 +1,7 @@
 package client
 
 import (
+	"fmt"
 	"gopkg.in/resty.v1"
 )
 
@@ -10,9 +11,9 @@ type Client struct {
 
 // Response is the default json return of the cmdb upon any request success or error
 type Response struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-	Data    string `json:"data"`
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
 }
 
 // ResponseError is used for the resty SetError Function as a reference to capture the error message on failure
@@ -36,5 +37,5 @@ func (c *Client) SetAuthToken(token string) {
 }
 
 func (res ResponseError) Error() string {
-	return res.Message
+	return fmt.Sprintf("%s\n%+v", res.Message, res.Data)
 }
