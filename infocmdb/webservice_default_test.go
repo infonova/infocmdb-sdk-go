@@ -10,6 +10,70 @@ import (
 	utilTesting "github.com/infonova/infocmdb-sdk-go/util/testing"
 )
 
+func TestInfoCMDB_CreateCi(t *testing.T) {
+	infocmdbUrl := utilTesting.New().GetUrl()
+	type fields struct {
+		v1 *v1.Cmdb
+		v2 *v2.Cmdb
+	}
+	type args struct {
+		ciTypeID  int
+		icon      string
+		historyId int
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantR   CreateCi
+		wantErr bool
+	}{
+		{
+			"v2 create CI",
+			fields{
+				&v1.Cmdb{Config: v1.Config{}},
+				&v2.Cmdb{Config: v2.Config{
+					Url:      infocmdbUrl,
+					Username: "admin",
+					Password: "admin",
+					BasePath: "/app/",
+				}},
+			},
+			args{
+				ciTypeID:  476,
+				icon:      "",
+				historyId: 0,
+			},
+			CreateCi{
+				ID:        617827,
+				CiTypeID:  476,
+				Icon:      "",
+				HistoryID: 59529024,
+				ValidFrom: "2020-01-13 15:14:05",
+				CreatedAt: "2020-01-13 15:14:05",
+				UpdatedAt: "2020-01-13 15:14:05",
+			},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			i := &Client{
+				v1: tt.fields.v1,
+				v2: tt.fields.v2,
+			}
+			gotR, err := i.CreateCi(tt.args.ciTypeID, tt.args.icon, tt.args.historyId)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("CreateCi() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotR, tt.wantR) {
+				t.Errorf("CreateCi() gotR = %v, want %v", gotR, tt.wantR)
+			}
+		})
+	}
+}
+
 func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
 	infocmdbUrl := utilTesting.New().GetUrl()
 	type fields struct {
