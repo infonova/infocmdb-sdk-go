@@ -101,6 +101,11 @@ func (t *Testing) SetupMocking() *Testing {
 	})
 
 	t.AddMocking(Mocking{
+		RequestString: `PUT##/apiV2/query/execute/int_createCi##{"query":{"params":{"argv1":"476","argv2":"","argv3":"0"}}}`,
+		ReturnString:  `{"success":true,"message":"Query executed successfully","data":[{"id":"617827","ci_type_id":"476","icon":"","history_id":"59529024","valid_from":"2020-01-13 15:14:05","created_at":"2020-01-13 15:14:05","updated_at":"2020-01-13 15:14:05"}]}`,
+	})
+
+	t.AddMocking(Mocking{
 		RequestString: `PUT##/apiV2/query/execute/int_getListOfCiIdsOfCiType##{"query":{"params":{"argv1":"1"}}}`,
 		ReturnString:  `{"status":"OK","data":[{"ciid":"1"},{"ciid":"2"}]}`,
 	})

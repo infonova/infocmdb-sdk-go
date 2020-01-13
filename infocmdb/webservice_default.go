@@ -229,12 +229,19 @@ func (c *Client) CreateAttribute(ciID int, attrID int) (r CreateAttribute, err e
 // CreateCi
 // int_createCi    create a CI
 type CreateCi struct {
-	Status    string `json:"status"`
-	CiTypeID  int    `json:"ci_type_id"`
+	ID        int    `json:"id,string"`
+	CiTypeID  int    `json:"ci_type_id,string"`
 	Icon      string `json:"icon"`
+	HistoryID int    `json:"history_id,string"`
 	ValidFrom string `json:"valid_from"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
+}
+type createCiResponse struct {
+	Status string `json:"status"`
+	Data   []struct {
+		CreateCi
+	} `json:"data"`
 }
 
 func (c *Client) CreateCi(ciTypeID int, icon string, historyID int) (r CreateCi, err error) {
@@ -249,12 +256,23 @@ func (c *Client) CreateCi(ciTypeID int, icon string, historyID int) (r CreateCi,
 		"argv3": strconv.Itoa(historyID),
 	}
 
-	err = c.v2.Query("int_createCi", &r, params)
+	jsonRet := new(createCiResponse)
+	err = c.v2.Query("int_createCi", &jsonRet, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		log.Error("Error: ", err)
 		return r, err
 	}
+
+	switch len(jsonRet.Data) {
+	case 0:
+		err = utilError.FunctionError(strconv.Itoa(ciTypeID) + " - " + v2.ErrNoResult.Error())
+	case 1:
+		r = jsonRet.Data[0].CreateCi
+	default:
+		err = utilError.FunctionError(strconv.Itoa(ciTypeID) + " - " + v2.ErrTooManyResults.Error())
+	}
+
 	return
 }
 
