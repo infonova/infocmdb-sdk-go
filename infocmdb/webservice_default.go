@@ -178,6 +178,12 @@ func (c *Client) GetListOfCiIdsByAttributeValue(att, value string, field v2.Attr
 // from dual
 // where not exists(select id from ci_project where ci_id = :argv1: and project_id = :argv2:)
 
+type addCiProjectMappingResponse struct {
+	Success bool       `json:"success"`
+	Message string     `json:"message"`
+	Data    []struct{} `json:"data"`
+}
+
 func (c *Client) AddCiProjectMapping(ciID int, projectID int, historyID int) (err error) {
 
 	if err = c.v2.Login(); err != nil {
@@ -190,7 +196,8 @@ func (c *Client) AddCiProjectMapping(ciID int, projectID int, historyID int) (er
 		"argv3": strconv.Itoa(historyID),
 	}
 
-	err = c.v2.Query("int_addCiProjectMapping", nil, params)
+	jsonRet := new(addCiProjectMappingResponse)
+	err = c.v2.Query("int_addCiProjectMapping", &jsonRet, params)
 	if err != nil {
 		log.Error("Error: ", err)
 	}

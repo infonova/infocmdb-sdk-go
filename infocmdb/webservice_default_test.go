@@ -74,6 +74,57 @@ func TestInfoCMDB_CreateCi(t *testing.T) {
 	}
 }
 
+func TestInfoCMDB_AddCiProjectMapping(t *testing.T) {
+	infocmdbUrl := utilTesting.New().GetUrl()
+	type fields struct {
+		v1 *v1.Cmdb
+		v2 *v2.Cmdb
+	}
+	type args struct {
+		ciID      int
+		projectID int
+		historyID int
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			"v2 create CI",
+			fields{
+				&v1.Cmdb{Config: v1.Config{}},
+				&v2.Cmdb{Config: v2.Config{
+					Url:      infocmdbUrl,
+					Username: "admin",
+					Password: "admin",
+					BasePath: "/app/",
+				}},
+			},
+			args{
+				ciID:      617830,
+				projectID: 33,
+				historyID: 59529029,
+			},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			i := &Client{
+				v1: tt.fields.v1,
+				v2: tt.fields.v2,
+			}
+			err := i.AddCiProjectMapping(tt.args.ciID, tt.args.projectID, tt.args.historyID)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("AddCiProjectMapping() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+		})
+	}
+}
+
 func TestInfoCMDB_GetListOfCiIdsOfCiType(t *testing.T) {
 	infocmdbUrl := utilTesting.New().GetUrl()
 	type fields struct {
