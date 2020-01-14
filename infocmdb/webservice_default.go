@@ -51,8 +51,7 @@ func (c *Client) Query(ws string, out interface{}, params map[string]string) (er
 type CiIds []int
 
 type getListOfCiIdsOfCiType struct {
-	Status string `json:"status"`
-	Data   []struct {
+	Data []struct {
 		CiID int `json:"ciid,string"`
 	} `json:"data"`
 }
@@ -208,8 +207,7 @@ func (c *Client) AddCiProjectMapping(ciID int, projectID int, historyID int) (er
 // // CreateAttribute
 // // int_createAttribute     create an attribute
 type CreateAttribute struct {
-	Status string `json:"status"`
-	CiID   int    `json:"id"`
+	CiID int `json:"id"`
 }
 
 func (c *Client) CreateAttribute(ciID int, attrID int) (r CreateAttribute, err error) {
@@ -245,8 +243,7 @@ type CreateCi struct {
 	UpdatedAt string `json:"updated_at"`
 }
 type createCiResponse struct {
-	Status string `json:"status"`
-	Data   []struct {
+	Data []struct {
 		CreateCi
 	} `json:"data"`
 }
@@ -295,8 +292,7 @@ type Ci struct {
 	ProjectIDs         []int
 }
 type getCi struct {
-	Status string `json:"status"`
-	Data   []struct {
+	Data []struct {
 		Ci
 	} `json:"data"`
 }
@@ -353,8 +349,7 @@ type CiAttribute struct {
 }
 
 type getCiAttributes struct {
-	Status string        `json:"status"`
-	Data   []CiAttribute `json:"data"`
+	Data []CiAttribute `json:"data"`
 }
 
 func (c *Client) GetCiAttributes(ciID int) (r []CiAttribute, err error) {
@@ -380,7 +375,6 @@ func (c *Client) GetCiAttributes(ciID int) (r []CiAttribute, err error) {
 // createCiRelation
 // int_createCiRelation    inserts a relation: argv1 = ci_id_1 argv2 = ci_id_2 argv3 = ci_relation_type_id argv4 = direction
 type createCiRelation struct {
-	Status string `json:"status"`
 }
 
 func (c *Client) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName string, direction v2.CiRelationDirection) (err error) {
@@ -440,7 +434,6 @@ func (c *Client) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName strin
 // deleteCiRelation
 // int_deleteCiRelation    delete a specific ci-relation
 type deleteCiRelation struct {
-	Status string `json:"status"`
 }
 
 func (c *Client) DeleteCiRelation(ciId1 int, ciId2 int, ciRelationTypeName string) (err error) {
@@ -475,8 +468,7 @@ func (c *Client) DeleteCiRelation(ciId1 int, ciId2 int, ciRelationTypeName strin
 // getAttributeDefaultOption
 // int_getAttributeDefaultOption   returns the value of an option
 type getAttributeDefaultOption struct {
-	Status string `json:"status"`
-	Data   []struct {
+	Data []struct {
 		Value string `json:"v"`
 	} `json:"data"`
 }
@@ -521,8 +513,7 @@ func (c *Client) GetAttributeDefaultOption(optionId int) (r string, err error) {
 // GetAttributeIdByAttributeName
 // int_getAttributeIdByAttributeName   returns the id of an attribute
 type getAttributeIdByAttributeNameRet struct {
-	Status string       `json:"status"`
-	Data   []responseId `json:"data"`
+	Data []responseId `json:"data"`
 }
 
 func (c *Client) GetAttributeIdByAttributeName(name string) (r int, err error) {
@@ -565,8 +556,7 @@ func (c *Client) GetAttributeIdByAttributeName(name string) (r int, err error) {
 // GetCiAttributeValue
 // int_getCiAttributeValue     get the value of a ci_attribute entry by ci_id and attribute_id
 type GetCiAttributeValue struct {
-	Status string `json:"status"`
-	Data   []struct {
+	Data []struct {
 		ID    string `json:"id"`
 		Value string `json:"v"`
 	} `json:"data"`
@@ -691,8 +681,7 @@ func (c *Client) GetCiAttributeValueCi(ciId int, attributeName string) (value st
 // getCiRelationCount
 // int_getCiRelationCount  returns the number of relations with the given parameters
 type getCiRelationCount struct {
-	Status string `json:"status"`
-	Data   []struct {
+	Data []struct {
 		Count int `json:"c,string"`
 	} `json:"data"`
 }
@@ -740,8 +729,7 @@ func (c *Client) GetCiRelationCount(ciId1 int, ciId2 int, ciRelationTypeName str
 // getCiRelationTypeIdByRelationTypeName
 // int_getCiRelationTypeIdByRelationTypeName   returns the id of a relation-type
 type getCiRelationTypeIdByRelationTypeName struct {
-	Status string       `json:"status"`
-	Data   []responseId `json:"data"`
+	Data []responseId `json:"data"`
 }
 
 func (c *Client) GetCiRelationTypeIdByRelationTypeName(name string) (r int, err error) {
@@ -784,8 +772,7 @@ func (c *Client) GetCiRelationTypeIdByRelationTypeName(name string) (r int, err 
 // getCiTypeIdByCiTypeName
 // int_getCiTypeIdByCiTypeName     returns the id for the CI-Type
 type getCiTypeIdByCiTypeName struct {
-	Status string       `json:"status"`
-	Data   []responseId `json:"data"`
+	Data []responseId `json:"data"`
 }
 
 func (c *Client) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
@@ -828,8 +815,7 @@ func (c *Client) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
 // GetListOfCiIdsByCiRelationDirectionList
 // int_getListOfCiIdsByCiRelationDirectionList    returns all related CI-IDs of a specific relation-type
 type getListOfCiIdsByCiRelation struct {
-	Status string `json:"status"`
-	Data   []struct {
+	Data []struct {
 		CiId int `json:"ci_id,string"`
 	} `json:"data"`
 }
@@ -893,8 +879,7 @@ func (c *Client) GetWorkflowContext(workflowInstanceId int) (workflowContext *v2
 
 // int_getProjectIdByProjectName returns the id of the project with the given name
 type getProjectIdByProjectName struct {
-	Status string       `json:"status"`
-	Data   []responseId `json:"data"`
+	Data []responseId `json:"data"`
 }
 
 func (c *Client) GetProjectIdByProjectName(name string) (projectID int, err error) {
