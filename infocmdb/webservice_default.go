@@ -196,7 +196,7 @@ func (c *Client) AddCiProjectMapping(ciID int, projectID int, historyID int) (er
 		"argv3": strconv.Itoa(historyID),
 	}
 
-	jsonRet := new(addCiProjectMappingResponse)
+	jsonRet := addCiProjectMappingResponse{}
 	err = c.v2.Query("int_addCiProjectMapping", &jsonRet, params)
 	if err != nil {
 		log.Error("Error: ", err)
@@ -263,7 +263,7 @@ func (c *Client) CreateCi(ciTypeID int, icon string, historyID int) (r CreateCi,
 		"argv3": strconv.Itoa(historyID),
 	}
 
-	jsonRet := new(createCiResponse)
+	jsonRet := createCiResponse{}
 	err = c.v2.Query("int_createCi", &jsonRet, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
@@ -889,4 +889,47 @@ func (c *Client) UpdateCiAttribute(ci int, ua []v2.UpdateCiAttribute) (err error
 
 func (c *Client) GetWorkflowContext(workflowInstanceId int) (workflowContext *v2.WorkflowContext, err error) {
 	return c.v2.GetWorkflowContext(workflowInstanceId)
+}
+
+// int_getProjectIdByProjectName returns the id of the project with the given name
+type getProjectIdByProjectName struct {
+	Status string       `json:"status"`
+	Data   []responseId `json:"data"`
+}
+
+func (c *Client) GetProjectIdByProjectName(name string) (projectID int, err error) {
+
+	if err = c.v2.Login(); err != nil {
+		return
+	}
+
+	cacheKey := "GetProjectIdByProjectName_" + name
+	cached, found := c.v1.Cache.Get(cacheKey)
+	if found {
+		return cached.(int), nil
+	}
+
+	params := map[string]string{
+		"argv1": name,
+	}
+
+	response := getProjectIdByProjectName{}
+	err = c.v2.Query("int_getProjectIdByProjectName", &response, params)
+	if err != nil {
+		err = utilError.FunctionError(err.Error())
+		log.Error("Error: ", err)
+		return
+	}
+
+	switch len(response.Data) {
+	case 0:
+		err = utilError.FunctionError(name + " - " + v2.ErrNoResult.Error())
+	case 1:
+		projectID = response.Data[0].Id
+		c.v1.Cache.Set(cacheKey, projectID, utilCache.DefaultExpiration)
+	default:
+		err = utilError.FunctionError(name + " - " + v2.ErrTooManyResults.Error())
+	}
+
+	return
 }

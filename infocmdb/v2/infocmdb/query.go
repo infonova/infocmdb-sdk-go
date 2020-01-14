@@ -35,12 +35,17 @@ func (i *Cmdb) Query(query string, out interface{}, params map[string]string) (e
 		SetError(&respError).
 		Put("/apiV2/query/execute/" + query)
 
-	if resp != nil && resp.IsError() {
+	if err != nil {
+		return
+	}
+
+	if resp.IsError() {
 		log.Debugf("Error result: %v", respError)
 		return respError
 	}
 
-	log.Debugf("Result: %v", out)
+	log.Debugf("Response: %s", resp.String())
+	log.Debugf("Mapped result: %+v", out)
 	return
 }
 
