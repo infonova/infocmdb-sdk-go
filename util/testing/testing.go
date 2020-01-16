@@ -145,6 +145,11 @@ func (t *Testing) SetupMocking() *Testing {
 		StatusCode:    http.StatusBadRequest,
 	})
 
+	t.AddMocking(Mocking{
+		RequestString: `PUT##/apiV2/query/execute/int_getAttributeDefaultOptionId##{"query":{"params":{"argv1":"438","argv2":"IN PROGRESS"}}}`,
+		ReturnString:  `{"status":"OK","data":[{"id":"1329"}]}`,
+	})
+
 	return t
 }
 

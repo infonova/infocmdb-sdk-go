@@ -516,7 +516,7 @@ type getAttributeIdByAttributeNameRet struct {
 	Data []responseId `json:"data"`
 }
 
-func (c *Client) GetAttributeIdByAttributeName(name string) (r int, err error) {
+func (c *Client) GetAttributeIdByAttributeName(name string) (attrId int, err error) {
 
 	if err = c.v2.Login(); err != nil {
 		return
@@ -544,8 +544,8 @@ func (c *Client) GetAttributeIdByAttributeName(name string) (r int, err error) {
 	case 0:
 		err = utilError.FunctionError(name + " - " + v2.ErrNoResult.Error())
 	case 1:
-		r = response.Data[0].Id
-		c.v1.Cache.Set(cacheKey, r, utilCache.DefaultExpiration)
+		attrId = response.Data[0].Id
+		c.v1.Cache.Set(cacheKey, attrId, utilCache.DefaultExpiration)
 	default:
 		err = utilError.FunctionError(name + " - " + v2.ErrTooManyResults.Error())
 	}
@@ -889,7 +889,7 @@ func (c *Client) GetProjectIdByProjectName(name string) (projectID int, err erro
 	}
 
 	cacheKey := "GetProjectIdByProjectName_" + name
-	cached, found := c.v1.Cache.Get(cacheKey)
+	cached, found := c.v2.Cache.Get(cacheKey)
 	if found {
 		return cached.(int), nil
 	}
@@ -911,10 +911,66 @@ func (c *Client) GetProjectIdByProjectName(name string) (projectID int, err erro
 		err = utilError.FunctionError(name + " - " + v2.ErrNoResult.Error())
 	case 1:
 		projectID = response.Data[0].Id
-		c.v1.Cache.Set(cacheKey, projectID, utilCache.DefaultExpiration)
+		c.v2.Cache.Set(cacheKey, projectID, utilCache.DefaultExpiration)
 	default:
 		err = utilError.FunctionError(name + " - " + v2.ErrTooManyResults.Error())
 	}
 
+	return
+}
+
+// int_getAttributeDefaultOptionId return the id of a specific attribute and value
+type getAttributeDefaultOptionId struct {
+	Data []responseId `json:"data"`
+}
+
+func (c *Client) GetAttrDefaultOptionIdByAttrId(attrId int, optionValue string) (attrDefaultOptionId int, err error) {
+
+	if err = c.v2.Login(); err != nil {
+		return
+	}
+
+	attrIdString := strconv.Itoa(attrId)
+
+	cacheKey := "GetAttrDefaultOptionIdByAttrId_" + attrIdString + "_" + optionValue
+	cached, found := c.v2.Cache.Get(cacheKey)
+	if found {
+		return cached.(int), nil
+	}
+
+	params := map[string]string{
+		"argv1": attrIdString,
+		"argv2": optionValue,
+	}
+
+	response := getAttributeDefaultOptionId{}
+	err = c.v2.Query("int_getAttributeDefaultOptionId", &response, params)
+	if err != nil {
+		err = utilError.FunctionError(err.Error())
+		log.Error("Error: ", err)
+		return
+	}
+
+	switch len(response.Data) {
+	case 0:
+		err = utilError.FunctionError(attrIdString + ", " + optionValue + " - " + v2.ErrNoResult.Error())
+	case 1:
+		attrDefaultOptionId = response.Data[0].Id
+		c.v2.Cache.Set(cacheKey, attrDefaultOptionId, utilCache.DefaultExpiration)
+	default:
+		err = utilError.FunctionError(attrIdString + ", " + optionValue + " - " + v2.ErrTooManyResults.Error())
+	}
+
+	return
+}
+
+func (c *Client) GetAttrDefaultOptionIdByAttrName(attrName string, optionValue string) (attrDefaultOptionId int, err error) {
+
+	attrId, err := c.GetAttributeIdByAttributeName(attrName)
+	if err != nil {
+		return
+	}
+
+	attrDefaultOptionId, err = c.GetAttrDefaultOptionIdByAttrId(attrId, optionValue)
 	return
 }
