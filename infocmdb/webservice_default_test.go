@@ -1,8 +1,10 @@
 package infocmdb
 
 import (
+	"github.com/patrickmn/go-cache"
 	"reflect"
 	"testing"
+	"time"
 
 	v1 "github.com/infonova/infocmdb-sdk-go/infocmdb/v1/infocmdb"
 	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
@@ -409,6 +411,63 @@ func TestInfoCMDB_UpdateCiAttribute(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UpdateCiAttribute() error = %v, wantErr %v", err, tt.wantErr)
 				return
+			}
+		})
+	}
+}
+
+func TestInfoCMDB_GetAttrDefaultOptionIdByAttrId(t *testing.T) {
+	infocmdbUrl := utilTesting.New().GetUrl()
+	type fields struct {
+		v1 *v1.Cmdb
+		v2 *v2.Cmdb
+	}
+	type args struct {
+		attrId      int
+		optionValue string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantR   int
+		wantErr bool
+	}{
+		{
+			"v2 GetAttributeDefaultOptionId",
+			fields{
+				&v1.Cmdb{Config: v1.Config{}},
+				&v2.Cmdb{
+					Config: v2.Config{
+						Url:      infocmdbUrl,
+						Username: "admin",
+						Password: "admin",
+						BasePath: "/app/",
+					},
+					Cache: cache.New(5*time.Minute, 10*time.Minute),
+				},
+			},
+			args{
+				attrId:      438,
+				optionValue: "IN PROGRESS",
+			},
+			1329,
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			i := &Client{
+				v1: tt.fields.v1,
+				v2: tt.fields.v2,
+			}
+			gotR, err := i.GetAttrDefaultOptionIdByAttrId(tt.args.attrId, tt.args.optionValue)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetAttrDefaultOptionIdByAttrId() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotR != tt.wantR {
+				t.Errorf("GetAttrDefaultOptionIdByAttrId() gotR = %v, want %v", gotR, tt.wantR)
 			}
 		})
 	}
