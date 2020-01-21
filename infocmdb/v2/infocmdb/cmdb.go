@@ -16,7 +16,6 @@ type Config struct {
 	Url      string `yaml:"apiUrl"`
 	Username string `yaml:"apiUser"`
 	Password string `yaml:"apiPassword"`
-	ApiKey   string
 	BasePath string `yaml:"BasePath"`
 }
 
@@ -70,29 +69,35 @@ const (
 	UPDATE_MODE_SET               = "set"
 )
 
-func (i *Cmdb) LoadConfigFile(path string) (err error) {
-	err = config.LoadYamlConfig(path, &i.Config)
-	if err != nil {
-		return
-	}
-
-	err = i.applyUrlFromRedirect()
-	if err != nil {
-		return
-	}
-
-	log.Debugf("Config after applied url from redirect: %+v", i.Config)
-	i.Client = client.New(i.Config.Url)
+func (cmdb *Cmdb) LoadConfig(config Config) (err error) {
+	cmdb.Config = config
+	cmdb.Client = client.New(config.Url)
 	return
 }
 
-func (i *Cmdb) applyUrlFromRedirect() (err error) {
+func (cmdb *Cmdb) LoadConfigFile(path string) (err error) {
+	err = config.LoadYamlConfig(path, &cmdb.Config)
+	if err != nil {
+		return
+	}
+
+	err = cmdb.applyUrlFromRedirect()
+	if err != nil {
+		return
+	}
+
+	log.Debugf("Config after applied url from redirect: %+v", cmdb.Config)
+	cmdb.Client = client.New(cmdb.Config.Url)
+	return
+}
+
+func (cmdb *Cmdb) applyUrlFromRedirect() (err error) {
 	c := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
 	}
-	resp, err := c.Get(i.Config.Url)
+	resp, err := c.Get(cmdb.Config.Url)
 	if err != nil {
 		return
 	}
@@ -100,7 +105,7 @@ func (i *Cmdb) applyUrlFromRedirect() (err error) {
 	for name, header := range resp.Header {
 		if name == "Location" && len(header) > 0 {
 			baseUrl, _ := url.Parse(header[0])
-			i.Config.Url = baseUrl.Scheme + "://" + baseUrl.Host + "/"
+			cmdb.Config.Url = baseUrl.Scheme + "://" + baseUrl.Host + "/"
 		}
 	}
 
@@ -108,7 +113,7 @@ func (i *Cmdb) applyUrlFromRedirect() (err error) {
 }
 
 // New returns a new Cmdb Client to access the V2 Api
-func New() (i *Cmdb) {
+func New() (cmdb *Cmdb) {
 	return &Cmdb{
 		Cache:  cache.New(5*time.Minute, 10*time.Minute),
 		Client: &client.Client{},

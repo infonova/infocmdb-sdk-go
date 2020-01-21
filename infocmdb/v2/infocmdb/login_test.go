@@ -3,9 +3,7 @@ package infocmdb
 import (
 	"testing"
 
-	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb/client"
 	utilTesting "github.com/infonova/infocmdb-sdk-go/util/testing"
-	"github.com/patrickmn/go-cache"
 )
 
 func TestInfoCMDB_LoginWithUserPass(t *testing.T) {
@@ -13,8 +11,6 @@ func TestInfoCMDB_LoginWithUserPass(t *testing.T) {
 
 	type fields struct {
 		Config Config
-		Cache  *cache.Cache
-		Client *client.Client
 	}
 	type args struct {
 		url      string
@@ -29,19 +25,19 @@ func TestInfoCMDB_LoginWithUserPass(t *testing.T) {
 	}{
 		{
 			"valid login admin//admin",
-			fields{Config: Config{Url: url, Username: "admin", Password: "admin"}},
+			fields{Config{Url: url, Username: "admin", Password: "admin"}},
 			args{},
 			false,
 		},
 		{
 			"invalid login admin//noadmin",
-			fields{Config: Config{Url: url, Username: "admin", Password: "fail"}},
+			fields{Config{Url: url, Username: "admin", Password: "fail"}},
 			args{},
 			true,
 		},
 		{
 			"invalid no username",
-			fields{Config: Config{Url: url, Username: "", Password: "fail"}},
+			fields{Config{Url: url, Username: "", Password: "fail"}},
 			args{},
 			true,
 		},
@@ -60,12 +56,12 @@ func TestInfoCMDB_LoginWithUserPass(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			i := new(Cmdb)
-			i.Config = tt.fields.Config
-			i.Cache = tt.fields.Cache
-			i.Client = client.New(i.Config.Url)
+			cmdbV2 := New()
+			if err := cmdbV2.LoadConfig(tt.fields.Config); err != nil {
+				t.Fatalf("LoadConfig failed: %v\n", err)
+			}
 
-			if err := i.Login(); (err != nil) != tt.wantErr {
+			if err := cmdbV2.Login(); (err != nil) != tt.wantErr {
 				t.Errorf("Cmdb.LoginWithUserPass() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

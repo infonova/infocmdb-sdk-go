@@ -7,15 +7,17 @@ import (
 	"strconv"
 )
 
-func (i *Cmdb) CiListByCiTypeID(ciTypeID int, out interface{}) (err error) {
+func (cmdb *Cmdb) CiListByCiTypeID(ciTypeID int, out interface{}) (err error) {
 	var respErr client.ResponseError
-	resp, err := i.Client.NewRequest().
-		SetResult(&out).
-		SetError(&respErr).
-		SetQueryParams(map[string]string{
-			"ciTypeId": fmt.Sprintf("%d", ciTypeID),
-		}).
-		Get("/apiV2/ci/index")
+	resp, err := cmdb.Client.Execute(resty.MethodGet, "/apiV2/ci/index",
+		func(request *resty.Request) *resty.Request {
+			return request.
+				SetResult(&out).
+				SetError(&respErr).
+				SetQueryParams(map[string]string{
+					"ciTypeId": fmt.Sprintf("%d", ciTypeID),
+				})
+		})
 
 	if resp != nil && resp.IsError() {
 		return respErr
@@ -200,19 +202,22 @@ type GetCiDetailResponse struct {
 	} `json:"data"`
 }
 
-func (i *Cmdb) CiDetailByCiId(ciId int64) (ciDetail GetCiDetailResponse, restyRes *resty.Response, err error) {
-	if err = i.Login(); err != nil {
+func (cmdb *Cmdb) CiDetailByCiId(ciId int64) (ciDetail GetCiDetailResponse, restyRes *resty.Response, err error) {
+	if err = cmdb.Login(); err != nil {
 		return
 	}
 
 	var respErr client.ResponseError
 
-	resp, err := i.Client.NewRequest().
-		SetResult(&ciDetail).
-		SetError(&respErr).
-		SetQueryParams(map[string]string{
-			"id": strconv.FormatInt(ciId, 10),
-		}).Get("/apiV2/ci")
+	resp, err := cmdb.Client.Execute(resty.MethodGet, "/apiV2/ci",
+		func(request *resty.Request) *resty.Request {
+			return request.
+				SetResult(&ciDetail).
+				SetError(&respErr).
+				SetQueryParams(map[string]string{
+					"id": strconv.FormatInt(ciId, 10),
+				})
+		})
 
 	if resp != nil && resp.IsError() {
 		return ciDetail, restyRes, respErr
@@ -237,17 +242,18 @@ type updateCiAttributesRequest struct {
 	Ci updateCiAttributes `json:"ci"`
 }
 
-func (i *Cmdb) UpdateCiAttribute(ci int, ua []UpdateCiAttribute) (err error) {
-	if err = i.Login(); err != nil {
+func (cmdb *Cmdb) UpdateCiAttribute(ci int, ua []UpdateCiAttribute) (err error) {
+	if err = cmdb.Login(); err != nil {
 		return
 	}
 
 	var errResp client.ResponseError
-	resp, err := i.Client.NewRequest().
-		SetBody(updateCiAttributesRequest{Ci: updateCiAttributes{Attributes: ua}}).
-		SetAuthToken(i.Config.ApiKey).
-		SetError(&errResp).
-		Put(fmt.Sprintf("/apiV2/ci/%d", ci))
+	resp, err := cmdb.Client.Execute(resty.MethodPut, fmt.Sprintf("/apiV2/ci/%d", ci),
+		func(request *resty.Request) *resty.Request {
+			return request.
+				SetBody(updateCiAttributesRequest{Ci: updateCiAttributes{Attributes: ua}}).
+				SetError(&errResp)
+		})
 
 	if err != nil {
 		return err

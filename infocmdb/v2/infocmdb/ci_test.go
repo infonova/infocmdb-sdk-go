@@ -157,15 +157,18 @@ func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := New()
-			ut.SetValidConfig(&c.Config)
+			cmdb := New()
+			ut.SetValidConfig(&cmdb.Config)
+			if err := cmdb.LoadConfig(cmdb.Config); err != nil {
+				t.Fatalf("LoadConfig failed: %v\n", err)
+			}
 
-			if err := c.Login(); err != nil {
+			if err := cmdb.Login(); err != nil {
 				t.Fatalf("Login failed: %v\n", err)
 			}
 
 			var citypetest2 EmployeeReturn
-			if err := c.CiListByCiTypeID(tt.args.ciTypeID, &citypetest2); (err != nil) != tt.wantErr {
+			if err := cmdb.CiListByCiTypeID(tt.args.ciTypeID, &citypetest2); (err != nil) != tt.wantErr {
 				t.Fatalf("Cmdb.CiListByCiTypeID() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
