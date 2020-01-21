@@ -3,6 +3,7 @@ package infocmdb
 import (
 	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb/client"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/resty.v1"
 )
 
 type queryParams struct {
@@ -13,14 +14,14 @@ type queryRequest struct {
 	Query queryParams `json:"query"`
 }
 
-func (i *Cmdb) Query(query string, out interface{}, params map[string]string) (err error) {
+func (cmdb *Cmdb) Query(query string, out interface{}, params map[string]string) (err error) {
 	log.Debugf("Querying webservice %v with params %v", query, params)
 
-	if err = i.Login(); err != nil {
+	if err = cmdb.Login(); err != nil {
 		return
 	}
 
-	r := queryRequest{
+	body := queryRequest{
 		Query: queryParams{
 			Params: params,
 		},
@@ -28,19 +29,20 @@ func (i *Cmdb) Query(query string, out interface{}, params map[string]string) (e
 
 	var respError client.ResponseError
 
-	resp, err := i.Client.NewRequest().
-		SetResult(out).
-		SetBody(r).
-		SetAuthToken(i.Config.ApiKey).
-		SetError(&respError).
-		Put("/apiV2/query/execute/" + query)
+	resp, err := cmdb.Client.Execute(resty.MethodPut, "/apiV2/query/execute/"+query,
+		func(request *resty.Request) *resty.Request {
+			return request.
+				SetResult(out).
+				SetBody(body).
+				SetError(&respError)
+		})
 
 	if err != nil {
 		return
 	}
 
 	if resp.IsError() {
-		log.Debugf("Error result: %v", respError)
+		log.Debugf("Status: %v, Error result: %v", resp.StatusCode(), respError)
 		return respError
 	}
 
@@ -49,8 +51,8 @@ func (i *Cmdb) Query(query string, out interface{}, params map[string]string) (e
 	return
 }
 
-func (i *Cmdb) QueryRaw(query string, params map[string]string) (r string, err error) {
-	if err = i.Login(); err != nil {
+func (cmdb *Cmdb) QueryRaw(query string, params map[string]string) (r string, err error) {
+	if err = cmdb.Login(); err != nil {
 		return
 	}
 
@@ -61,11 +63,12 @@ func (i *Cmdb) QueryRaw(query string, params map[string]string) (r string, err e
 	}
 
 	var respError client.ResponseError
-	resp, err := i.Client.NewRequest().
-		SetBody(qr).
-		SetAuthToken(i.Config.ApiKey).
-		SetError(&respError).
-		Put("/apiV2/query/execute/" + query)
+	resp, err := cmdb.Client.Execute(resty.MethodPut, "/apiV2/query/execute/"+query,
+		func(request *resty.Request) *resty.Request {
+			return request.
+				SetBody(qr).
+				SetError(&respError)
+		})
 
 	if resp == nil {
 		return

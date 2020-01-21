@@ -160,8 +160,8 @@ type getWorkflowContextResponse struct {
 	} `json:"data"`
 }
 
-func (i *Cmdb) GetWorkflowContext(workflowInstanceId int) (workflowContext *WorkflowContext, err error) {
-	if err = i.Login(); err != nil {
+func (cmdb *Cmdb) GetWorkflowContext(workflowInstanceId int) (workflowContext *WorkflowContext, err error) {
+	if err = cmdb.Login(); err != nil {
 		return
 	}
 
@@ -170,7 +170,7 @@ func (i *Cmdb) GetWorkflowContext(workflowInstanceId int) (workflowContext *Work
 	}
 
 	getWorkflowContextResponse := getWorkflowContextResponse{}
-	err = i.Query("int_getWorkflowContext", &getWorkflowContextResponse, params)
+	err = cmdb.Query("int_getWorkflowContext", &getWorkflowContextResponse, params)
 	if err != nil {
 		return
 	}

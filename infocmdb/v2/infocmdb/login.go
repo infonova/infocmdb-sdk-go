@@ -1,58 +1,29 @@
 package infocmdb
 
 import (
-	"github.com/infonova/infocmdb-sdk-go/infocmdb/v1/infocmdb"
 	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb/client"
+	utilCache "github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 )
 
-type LoginTokenReturn struct {
-	Data struct {
-		Token string `json:"token"`
-	} `json:"data"`
-	Message string `json:"message"`
-	Success bool   `json:"success"`
-}
+func (cmdb *Cmdb) Login() (err error) {
+	cacheKey := "LoggedIn"
+	_, alreadyLoggedIn := cmdb.Cache.Get(cacheKey)
 
-func (i *Cmdb) Login() (err error) {
-
-	if i.Config.ApiKey != "" {
+	if alreadyLoggedIn {
 		log.Trace("already logged in")
 		return nil
 	}
-	if i.Config.Username == "" || i.Config.Password == "" {
-		return infocmdb.ErrNoCredentials
-	}
 
-	var loginResult LoginTokenReturn
-	params := map[string]string{
-		"username": i.Config.Username,
-		"password": i.Config.Password,
-		"lifetime": "600",
-	}
-
-	i.Client = client.New(i.Config.Url)
-
-	var errResp client.ResponseError
-	resp, err := i.Client.NewRequest().
-		SetError(&errResp).
-		SetResult(&loginResult).
-		SetFormData(params).
-		Post("/apiV2/auth/token")
-
+	_, err = cmdb.Client.Login(client.LoginParams{
+		Username: cmdb.Config.Username,
+		Password: cmdb.Config.Password,
+		Lifetime: 600,
+	})
 	if err != nil {
-		return err
+		return
 	}
 
-	if resp != nil && resp.IsError() {
-		return errResp
-	}
-
-	if loginResult.Data.Token == "" {
-		return infocmdb.ErrLoginFailed
-	}
-
-	i.Config.ApiKey = loginResult.Data.Token
-	i.Client.SetAuthToken(i.Config.ApiKey)
+	cmdb.Cache.Set(cacheKey, true, utilCache.NoExpiration)
 	return
 }
