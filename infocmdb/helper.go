@@ -3,6 +3,7 @@ package infocmdb
 import (
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
 )
@@ -14,7 +15,11 @@ func (c *Client) AttributeBasedRelation(sourceCiId int, attributeName string, ci
 		var value string
 		value, _, err = c.GetCiAttributeValueCi(sourceCiId, attributeName)
 		if err != nil {
-			return
+			if strings.Contains(err.Error(), infocmdb.ErrNoResult.Error()) {
+				value = ""
+			} else {
+				return
+			}
 		}
 
 		currentCiValues = regexp.MustCompile(",\\s?").Split(value, -1)
