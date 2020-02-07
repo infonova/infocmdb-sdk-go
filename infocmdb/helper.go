@@ -15,14 +15,12 @@ func (c *Client) AttributeBasedRelation(sourceCiId int, attributeName string, ci
 		var value string
 		value, _, err = c.GetCiAttributeValueCi(sourceCiId, attributeName)
 		if err != nil {
-			if strings.Contains(err.Error(), infocmdb.ErrNoResult.Error()) {
-				value = ""
-			} else {
+			if !strings.Contains(err.Error(), infocmdb.ErrNoResult.Error()) {
 				return
 			}
+		} else {
+			currentCiValues = regexp.MustCompile(",\\s?").Split(value, -1)
 		}
-
-		currentCiValues = regexp.MustCompile(",\\s?").Split(value, -1)
 	}
 
 	destinationCiIds := make([]int, len(currentCiValues))
