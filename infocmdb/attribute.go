@@ -1,10 +1,7 @@
 package infocmdb
 
 import (
-	"fmt"
-	"reflect"
 	"strconv"
-	"strings"
 
 	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
 	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
@@ -46,17 +43,6 @@ func (c *Client) GetCiAttributes(ciID int) (r []CiAttribute, err error) {
 	return
 }
 
-type BindError struct {
-	Msg       string
-	FieldName string
-	SrcName   string
-	SrcType   string
-}
-
-func (e *BindError) Error() string {
-	return e.Msg
-}
-
 func (c *Client) GetAndBindCiAttributes(ciID int, out interface{}) (err error) {
 	attributes, err := c.GetCiAttributes(ciID)
 	if err != nil {
@@ -64,72 +50,6 @@ func (c *Client) GetAndBindCiAttributes(ciID int, out interface{}) (err error) {
 	}
 
 	return bindCiAttributes(attributes, out)
-}
-
-func bindCiAttributes(attributes []CiAttribute, out interface{}) (err error) {
-	attrNameToAttrMap := map[string]CiAttribute{}
-	for _, attr := range attributes {
-		attrNameToAttrMap[attr.AttributeName] = attr
-	}
-
-	outValue := reflect.ValueOf(out)
-	for outValue.Kind() == reflect.Ptr || outValue.Kind() == reflect.Interface {
-		outValue = outValue.Elem()
-	}
-	for i := 0; i < outValue.NumField(); i++ {
-		structField := outValue.Type().Field(i)
-		valueField := outValue.Field(i)
-
-		tag := structField.Tag.Get("attr")
-
-		if tag == "" || tag == "-" {
-			continue
-		}
-
-		attr := attrNameToAttrMap[tag]
-
-		structFieldTypeName := structField.Type.String()
-		switch structFieldTypeName {
-		case "string":
-			valueField.SetString(attr.Value)
-		case "[]string":
-			err = bindAttrToStringSliceField(attr, valueField)
-			if err != nil {
-				return
-			}
-		default:
-			return &BindError{
-				Msg:       fmt.Sprintf("failed to map struct field %v of type %v", structField.Name, structFieldTypeName),
-				FieldName: structField.Name,
-				SrcName:   attr.AttributeName,
-				SrcType:   attr.AttributeType,
-			}
-		}
-	}
-
-	return
-}
-
-func bindAttrToStringSliceField(attr CiAttribute, field reflect.Value) (err error) {
-	switch attr.AttributeType {
-	case "textarea":
-		values := strings.Split(attr.Value, "\n")
-
-		for i, value := range values {
-			values[i] = strings.TrimSpace(value)
-		}
-
-		field.Set(reflect.ValueOf(values))
-	default:
-		return &BindError{
-			Msg:       fmt.Sprintf("failed to map attribute type %v to []string", attr.AttributeType),
-			FieldName: field.Type().Name(),
-			SrcName:   attr.AttributeName,
-			SrcType:   attr.AttributeType,
-		}
-	}
-
-	return
 }
 
 type getAttributeDefaultOption struct {
