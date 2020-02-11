@@ -2,8 +2,9 @@ package infocmdb
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"testing"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // Type of the precondition that will be tested for existence.

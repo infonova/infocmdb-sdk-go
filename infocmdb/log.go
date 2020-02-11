@@ -2,9 +2,10 @@ package infocmdb
 
 import (
 	"bytes"
+	"os"
+
 	log "github.com/sirupsen/logrus"
 	easy "github.com/t-tomalak/logrus-easy-formatter"
-	"os"
 )
 
 type logOutputSplitter struct{}

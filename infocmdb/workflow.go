@@ -3,8 +3,10 @@ package infocmdb
 import (
 	"encoding/json"
 	"errors"
-	log "github.com/sirupsen/logrus"
 	"os"
+
+	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
+	log "github.com/sirupsen/logrus"
 )
 
 // Input parameters to a workflow.
@@ -84,4 +86,8 @@ func parseParams() (params WorkflowParams, err error) {
 	}
 
 	return
+}
+
+func (c *Client) GetWorkflowContext(workflowInstanceId int) (workflowContext *v2.WorkflowContext, err error) {
+	return c.v2.GetWorkflowContext(workflowInstanceId)
 }
