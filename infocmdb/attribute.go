@@ -9,6 +9,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type CiAttribute struct {
+	CiID                 int    `json:"ci_id,string,string"`
+	CiAttributeID        int    `json:"ci_attribute_id,string"`
+	AttributeID          int    `json:"attribute_id,string"`
+	AttributeName        string `json:"attribute_name"`
+	AttributeDescription string `json:"attribute_description"`
+	AttributeType        string `json:"attribute_type"`
+	Value                string `json:"value"`
+	ModifiedAt           string `json:"modified_at"`
+}
+
 type getCiAttributes struct {
 	Data []CiAttribute `json:"data"`
 }
@@ -30,6 +41,15 @@ func (c *Client) GetCiAttributes(ciID int) (r []CiAttribute, err error) {
 	}
 	r = jsonRet.Data
 	return
+}
+
+func (c *Client) GetAndBindCiAttributes(ciID int, out interface{}) (err error) {
+	attributes, err := c.GetCiAttributes(ciID)
+	if err != nil {
+		return
+	}
+
+	return bindCiAttributes(attributes, out)
 }
 
 type getAttributeDefaultOption struct {
@@ -307,17 +327,6 @@ func (c *Client) CreateAttribute(ciID int, attrID int) (r CreateAttribute, err e
 	}
 
 	return
-}
-
-type CiAttribute struct {
-	CiID                 int    `json:"ci_id,string,string"`
-	CiAttributeID        int    `json:"ci_attribute_id,string"`
-	AttributeID          int    `json:"attribute_id,string"`
-	AttributeName        string `json:"attribute_name"`
-	AttributeDescription string `json:"attribute_description"`
-	AttributeType        string `json:"attribute_type"`
-	Value                string `json:"value"`
-	ModifiedAt           string `json:"modified_at"`
 }
 
 func (c *Client) UpdateCiAttribute(ci int, ua []v2.UpdateCiAttribute) (err error) {
