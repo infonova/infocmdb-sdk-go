@@ -15,7 +15,7 @@ func TestUnmarshalWorkflowContext(t *testing.T) {
 	}{
 		{
 			name:    "ci_create github repository",
-			ctxData: `{"Environment":{"APPLICATION_ENV":"development","APPLICATION_PATH":"\/app\/application","APPLICATION_URL":"http:\/\/infocmdb.local\/","APPLICATION_DATA":"\/app\/data","APPLICATION_PUBLIC":"\/app\/public\/","WORKFLOW_CONFIG_PATH":"\/app\/data\/configs\/workflows","WORKFLOW_DEBUGGING":"false"},"ciid":8,"triggerType":"ci_create","data":{"new":{"relations":[],"projects":{"1":{"id":"1","name":"General","description":"General","note":"General","order_number":"10","is_active":"1","user_id":"1","valid_from":"2019-11-27 15:53:32","ci_project_valid_from":"2019-11-28 12:23:27","ci_project_history_id":"33"}},"ciTypeId":"3","ciTypeName":"res_github_repo","attributes":{"1":{"6":{"id":"1","name":"res_github_repo_name","description":"Name","note":"","hint":"","attribute_type_id":"1","attribute_group_id":"2","order_number":"20","column":"1","is_unique":"0","is_numeric":"0","is_bold":"0","is_event":"0","is_unique_check":"0","is_autocomplete":"0","is_multiselect":"0","is_project_restricted":"0","regex":"","workflow_id":null,"script_name":null,"tag":"","input_maxlength":"0","textarea_cols":"30","textarea_rows":"3","is_active":"1","user_id":"1","valid_from":"2019-11-28 12:23:27","historicize":"1","display_style":null,"attributeTypeName":"input","attribute_group":"Resource Information","parent_attribute_group":"0","value_text":"demo","value_date":null,"value_ci":null,"ciAttributeId":"6","initial":"1","valueNote":null,"history_id":"32","value_default":null}}}}},"user_id":"1"}`,
+			ctxData: `{"Environment":{"APPLICATION_ENV":"development","APPLICATION_PATH":"\/app\/application","APPLICATION_URL":"http:\/\/infocmdb.local\/","APPLICATION_DATA":"\/app\/data","APPLICATION_PUBLIC":"\/app\/public\/","WORKFLOW_CONFIG_PATH":"\/app\/data\/configs\/workflows","WORKFLOW_DEBUGGING":"false"},"ciid":8,"triggerType":"ci_create","data":{"new":{"relations":[],"projects":{"1":{"id":"1","name":"General","description":"General","note":"General","order_number":"10","is_active":"1","user_id":"1","valid_from":"2019-11-27 15:53:32","ci_project_valid_from":"2019-11-28 12:23:27","ci_project_history_id":"33"}},"ciTypeId":"3","ciTypeName":"res_github_repo","attributes":{"1":{"6":{"id":"1","name":"res_github_repo_name","description":"Name","note":"","hint":"","attribute_type_id":"1","attribute_group_id":"2","order_number":"20","column":"1","is_unique":"0","is_numeric":"0","is_bold":"0","is_event":"0","is_unique_check":"0","is_autocomplete":"0","is_multiselect":"0","is_project_restricted":"0","regex":"","workflow_id":"1","script_name":null,"tag":"","input_maxlength":"0","textarea_cols":"30","textarea_rows":"3","is_active":"1","user_id":"1","valid_from":"2019-11-28 12:23:27","historicize":"1","display_style":null,"attributeTypeName":"input","attribute_group":"Resource Information","parent_attribute_group":"0","value_text":"demo","value_date":null,"value_ci":null,"ciAttributeId":"6","initial":"1","valueNote":null,"history_id":"32","value_default":null}}}}},"user_id":"1"}`,
 			wantCtx: &WorkflowContext{
 				Environment: map[string]string{
 					"APPLICATION_ENV":      "development",
@@ -68,7 +68,7 @@ func TestUnmarshalWorkflowContext(t *testing.T) {
 									IsMultiselect:        "0",
 									IsProjectRestricted:  "0",
 									Regex:                "",
-									WorkflowID:           0,
+									WorkflowID:           1,
 									ScriptName:           "",
 									Tag:                  "",
 									InputMaxlength:       "0",

@@ -94,7 +94,7 @@ type Attribute struct {
 	IsMultiselect        string `json:"is_multiselect"`
 	IsProjectRestricted  string `json:"is_project_restricted"`
 	Regex                string `json:"regex"`
-	WorkflowID           int    `json:"workflow_id"`
+	WorkflowID           int    `json:"workflow_id,string"`
 	ScriptName           string `json:"script_name"`
 	Tag                  string `json:"tag"`
 	InputMaxlength       string `json:"input_maxlength"`
