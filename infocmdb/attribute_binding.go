@@ -98,6 +98,10 @@ func bindAttrToIntSliceField(attr CiAttribute, field reflect.Value) (err error) 
 
 	for _, value := range values {
 		trimmedValue := strings.TrimSpace(value)
+		if trimmedValue == "" {
+			continue
+		}
+
 		number, err := strconv.Atoi(trimmedValue)
 		if err != nil {
 			return &BindError{
