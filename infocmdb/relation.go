@@ -109,14 +109,14 @@ func (c *Client) AttributeBasedRelation(sourceCiId int, attributeName string, ci
 			if !strings.Contains(err.Error(), v2.ErrNoResult.Error()) {
 				return
 			}
-		} else {
+		} else if value != "" {
 			currentCiValues = regexp.MustCompile(",\\s?").Split(value, -1)
 		}
 	}
 
 	destinationCiIds := make([]int, len(currentCiValues))
 	for i, s := range currentCiValues {
-		destinationCiIds[i], _ = strconv.Atoi(s)
+		destinationCiIds[i], _ = strconv.Atoi(strings.TrimSpace(s))
 	}
 
 	return c.CiBasedRelation(sourceCiId, destinationCiIds, ciRelationTypeName, triggerType, swapCiColumns)
