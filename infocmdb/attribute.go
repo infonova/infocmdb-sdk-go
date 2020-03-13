@@ -305,30 +305,6 @@ func (c *Client) GetCiAttributeValueCi(ciId int, attributeName string) (value st
 	return
 }
 
-type CreateAttribute struct {
-	CiID int `json:"id"`
-}
-
-func (c *Client) CreateAttribute(ciID int, attrID int) (r CreateAttribute, err error) {
-	if err = c.v2.Login(); err != nil {
-		return
-	}
-
-	params := map[string]string{
-		"argv1": strconv.Itoa(ciID),
-		"argv2": strconv.Itoa(attrID),
-	}
-
-	err = c.v2.Query("int_createCiAttribute", &r, params)
-	if err != nil {
-		err = utilError.FunctionError(err.Error())
-		log.Error("Error: ", err)
-		return r, err
-	}
-
-	return
-}
-
 func (c *Client) UpdateCiAttribute(ci int, ua []v2.UpdateCiAttribute) (err error) {
 	return c.v2.UpdateCiAttribute(ci, ua)
 }
