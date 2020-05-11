@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"strconv"
 
 	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
 	log "github.com/sirupsen/logrus"
@@ -23,6 +24,20 @@ type WorkflowParams struct {
 	CiProjectId         int    	`json:"ciProjectId"`
 	FileImportHistoryId int    	`json:"fileImportHistoryId"`
 }
+
+type WorkflowParamsHelper struct {
+	Apikey              string 			`json:"apikey"`
+	TriggerType         string 			`json:"triggerType"`
+	WorkflowItemId      int    			`json:"workflow_item_id"`
+	WorkflowInstanceId  int    			`json:"workflow_instance_id"`
+	CiId                IntWrapper		`json:"ciid"`
+	CiAttributeId       int    			`json:"ciAttributeId"`
+	CiRelationId        int    			`json:"ciRelationId"`
+	CiProjectId         int    			`json:"ciProjectId"`
+	FileImportHistoryId int    			`json:"fileImportHistoryId"`
+}
+
+type IntWrapper int
 
 // User defined workflow function that can be passed to `workflow.Run`.
 type WorkflowFunc func(params WorkflowParams, cmdb *Client) (err error)
@@ -79,13 +94,39 @@ func parseParams() (params WorkflowParams, err error) {
 		return params, errors.New("missing json encoded WorkflowParams as first program argument")
 	}
 
+	var parsedParams WorkflowParamsHelper
 	jsonParam := os.Args[1]
-	err = json.Unmarshal([]byte(jsonParam), &params)
+	err = json.Unmarshal([]byte(jsonParam), &parsedParams)
 	if err != nil {
 		return
 	}
 
+	params.Apikey = parsedParams.Apikey
+	params.TriggerType = parsedParams.TriggerType
+	params.WorkflowItemId = parsedParams.WorkflowItemId
+	params.WorkflowInstanceId = parsedParams.WorkflowInstanceId
+	params.CiId = int(parsedParams.CiId)
+	params.CiAttributeId = parsedParams.CiAttributeId
+	params.CiRelationId = parsedParams.CiRelationId
+	params.CiProjectId = parsedParams.CiProjectId
+	params.FileImportHistoryId = parsedParams.FileImportHistoryId
 	return
+}
+
+func (iw *IntWrapper) UnmarshalJSON(b []byte) error {
+	if b[0] != '"' {
+		return json.Unmarshal(b, (*int)(iw))
+	}
+	var s string
+	if err := json.Unmarshal(b, &s); err != nil {
+		return err
+	}
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		return err
+	}
+	*iw = IntWrapper(i)
+	return nil
 }
 
 func (c *Client) GetWorkflowContext(workflowInstanceId int) (workflowContext *v2.WorkflowContext, err error) {
