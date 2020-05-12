@@ -120,6 +120,35 @@ func Test_parseParams(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "ciid string",
+			osArgs: osArgs{
+				"test_workflow.go",
+				`
+{
+  "apikey": "626409876d3de140670e0325850215",
+  "ciAttributeId": 167698,
+  "triggerType": "ci_attribute_create",
+  "ciid": "14103",
+  "user_id": 0,
+  "workflow_item_id": 32511,
+  "workflow_instance_id": 32511
+}
+`,
+			},
+			wantParams: WorkflowParams{
+				Apikey:              "626409876d3de140670e0325850215",
+				TriggerType:         "ci_attribute_create",
+				WorkflowItemId:      32511,
+				WorkflowInstanceId:  32511,
+				CiId:                14103,
+				CiAttributeId:       167698,
+				CiRelationId:        0,
+				CiProjectId:         0,
+				FileImportHistoryId: 0,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
