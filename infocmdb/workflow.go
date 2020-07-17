@@ -18,7 +18,7 @@ type WorkflowParams struct {
 	TriggerType         string 	`json:"triggerType"`
 	WorkflowItemId      int		`json:"workflow_item_id"`
 	WorkflowInstanceId  int    	`json:"workflow_instance_id"`
-	CiId                int		`json:"ciid,string"`
+	CiId                int		`json:"ciid"`
 	CiAttributeId       int    	`json:"ciAttributeId"`
 	CiRelationId        int   	`json:"ciRelationId"`
 	CiProjectId         int    	`json:"ciProjectId"`
@@ -31,7 +31,7 @@ type WorkflowParamsHelper struct {
 	WorkflowItemId      int    			`json:"workflow_item_id"`
 	WorkflowInstanceId  int    			`json:"workflow_instance_id"`
 	CiId                IntWrapper		`json:"ciid"`
-	CiAttributeId       int    			`json:"ciAttributeId"`
+	CiAttributeId       IntWrapper    	`json:"ciAttributeId"`
 	CiRelationId        int    			`json:"ciRelationId"`
 	CiProjectId         int    			`json:"ciProjectId"`
 	FileImportHistoryId int    			`json:"fileImportHistoryId"`
@@ -106,7 +106,7 @@ func parseParams() (params WorkflowParams, err error) {
 	params.WorkflowItemId = parsedParams.WorkflowItemId
 	params.WorkflowInstanceId = parsedParams.WorkflowInstanceId
 	params.CiId = int(parsedParams.CiId)
-	params.CiAttributeId = parsedParams.CiAttributeId
+	params.CiAttributeId = int(parsedParams.CiAttributeId)
 	params.CiRelationId = parsedParams.CiRelationId
 	params.CiProjectId = parsedParams.CiProjectId
 	params.FileImportHistoryId = parsedParams.FileImportHistoryId
