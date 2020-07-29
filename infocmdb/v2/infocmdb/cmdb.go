@@ -69,7 +69,7 @@ const (
 	UPDATE_MODE_SET               = "set"
 )
 
-func (cmdb *Cmdb) LoadConfig(config Config) (err error) {
+func (cmdb *Cmdb) LoadConfig(config Config) {
 	cmdb.Config = config
 	cmdb.Client = client.New(config.Url)
 	return
