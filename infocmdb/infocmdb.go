@@ -57,3 +57,20 @@ func (c *Client) LoadConfig(path string) (err error) {
 
 	return
 }
+
+// Create a client for use in unit tests (possibly of other libraries that wrap infocmdb-sdk-go).
+// A default configuration with username and password "admin" is used.
+func NewTestClient(url string) (c *Client) {
+	c = NewClient()
+	c.v1.LoadConfig(v1.Config{
+		ApiUrl:      url,
+		ApiUser:     "admin",
+		ApiPassword: "admin",
+	})
+	c.v2.LoadConfig(v2.Config{
+		Url:      url,
+		Username: "admin",
+		Password: "admin",
+	})
+	return
+}
