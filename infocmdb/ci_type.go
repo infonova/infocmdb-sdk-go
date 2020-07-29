@@ -1,10 +1,11 @@
 package infocmdb
 
 import (
-	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
-	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
 	utilCache "github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
+
+	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
+	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
 )
 
 type getCiTypeIdByCiTypeName struct {
@@ -16,7 +17,7 @@ func (c *Client) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
 		return
 	}
 
-	cacheKey := "GetCiRelationTypeIdByRelationTypeName_" + name
+	cacheKey := "GetCiTypeIdByCiTypeName_" + name
 	cached, found := c.v1.Cache.Get(cacheKey)
 	if found {
 		return cached.(int), nil
@@ -46,4 +47,3 @@ func (c *Client) GetCiTypeIdByCiTypeName(name string) (r int, err error) {
 
 	return
 }
-
