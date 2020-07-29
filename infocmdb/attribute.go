@@ -1,13 +1,18 @@
 package infocmdb
 
 import (
+	"errors"
+	"reflect"
 	"strconv"
+
+	utilCache "github.com/patrickmn/go-cache"
+	log "github.com/sirupsen/logrus"
 
 	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
 	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
-	utilCache "github.com/patrickmn/go-cache"
-	log "github.com/sirupsen/logrus"
 )
+
+type CiAttributes = []CiAttribute
 
 type CiAttribute struct {
 	CiID                 int    `json:"ci_id,string,string"`
@@ -24,13 +29,34 @@ type getCiAttributes struct {
 	Data []CiAttribute `json:"data"`
 }
 
-func (c *Client) GetCiAttributes(ciID int) (r []CiAttribute, err error) {
+func (c *Client) GetCiAttributes(ciId int) (ciAttributes CiAttributes, err error) {
+	ciIdToAttributesMap, err := c.GetMapOfCiAttributes([]int{ciId})
+	if err != nil {
+	    return
+	}
+
+	ciAttributes = ciIdToAttributesMap[ciId]
+	return
+}
+
+func (c *Client) GetMapOfCiAttributes(ciIds []int) (ciIdToAttributesMap map[int]CiAttributes, err error) {
+	ciIdToAttributesMap = map[int]CiAttributes{}
+
 	if err = c.v2.Login(); err != nil {
 		return
 	}
 
+	commaSeparatedCiIds := ""
+	for _, ciId := range ciIds {
+		if commaSeparatedCiIds != "" {
+			commaSeparatedCiIds += ", "
+		}
+
+		commaSeparatedCiIds += strconv.Itoa(ciId)
+	}
+
 	params := map[string]string{
-		"argv1": strconv.Itoa(ciID),
+		"argv1": commaSeparatedCiIds,
 	}
 
 	jsonRet := getCiAttributes{}
@@ -39,17 +65,59 @@ func (c *Client) GetCiAttributes(ciID int) (r []CiAttribute, err error) {
 		err = utilError.FunctionError(err.Error())
 		log.Error("Error: ", err)
 	}
-	r = jsonRet.Data
+
+	for _, ciAttribute := range jsonRet.Data {
+		ciAttributes, ok := ciIdToAttributesMap[ciAttribute.CiID]
+		if !ok {
+			ciAttributes = CiAttributes{}
+		}
+		ciAttributes = append(ciAttributes, ciAttribute)
+		ciIdToAttributesMap[ciAttribute.CiID] = ciAttributes
+	}
+
 	return
 }
 
-func (c *Client) GetAndBindCiAttributes(ciID int, out interface{}) (err error) {
-	attributes, err := c.GetCiAttributes(ciID)
+func (c *Client) GetAndBindCiAttributes(ciId int, out interface{}) (err error) {
+	attributes, err := c.GetCiAttributes(ciId)
 	if err != nil {
 		return
 	}
 
 	return bindCiAttributes(attributes, out)
+}
+
+func (c *Client) GetAndBindListOfCiAttributes(ciIds []int, out interface{}) (err error) {
+	ciIdToAttributesMap, err := c.GetMapOfCiAttributes(ciIds)
+	if err != nil {
+		return
+	}
+
+	outSlicePtr := reflect.ValueOf(out)
+	if outSlicePtr.Kind() != reflect.Ptr {
+		return errors.New("out parameter is not a slice pointer")
+	}
+	outSlice := outSlicePtr.Elem()
+	if outSlice.Kind() != reflect.Slice {
+		return errors.New("out parameter is not a slice pointer")
+	}
+	outSliceElem := reflect.TypeOf(outSlice.Interface()).Elem()
+	outSliceValue := reflect.MakeSlice(outSlice.Type(), 0, 0)
+
+	for _, ciId := range ciIds {
+		ciAttributes := ciIdToAttributesMap[ciId]
+
+		elem := reflect.New(outSliceElem)
+		err = bindCiAttributes(ciAttributes, elem.Interface())
+		if err != nil {
+			return
+		}
+
+		outSliceValue = reflect.Append(outSliceValue, elem.Elem())
+	}
+
+	outSlice.Set(outSliceValue)
+	return
 }
 
 type getAttributeDefaultOption struct {

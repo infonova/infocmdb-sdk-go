@@ -6,9 +6,10 @@ import (
 	"strconv"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
+
 	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
 	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
-	log "github.com/sirupsen/logrus"
 )
 
 type Ci struct {
@@ -137,6 +138,17 @@ func (c *Client) GetListOfCiIdsOfCiTypeName(ciTypeName string) (ciIds CiIds, err
 	}
 
 	ciIds, err = c.GetListOfCiIdsOfCiType(ciTypeId)
+	return
+}
+
+func (c *Client) GetAndBindListOfCiAttributesOfCiTypeName(ciTypeName string, out interface{}) (err error) {
+	ciIds, err := c.GetListOfCiIdsOfCiTypeName(ciTypeName)
+	if err != nil {
+		err = errors.New("failed to get \"" + ciTypeName + "\" ci ids: " + err.Error())
+		return
+	}
+
+	err = c.GetAndBindListOfCiAttributes(ciIds, out)
 	return
 }
 
