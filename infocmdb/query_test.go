@@ -42,9 +42,7 @@ func TestInfoCMDB_QueryWebservice(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmdbV2 := v2.New()
-			if err := cmdbV2.LoadConfig(tt.fields.v2Config); err != nil {
-				t.Fatalf("LoadConfig failed: %v\n", err)
-			}
+			cmdbV2.LoadConfig(tt.fields.v2Config)
 			cmdb := &Client{
 				v2: cmdbV2,
 			}

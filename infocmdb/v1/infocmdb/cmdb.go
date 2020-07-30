@@ -50,22 +50,25 @@ const (
 	ATTRIBUTE_VALUE_TYPE_CI                         = "value_ci"
 )
 
-func (i *Cmdb) LoadConfigFile(path string) (err error) {
-	err = config.LoadYamlConfig(path, &i.Config)
+// New returns a new Cmdb Client to access the V1 Api
+func New() (i *Cmdb) {
+	return &Cmdb{
+		Cache: cache.New(5*time.Minute, 10*time.Minute),
+	}
+}
+
+func (i *Cmdb) LoadConfig(config Config) {
+	i.Config = config
 	return
 }
 
-func New(config string) (i *Cmdb, err error) {
-	i = new(Cmdb)
-	err = i.LoadConfigFile(config)
+func (i *Cmdb) LoadConfigFile(path string) (err error) {
+	err = config.LoadYamlConfig(path, &i.Config)
 	if err != nil {
-		log.Error(err)
-		return nil, err
+		return err
 	}
 
-	i.Cache = cache.New(5*time.Minute, 10*time.Minute)
-
-	return i, nil
+	return
 }
 
 func (i *Cmdb) Login() error {

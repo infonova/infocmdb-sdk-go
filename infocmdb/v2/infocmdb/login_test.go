@@ -57,9 +57,7 @@ func TestInfoCMDB_LoginWithUserPass(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmdbV2 := New()
-			if err := cmdbV2.LoadConfig(tt.fields.Config); err != nil {
-				t.Fatalf("LoadConfig failed: %v\n", err)
-			}
+			cmdbV2.LoadConfig(tt.fields.Config)
 
 			if err := cmdbV2.Login(); (err != nil) != tt.wantErr {
 				t.Errorf("Cmdb.LoginWithUserPass() error = %v, wantErr %v", err, tt.wantErr)

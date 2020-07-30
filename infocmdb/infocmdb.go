@@ -35,19 +35,23 @@ type Client struct {
 }
 
 // NewClient returns a new cmdb client
-func NewClient() *Client {
-	return new(Client)
+func NewClient() (c *Client) {
+	c = &Client{
+		v1: v1.New(),
+		v2: v2.New(),
+	}
+	return
 }
 
 // LoadConfig from file in yaml format
-func (c *Client) LoadConfig(f string) (err error) {
-	c.v1, err = v1.New(f)
+func (c *Client) LoadConfig(path string) (err error) {
+	err = c.v1.LoadConfigFile(path)
 	if err != nil {
 		return
 	}
 
-	c.v2 = v2.New()
-	if err = c.v2.LoadConfigFile(f); err != nil {
+	err = c.v2.LoadConfigFile(path)
+	if err != nil {
 		return
 	}
 
