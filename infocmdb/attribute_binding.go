@@ -49,6 +49,11 @@ func bindCiAttributes(attributes []CiAttribute, out interface{}) (err error) {
 			if err != nil {
 				return
 			}
+		case "int":
+			err = bindAttrToIntField(attrs, valueField)
+			if err != nil {
+				return
+			}
 		case "[]string":
 			err = bindAttrToStringSliceField(attrs, valueField)
 			if err != nil {
@@ -86,6 +91,35 @@ func bindAttrToStringField(attrs []CiAttribute, field reflect.Value) (err error)
 		attr := attrs[0]
 		return &BindError{
 			Msg:       fmt.Sprintf("failed to map multiple attributes with name \"%v\" to string", attr.AttributeName),
+			FieldName: field.Type().Name(),
+			SrcName:   attr.AttributeName,
+			SrcType:   attr.AttributeType,
+		}
+	}
+
+	return
+}
+
+func bindAttrToIntField(attrs []CiAttribute, field reflect.Value) (err error) {
+	if len(attrs) == 0 {
+		return
+	} else if len(attrs) == 1 {
+		attr := attrs[0]
+		intValue, err := strconv.Atoi(attr.Value)
+		if err != nil {
+			return &BindError{
+				Msg:       fmt.Sprintf("failed to map attribute with name \"%v\" and value \"%v\" to int",
+					attr.AttributeName, attr.Value),
+				FieldName: field.Type().Name(),
+				SrcName:   attr.AttributeName,
+				SrcType:   attr.AttributeType,
+			}
+		}
+		field.SetInt(int64(intValue))
+	} else {
+		attr := attrs[0]
+		return &BindError{
+			Msg:       fmt.Sprintf("failed to map multiple attributes with name \"%v\" to int", attr.AttributeName),
 			FieldName: field.Type().Name(),
 			SrcName:   attr.AttributeName,
 			SrcType:   attr.AttributeType,
