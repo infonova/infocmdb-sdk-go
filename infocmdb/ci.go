@@ -319,3 +319,11 @@ func (c *Client) GetAndBindCiByAttributeValue(name string, value string, valueTy
 
 	return
 }
+
+func (c *Client) GetAndBindCiByAttributeValueText(name string, value string, out interface{}) (err error) {
+	return c.GetAndBindCiByAttributeValue(name, value, v2.ATTRIBUTE_VALUE_TYPE_TEXT, out)
+}
+
+func (c *Client) GetAndBindCiByAttributeValueCi(name string, value string, out interface{}) (err error) {
+	return c.GetAndBindCiByAttributeValue(name, value, v2.ATTRIBUTE_VALUE_TYPE_CI, out)
+}
