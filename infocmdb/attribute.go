@@ -39,6 +39,10 @@ func (c *Client) GetCiAttributes(ciId int) (ciAttributes CiAttributes, err error
 
 func (c *Client) GetMapOfCiAttributes(ciIds []int) (ciIdToAttributesMap map[int]CiAttributes, err error) {
 	ciIdToAttributesMap = map[int]CiAttributes{}
+	
+	if len(ciIds) == 0 {
+		return
+	}
 
 	if err = c.v2.Login(); err != nil {
 		return
