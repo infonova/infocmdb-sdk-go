@@ -97,7 +97,6 @@ func (c *Client) GetAndBindCiByAttributeValueCi(name string, value string, out i
 	return c.GetAndBindCiByAttributeValue(name, value, v2.ATTRIBUTE_VALUE_TYPE_CI, out)
 }
 
-
 func bindCi(ciId int, attributes []CiAttribute, out interface{}) (err error) {
 	attrNameToAttrMap := map[string][]CiAttribute{}
 	for _, attr := range attributes {
@@ -114,47 +113,64 @@ func bindCi(ciId int, attributes []CiAttribute, out interface{}) (err error) {
 		structField := outValue.Type().Field(i)
 		valueField := outValue.Field(i)
 
-		tag := structField.Tag.Get("attr")
-		if tag == "" || tag == "-" {
+		ciTag := structField.Tag.Get("ci")
+		if ciTag == "id" {
+			valueField.SetInt(int64(ciId))
 			continue
 		}
 
-		attrs := attrNameToAttrMap[tag]
+		attrTag := structField.Tag.Get("attr")
+		if attrTag == "" || attrTag == "-" {
+			continue
+		}
 
-		structFieldTypeName := structField.Type.String()
-		switch structFieldTypeName {
-		case "string":
-			err = bindAttrToStringField(attrs, valueField)
-			if err != nil {
-				return
-			}
-		case "int":
-			err = bindAttrToIntField(attrs, valueField)
-			if err != nil {
-				return
-			}
-		case "[]string":
-			err = bindAttrToStringSliceField(attrs, valueField)
-			if err != nil {
-				return
-			}
-		case "[]int":
-			err = bindAttrToIntSliceField(attrs, valueField)
-			if err != nil {
-				return
-			}
-		default:
-			var attr CiAttribute
-			if len(attrs) > 0 {
-				attr = attrs[0]
-			}
-			return &BindError{
-				Msg:       fmt.Sprintf("failed to map struct field %v of type %v", structField.Name, structFieldTypeName),
-				FieldName: structField.Name,
-				SrcName:   attr.AttributeName,
-				SrcType:   attr.AttributeType,
-				SrcValue:  attr.Value,
-			}
+		attrs := attrNameToAttrMap[attrTag]
+
+		err = bindAttr(attrs, structField, valueField)
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
+func bindAttr(attrs []CiAttribute, structField reflect.StructField, valueField reflect.Value) (err error) {
+	structFieldTypeName := structField.Type.String()
+
+	switch structFieldTypeName {
+	case "string":
+		err = bindAttrToStringField(attrs, valueField)
+		if err != nil {
+			return
+		}
+	case "int":
+		err = bindAttrToIntField(attrs, valueField)
+		if err != nil {
+			return
+		}
+	case "[]string":
+		err = bindAttrToStringSliceField(attrs, valueField)
+		if err != nil {
+			return
+		}
+	case "[]int":
+		err = bindAttrToIntSliceField(attrs, valueField)
+		if err != nil {
+			return
+		}
+	default:
+		var attr CiAttribute
+		if len(attrs) > 0 {
+			attr = attrs[0]
+		}
+		return &BindError{
+			Msg: fmt.Sprintf("failed to map struct field %v of type %v",
+				structField.Name, structFieldTypeName),
+			FieldName: structField.Name,
+			SrcName:   attr.AttributeName,
+			SrcType:   attr.AttributeType,
+			SrcValue:  attr.Value,
 		}
 	}
 
