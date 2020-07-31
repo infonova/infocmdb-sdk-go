@@ -158,20 +158,20 @@ type getListOfCiIdsByAttributeValue struct {
 	} `json:"data"`
 }
 
-func (c *Client) GetListOfCiIdsByAttributeValue(att, value string, field v2.AttributeValueType) (ciIds CiIds, err error) {
+func (c *Client) GetListOfCiIdsByAttributeValue(name string, value string, valueType v2.AttributeValueType) (ciIds CiIds, err error) {
 	if err = c.v2.Login(); err != nil {
 		return
 	}
 
-	attId, err := c.GetAttributeIdByAttributeName(att)
+	attrId, err := c.GetAttributeIdByAttributeName(name)
 	if err != nil {
 		return nil, err
 	}
 
 	params := map[string]string{
-		"argv1": strconv.Itoa(attId),
+		"argv1": strconv.Itoa(attrId),
 		"argv2": value,
-		"argv3": string(field),
+		"argv3": string(valueType),
 	}
 
 	ret := getListOfCiIdsByAttributeValue{}
@@ -286,4 +286,44 @@ func (c *Client) CreateCi(ciTypeID int, icon string, historyID int) (r CreateCi,
 	}
 
 	return
+}
+
+func (c *Client) GetCiIdByAttributeValue(name string, value string, valueType v2.AttributeValueType) (ciId int, err error) {
+	ciIds, err := c.GetListOfCiIdsByAttributeValue(name, value, valueType)
+	if err != nil {
+	    return
+	}
+
+	switch len(ciIds) {
+	case 0:
+		err = utilError.FunctionError(name + " - " + v2.ErrNoResult.Error())
+	case 1:
+		ciId = ciIds[0]
+	default:
+		err = utilError.FunctionError(name + " - " + v2.ErrTooManyResults.Error())
+	}
+
+	return
+}
+
+func (c *Client) GetAndBindCiByAttributeValue(name string, value string, valueType v2.AttributeValueType, out interface{}) (err error) {
+	ciId, err := c.GetCiIdByAttributeValue(name, value, valueType)
+	if err != nil {
+	    return
+	}
+
+	err = c.GetAndBindCiAttributes(ciId, out)
+	if err != nil {
+	    return
+	}
+
+	return
+}
+
+func (c *Client) GetAndBindCiByAttributeValueText(name string, value string, out interface{}) (err error) {
+	return c.GetAndBindCiByAttributeValue(name, value, v2.ATTRIBUTE_VALUE_TYPE_TEXT, out)
+}
+
+func (c *Client) GetAndBindCiByAttributeValueCi(name string, value string, out interface{}) (err error) {
+	return c.GetAndBindCiByAttributeValue(name, value, v2.ATTRIBUTE_VALUE_TYPE_CI, out)
 }
