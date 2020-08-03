@@ -141,17 +141,6 @@ func (c *Client) GetListOfCiIdsOfCiTypeName(ciTypeName string) (ciIds CiIds, err
 	return
 }
 
-func (c *Client) GetAndBindListOfCiAttributesOfCiTypeName(ciTypeName string, out interface{}) (err error) {
-	ciIds, err := c.GetListOfCiIdsOfCiTypeName(ciTypeName)
-	if err != nil {
-		err = errors.New("failed to get \"" + ciTypeName + "\" ci ids: " + err.Error())
-		return
-	}
-
-	err = c.GetAndBindListOfCiAttributes(ciIds, out)
-	return
-}
-
 type getListOfCiIdsByAttributeValue struct {
 	Data []struct {
 		CiID int `json:"ci_id,string"`
@@ -304,26 +293,4 @@ func (c *Client) GetCiIdByAttributeValue(name string, value string, valueType v2
 	}
 
 	return
-}
-
-func (c *Client) GetAndBindCiByAttributeValue(name string, value string, valueType v2.AttributeValueType, out interface{}) (err error) {
-	ciId, err := c.GetCiIdByAttributeValue(name, value, valueType)
-	if err != nil {
-	    return
-	}
-
-	err = c.GetAndBindCiAttributes(ciId, out)
-	if err != nil {
-	    return
-	}
-
-	return
-}
-
-func (c *Client) GetAndBindCiByAttributeValueText(name string, value string, out interface{}) (err error) {
-	return c.GetAndBindCiByAttributeValue(name, value, v2.ATTRIBUTE_VALUE_TYPE_TEXT, out)
-}
-
-func (c *Client) GetAndBindCiByAttributeValueCi(name string, value string, out interface{}) (err error) {
-	return c.GetAndBindCiByAttributeValue(name, value, v2.ATTRIBUTE_VALUE_TYPE_CI, out)
 }

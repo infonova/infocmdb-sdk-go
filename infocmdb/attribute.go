@@ -1,8 +1,6 @@
 package infocmdb
 
 import (
-	"errors"
-	"reflect"
 	"strconv"
 
 	utilCache "github.com/patrickmn/go-cache"
@@ -75,48 +73,6 @@ func (c *Client) GetMapOfCiAttributes(ciIds []int) (ciIdToAttributesMap map[int]
 		ciIdToAttributesMap[ciAttribute.CiID] = ciAttributes
 	}
 
-	return
-}
-
-func (c *Client) GetAndBindCiAttributes(ciId int, out interface{}) (err error) {
-	attributes, err := c.GetCiAttributes(ciId)
-	if err != nil {
-		return
-	}
-
-	return bindCiAttributes(attributes, out)
-}
-
-func (c *Client) GetAndBindListOfCiAttributes(ciIds []int, out interface{}) (err error) {
-	ciIdToAttributesMap, err := c.GetMapOfCiAttributes(ciIds)
-	if err != nil {
-		return
-	}
-
-	outSlicePtr := reflect.ValueOf(out)
-	if outSlicePtr.Kind() != reflect.Ptr {
-		return errors.New("out parameter is not a slice pointer")
-	}
-	outSlice := outSlicePtr.Elem()
-	if outSlice.Kind() != reflect.Slice {
-		return errors.New("out parameter is not a slice pointer")
-	}
-	outSliceElem := reflect.TypeOf(outSlice.Interface()).Elem()
-	outSliceValue := reflect.MakeSlice(outSlice.Type(), 0, 0)
-
-	for _, ciId := range ciIds {
-		ciAttributes := ciIdToAttributesMap[ciId]
-
-		elem := reflect.New(outSliceElem)
-		err = bindCiAttributes(ciAttributes, elem.Interface())
-		if err != nil {
-			return
-		}
-
-		outSliceValue = reflect.Append(outSliceValue, elem.Elem())
-	}
-
-	outSlice.Set(outSliceValue)
 	return
 }
 
