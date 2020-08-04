@@ -48,16 +48,50 @@ func (c *Client) GetAndBindListOfCis(ciIds []int, out interface{}) (err error) {
 	outSliceElem := reflect.TypeOf(outSlice.Interface()).Elem()
 	outSliceValue := reflect.MakeSlice(outSlice.Type(), 0, 0)
 
-	for _, ciId := range ciIds {
-		ciAttributes := ciIdToAttributesMap[ciId]
+	if outSliceElem.Kind() == reflect.Ptr {
+		// out has type `[]*UserStruct`
+		// outSliceElem has type `*UserStruct`
+		for _, ciId := range ciIds {
+			ciAttributes := ciIdToAttributesMap[ciId]
 
-		elem := reflect.New(outSliceElem)
-		err = bindCi(ciId, ciAttributes, elem.Interface())
-		if err != nil {
-			return
+			// creating a new `UserStruct` from `*UserStruct`.Elem() means variable elem has type `*UserStruct`
+			// outSliceElem = `*UserStruct`
+			// outSliceElem.Elem() = `UserStruct`
+			// New(outSliceElem.Elem()) is a pointer to a new UserStruct = `*UserStruct` (pointer to non-nil UserStruct)
+			elem := reflect.New(outSliceElem.Elem())
+
+			// cast to interface so that elem can be bound
+			err = bindCi(ciId, ciAttributes, elem.Interface())
+			if err != nil {
+				return
+			}
+
+			// append value to slice, out has type `[]*UserStruct`, so need to append &UserStruct:
+			// elem = `*UserStruct`
+			// elem.Elem() = `UserStruct`
+			// elem.Elem().Addr() = `&UserStruct`
+			outSliceValue = reflect.Append(outSliceValue, elem.Elem().Addr())
 		}
+	} else {
+		// out has type `[]UserStruct`
+		// outSliceElem has type `UserStruct`
+		for _, ciId := range ciIds {
+			ciAttributes := ciIdToAttributesMap[ciId]
 
-		outSliceValue = reflect.Append(outSliceValue, elem.Elem())
+			// creating a new `UserStruct` means variable elem has type `*UserStruct`
+			elem := reflect.New(outSliceElem)
+
+			// cast to interface so that elem can be bound
+			err = bindCi(ciId, ciAttributes, elem.Interface())
+			if err != nil {
+				return
+			}
+
+			// append value to slice, out has type `[]UserStruct`, so need to append UserStruct:
+			// elem = `*UserStruct`
+			// elem.Elem() = `UserStruct`
+			outSliceValue = reflect.Append(outSliceValue, elem.Elem())
+		}
 	}
 
 	outSlice.Set(outSliceValue)
