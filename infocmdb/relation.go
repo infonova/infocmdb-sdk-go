@@ -1,16 +1,15 @@
 package infocmdb
 
 import (
-	"errors"
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 
-	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
-	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
 	utilCache "github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
+
+	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
+	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
 )
 
 type createCiRelation struct {
@@ -21,20 +20,7 @@ func (c *Client) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName strin
 		return
 	}
 
-	var directionId int
-	switch direction {
-	case v2.CI_RELATION_DIRECTION_DIRECTED_FROM:
-		directionId = 1
-	case v2.CI_RELATION_DIRECTION_DIRECTED_TO:
-		directionId = 2
-	case v2.CI_RELATION_DIRECTION_BIDIRECTIONAL:
-		directionId = 3
-	case v2.CI_RELATION_DIRECTION_OMNIDIRECTIONAL:
-		directionId = 4
-	default:
-		err = errors.New(fmt.Sprintf("Invalid direction '%s'", direction))
-		return
-	}
+	directionId, err := direction.GetId()
 
 	counter, err := c.GetCiRelationCount(ciId1, ciId2, ciRelationTypeName)
 	if err != nil {
@@ -256,6 +242,58 @@ func (c *Client) GetCiRelationTypeIdByRelationTypeName(name string) (r int, err 
 		c.v1.Cache.Set(cacheKey, r, utilCache.DefaultExpiration)
 	default:
 		err = utilError.FunctionError(name + " - " + v2.ErrTooManyResults.Error())
+	}
+
+	return
+}
+
+type Relation struct {
+	Id        int
+	CiId1     int
+	CiId2     int
+	Direction v2.CiRelationDirection
+}
+
+type getCiRelationsByName struct {
+	Data []struct {
+		Id        IntWrapper `json:"id"`
+		CiId1     IntWrapper `json:"ci_id_1"`
+		CiId2     IntWrapper `json:"ci_id_2"`
+		Direction IntWrapper `json:"direction"`
+	} `json:"data"`
+}
+
+func (c *Client) GetListOfRelationsByName(name string) (relations []Relation, err error) {
+	relations = []Relation{}
+
+	if err = c.v2.Login(); err != nil {
+		return
+	}
+
+	params := map[string]string{
+		"argv1": name,
+	}
+
+	jsonRet := getCiRelationsByName{}
+	err = c.v2.Query("int_getCiRelationsByName", &jsonRet, params)
+	if err != nil {
+		err = utilError.FunctionError(err.Error())
+		log.Error("Error: ", err)
+		return
+	}
+
+	for _, relation := range jsonRet.Data {
+		direction, err := v2.NewCiRelationDirection(int(relation.Direction))
+		if err != nil {
+		    return relations, err
+		}
+
+		relations = append(relations, Relation{
+			Id:        int(relation.Id),
+			CiId1:     int(relation.CiId1),
+			CiId2:     int(relation.CiId2),
+			Direction: direction,
+		})
 	}
 
 	return
