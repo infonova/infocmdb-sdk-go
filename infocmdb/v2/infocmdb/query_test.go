@@ -38,9 +38,7 @@ func TestInfoCMDB_Query(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmdbV2 := New()
-			if err := cmdbV2.LoadConfig(tt.fields.Config); err != nil {
-				t.Fatalf("LoadConfig failed: %v\n", err)
-			}
+			cmdbV2.LoadConfig(tt.fields.Config)
 
 			if err := cmdbV2.Query(tt.args.query, tt.args.out, tt.args.params); (err != nil) != tt.wantErr {
 				t.Errorf("Cmdb.Query() error = %v, wantErr %v", err, tt.wantErr)

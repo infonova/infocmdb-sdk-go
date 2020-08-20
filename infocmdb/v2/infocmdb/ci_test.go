@@ -159,9 +159,7 @@ func TestInfoCMDB_CiListByCiTypeID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			cmdb := New()
 			ut.SetValidConfig(&cmdb.Config)
-			if err := cmdb.LoadConfig(cmdb.Config); err != nil {
-				t.Fatalf("LoadConfig failed: %v\n", err)
-			}
+			cmdb.LoadConfig(cmdb.Config)
 
 			if err := cmdb.Login(); err != nil {
 				t.Fatalf("Login failed: %v\n", err)

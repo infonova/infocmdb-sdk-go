@@ -3,11 +3,14 @@ package infocmdb
 import (
 	"strconv"
 
-	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
-	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
 	utilCache "github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
+
+	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
+	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
 )
+
+type CiAttributes = []CiAttribute
 
 type CiAttribute struct {
 	CiID                 int    `json:"ci_id,string,string"`
@@ -24,13 +27,38 @@ type getCiAttributes struct {
 	Data []CiAttribute `json:"data"`
 }
 
-func (c *Client) GetCiAttributes(ciID int) (r []CiAttribute, err error) {
+func (c *Client) GetCiAttributes(ciId int) (ciAttributes CiAttributes, err error) {
+	ciIdToAttributesMap, err := c.GetMapOfCiAttributes([]int{ciId})
+	if err != nil {
+	    return
+	}
+
+	ciAttributes = ciIdToAttributesMap[ciId]
+	return
+}
+
+func (c *Client) GetMapOfCiAttributes(ciIds []int) (ciIdToAttributesMap map[int]CiAttributes, err error) {
+	ciIdToAttributesMap = map[int]CiAttributes{}
+	
+	if len(ciIds) == 0 {
+		return
+	}
+
 	if err = c.v2.Login(); err != nil {
 		return
 	}
 
+	commaSeparatedCiIds := ""
+	for _, ciId := range ciIds {
+		if commaSeparatedCiIds != "" {
+			commaSeparatedCiIds += ", "
+		}
+
+		commaSeparatedCiIds += strconv.Itoa(ciId)
+	}
+
 	params := map[string]string{
-		"argv1": strconv.Itoa(ciID),
+		"argv1": commaSeparatedCiIds,
 	}
 
 	jsonRet := getCiAttributes{}
@@ -39,17 +67,17 @@ func (c *Client) GetCiAttributes(ciID int) (r []CiAttribute, err error) {
 		err = utilError.FunctionError(err.Error())
 		log.Error("Error: ", err)
 	}
-	r = jsonRet.Data
-	return
-}
 
-func (c *Client) GetAndBindCiAttributes(ciID int, out interface{}) (err error) {
-	attributes, err := c.GetCiAttributes(ciID)
-	if err != nil {
-		return
+	for _, ciAttribute := range jsonRet.Data {
+		ciAttributes, ok := ciIdToAttributesMap[ciAttribute.CiID]
+		if !ok {
+			ciAttributes = CiAttributes{}
+		}
+		ciAttributes = append(ciAttributes, ciAttribute)
+		ciIdToAttributesMap[ciAttribute.CiID] = ciAttributes
 	}
 
-	return bindCiAttributes(attributes, out)
+	return
 }
 
 type getAttributeDefaultOption struct {

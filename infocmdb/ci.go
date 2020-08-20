@@ -6,9 +6,10 @@ import (
 	"strconv"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
+
 	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
 	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
-	log "github.com/sirupsen/logrus"
 )
 
 type Ci struct {
@@ -146,20 +147,20 @@ type getListOfCiIdsByAttributeValue struct {
 	} `json:"data"`
 }
 
-func (c *Client) GetListOfCiIdsByAttributeValue(att, value string, field v2.AttributeValueType) (ciIds CiIds, err error) {
+func (c *Client) GetListOfCiIdsByAttributeValue(name string, value string, valueType v2.AttributeValueType) (ciIds CiIds, err error) {
 	if err = c.v2.Login(); err != nil {
 		return
 	}
 
-	attId, err := c.GetAttributeIdByAttributeName(att)
+	attrId, err := c.GetAttributeIdByAttributeName(name)
 	if err != nil {
 		return nil, err
 	}
 
 	params := map[string]string{
-		"argv1": strconv.Itoa(attId),
+		"argv1": strconv.Itoa(attrId),
 		"argv2": value,
-		"argv3": string(field),
+		"argv3": string(valueType),
 	}
 
 	ret := getListOfCiIdsByAttributeValue{}
@@ -271,6 +272,24 @@ func (c *Client) CreateCi(ciTypeID int, icon string, historyID int) (r CreateCi,
 		r = jsonRet.Data[0].CreateCi
 	default:
 		err = utilError.FunctionError(strconv.Itoa(ciTypeID) + " - " + v2.ErrTooManyResults.Error())
+	}
+
+	return
+}
+
+func (c *Client) GetCiIdByAttributeValue(name string, value string, valueType v2.AttributeValueType) (ciId int, err error) {
+	ciIds, err := c.GetListOfCiIdsByAttributeValue(name, value, valueType)
+	if err != nil {
+	    return
+	}
+
+	switch len(ciIds) {
+	case 0:
+		err = utilError.FunctionError(name + " - " + v2.ErrNoResult.Error())
+	case 1:
+		ciId = ciIds[0]
+	default:
+		err = utilError.FunctionError(name + " - " + v2.ErrTooManyResults.Error())
 	}
 
 	return
