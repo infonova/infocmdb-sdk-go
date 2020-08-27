@@ -90,7 +90,7 @@ func (i *Cmdb) SendNotification(notifyName string, params NotifyParams) (resp No
 	response, err := httpClient.Do(req)
 
 	if err != nil {
-		return resp, errors.New("failed to make a request.Error: " + err.Error())
+		return resp, errors.New("failed to make a request. Error: " + err.Error())
 	}
 
 	bodyBytes, err := ioutil.ReadAll(response.Body)
@@ -101,16 +101,16 @@ func (i *Cmdb) SendNotification(notifyName string, params NotifyParams) (resp No
 	var responseStruct sendNotificationResp
 	err = json.Unmarshal(bodyBytes, &responseStruct)
 	if err != nil {
-		return resp, errors.New("failed to parse response body.Error: " + err.Error() + "Body:" + string(bodyBytes))
+		return resp, errors.New("failed to parse response body. Error: " + err.Error() + "Body: " + string(bodyBytes))
 	}
 
 	switch responseStruct.Status {
 	case "OK":
 
-		nRS := NotificationResponse{
+		resp := NotificationResponse{
 			SentTo: responseStruct.Data,
 		}
-		return nRS, nil
+		return resp, nil
 
 	case "error":
 		return resp, errors.New(responseStruct.Message)
