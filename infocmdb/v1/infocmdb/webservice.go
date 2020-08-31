@@ -5,12 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"reflect"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -22,11 +23,12 @@ type ResultLogin struct {
 	ApiKey string `json:"apikey"`
 }
 
-func (i *Cmdb) LoginWithUserPass(url string, username string, password string) error {
+func (i *Cmdb) LoginWithUserPass(apiUrl string, username string, password string) error {
 
-	log.Debugf("Opening new WebClient connection. (Url: %s, Username: %s)", url, username)
+	log.Debugf("Opening new WebClient connection. (Url: %s, Username: %s)", apiUrl, username)
 
-	reqURL := fmt.Sprintf("%s/api/login/username/%s/password/%s/timeout/600/method/json", url, username, password)
+	reqURL := fmt.Sprintf("%s/api/login/username/%s/password/%s/timeout/600/method/json",
+		apiUrl, url.PathEscape(username), url.PathEscape(password))
 
 	resp, err := http.Get(reqURL)
 	if err != nil {
