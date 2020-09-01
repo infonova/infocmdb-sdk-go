@@ -333,6 +333,42 @@ func (c *Client) GetCiAttributeValueCi(ciId int, attributeName string) (value st
 	return
 }
 
+type getCiAttributeValueOld struct {
+	Data []struct {
+		Value string `json:"v"`
+	} `json:"data"`
+}
+
+func (c *Client) GetOldCiAttributeValue(ciId int, attributeName string, valueType v2.AttributeValueType) (value string, err error) {
+	if err = c.v2.Login(); err != nil {
+		return
+	}
+
+	params := map[string]string{
+		"argv1": strconv.Itoa(ciId),
+		"argv2": attributeName,
+		"argv3": string(valueType),
+	}
+
+	getCiAttributeValueOld := getCiAttributeValueOld{}
+	err = c.v2.Query("int_getCiAttributeValueOld", &getCiAttributeValueOld, params)
+	if err != nil {
+		err = utilError.FunctionError(err.Error())
+		log.Error("Error: ", err)
+		return
+	}
+
+	if len(getCiAttributeValueOld.Data) > 0 {
+		value = getCiAttributeValueOld.Data[0].Value
+	}
+
+	return
+}
+
+func (c *Client) GetOldCiAttributeValueText(ciId int, attributeName string) (value string, err error) {
+	return c.GetOldCiAttributeValue(ciId, attributeName, v2.ATTRIBUTE_VALUE_TYPE_TEXT)
+}
+
 func (c *Client) UpdateCiAttribute(ci int, ua []v2.UpdateCiAttribute) (err error) {
 	return c.v2.UpdateCiAttribute(ci, ua)
 }
