@@ -1,10 +1,11 @@
 package infocmdb
 
 import (
+	"errors"
+	"strconv"
+
 	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
 	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
-
-	"strconv"
 
 	utilCache "github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
@@ -92,4 +93,39 @@ func (c *Client) GetCiTypeName(ciId int) (ciTypeName string, err error) {
 	}
 
 	return
+}
+
+type respSetTypeOfCi struct {
+	Message bool `json:"success"`
+}
+
+func (c *Client) SetTypeOfCi(ciId int, ciType string) (respStatus string, err error) {
+
+	if err = c.v2.Login(); err != nil {
+		return
+	}
+
+	ciTypeId, err := c.GetCiTypeIdByCiTypeName(ciType)
+	ciTypeIdString := strconv.Itoa(ciTypeId)
+	ciIdString := strconv.Itoa(ciId)
+
+	params := map[string]string{
+		"argv1": ciIdString,
+		"argv2": ciTypeIdString,
+		"argv3": "0",
+	}
+
+	response := respSetTypeOfCi{}
+	err = c.v2.Query("int_setCiTypeOfCi", &response, params)
+	if err != nil {
+		err = utilError.FunctionError(err.Error())
+		log.Error("Error: ", err)
+		return
+	}
+
+	if response.Message == true {
+		return "OK", nil
+	} else {
+		return respStatus, errors.New("couldn't change ci type to: " + ciType + " for ciid: " + ciIdString)
+	}
 }
