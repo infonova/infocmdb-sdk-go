@@ -96,16 +96,30 @@ func (c *Client) GetCiTypeName(ciId int) (ciTypeName string, err error) {
 }
 
 type respSetTypeOfCi struct {
-	Message bool `json:"success"`
+	Success bool   `json:"success"`
+	Message string `json:"message"`
 }
 
-func (c *Client) SetTypeOfCi(ciId int, ciType string) (respStatus string, err error) {
+func (c *Client) SetTypeOfCi(ciId int, ciType string) (err error) {
 
 	if err = c.v2.Login(); err != nil {
 		return
 	}
 
+	currentCiTYpe, err := c.GetCiTypeName(ciId)
+	if err != nil {
+		return err
+	}
+
+	if ciType == currentCiTYpe {
+		return errors.New("the requested ci type is already set: " + currentCiTYpe)
+	}
+
 	ciTypeId, err := c.GetCiTypeIdByCiTypeName(ciType)
+	if err != nil {
+		return err
+	}
+
 	ciTypeIdString := strconv.Itoa(ciTypeId)
 	ciIdString := strconv.Itoa(ciId)
 
@@ -123,9 +137,9 @@ func (c *Client) SetTypeOfCi(ciId int, ciType string) (respStatus string, err er
 		return
 	}
 
-	if response.Message == true {
-		return "OK", nil
-	} else {
-		return respStatus, errors.New("couldn't change ci type to: " + ciType + " for ciid: " + ciIdString)
+	if response.Success != true {
+		return errors.New("couldn't change ci type to: " + ciType + " for ciid: " + ciIdString + " ,error: " + response.Message)
 	}
+
+	return
 }
