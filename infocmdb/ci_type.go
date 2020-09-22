@@ -247,18 +247,18 @@ func (c *Client) TypeIsActive(active bool) func(*ciTypeParams) {
 	}
 }
 
-func (c *Client) TypeIsAttributeAttach(attach bool) func(*ciTypeParams) {
+func (c *Client) TypeIsAttributeAttach(attachAtt bool) func(*ciTypeParams) {
 	return func(obj *ciTypeParams) {
-		if attach == true {
-			obj.IsActive = 1
+		if attachAtt == true {
+			obj.IsAttributeAttach = 1
 		}
 	}
 }
 
-func (c *Client) TypeIsCiAttach(attach bool) func(*ciTypeParams) {
+func (c *Client) TypeIsCiAttach(attachCi bool) func(*ciTypeParams) {
 	return func(obj *ciTypeParams) {
-		if attach == true {
-			obj.IsActive = 1
+		if attachCi == true {
+			obj.IsCiAttach = 1
 		}
 	}
 }
