@@ -151,119 +151,54 @@ type respCreateCiType struct {
 	Data    []responseId `json:"data"`
 }
 
-type ciTypeParams struct {
+type CiTypeParams struct {
 	Name                    string
 	Description             string
 	Note                    string
 	ParentCiTypeId          int
 	OrderNumber             int
-	CreateButtonDescription string
-	Icon                    string
-	Query                   string
+	createButtonDescription string
+	icon                    string
+	query                   string
 	DefaultProjectId        int
-	DefaultAttributeId      int
-	DefaultSortAttributeId  int
-	IsDefaultSortAsc        int
+	defaultAttributeId      int
+	defaultSortAttributeId  int
+	isDefaultSortAsc        int
 	IsCiAttach              int
 	IsAttributeAttach       int
-	Tag                     string
-	IsTabEnabled            int
-	IsEventEnabled          int
+	tag                     string
+	isTabEnabled            int
+	isEventEnabled          int
 	IsActive                int
-	UserId                  int
+	userId                  int
 }
 
-func (c *Client) NewTypeParams(options ...func(*ciTypeParams)) *ciTypeParams {
-	typeParams := &ciTypeParams{
+func (c *Client) NewCiTypeParams() (params *CiTypeParams) {
+	params = &CiTypeParams{
 		Name:                    "",
 		Description:             "",
 		Note:                    "",
 		ParentCiTypeId:          0,
 		OrderNumber:             0,
-		CreateButtonDescription: "",
-		Icon:                    "",
-		Query:                   "",
+		createButtonDescription: "",
+		icon:                    "",
+		query:                   "",
 		DefaultProjectId:        0,
-		DefaultAttributeId:      0,
-		DefaultSortAttributeId:  0,
-		IsDefaultSortAsc:        0,
+		defaultAttributeId:      0,
+		defaultSortAttributeId:  0,
+		isDefaultSortAsc:        0,
 		IsCiAttach:              0,
 		IsAttributeAttach:       0,
-		Tag:                     "",
-		IsTabEnabled:            0,
-		IsEventEnabled:          0,
+		tag:                     "",
+		isTabEnabled:            0,
+		isEventEnabled:          0,
 		IsActive:                1,
-		UserId:                  0,
+		userId:                  0,
 	}
-
-	for _, option := range options {
-		option(typeParams)
-	}
-	return typeParams
-
+	return
 }
 
-func (c *Client) TypeWithName(name string) func(*ciTypeParams) {
-	return func(obj *ciTypeParams) {
-		obj.Name = name
-	}
-}
-
-func (c *Client) TypeWithDesc(desc string) func(*ciTypeParams) {
-	return func(obj *ciTypeParams) {
-		obj.Description = desc
-	}
-}
-
-func (c *Client) TypeWithNote(note string) func(*ciTypeParams) {
-	return func(obj *ciTypeParams) {
-		obj.Note = note
-	}
-}
-
-func (c *Client) TypeWithParentCiTypeId(parentId int) func(*ciTypeParams) {
-	return func(obj *ciTypeParams) {
-		obj.ParentCiTypeId = parentId
-	}
-}
-
-func (c *Client) TypeWithOrderNumber(orderNum int) func(*ciTypeParams) {
-	return func(obj *ciTypeParams) {
-		obj.OrderNumber = orderNum
-	}
-}
-
-func (c *Client) TypeWithDefProjectId(projId int) func(*ciTypeParams) {
-	return func(obj *ciTypeParams) {
-		obj.DefaultProjectId = projId
-	}
-}
-
-func (c *Client) TypeIsActive(active bool) func(*ciTypeParams) {
-	return func(obj *ciTypeParams) {
-		if active != true {
-			obj.IsActive = 0
-		}
-	}
-}
-
-func (c *Client) TypeIsAttributeAttach(attachAtt bool) func(*ciTypeParams) {
-	return func(obj *ciTypeParams) {
-		if attachAtt == true {
-			obj.IsAttributeAttach = 1
-		}
-	}
-}
-
-func (c *Client) TypeIsCiAttach(attachCi bool) func(*ciTypeParams) {
-	return func(obj *ciTypeParams) {
-		if attachCi == true {
-			obj.IsCiAttach = 1
-		}
-	}
-}
-
-func (c *Client) CreateCiType(typeParams *ciTypeParams) (typeId int, err error) {
+func (c *Client) CreateCiType(typeParams *CiTypeParams) (typeId int, err error) {
 
 	if err = c.v2.Login(); err != nil {
 		return
@@ -301,20 +236,20 @@ func (c *Client) CreateCiType(typeParams *ciTypeParams) (typeId int, err error) 
 			typeParams.Note,
 			strconv.Itoa(typeParams.ParentCiTypeId),
 			strconv.Itoa(typeParams.OrderNumber),
-			typeParams.CreateButtonDescription,
-			typeParams.Icon,
-			typeParams.Query,
+			typeParams.createButtonDescription,
+			typeParams.icon,
+			typeParams.query,
 			strconv.Itoa(typeParams.DefaultProjectId),
-			strconv.Itoa(typeParams.DefaultAttributeId),
-			strconv.Itoa(typeParams.DefaultSortAttributeId),
-			strconv.Itoa(typeParams.IsDefaultSortAsc),
+			strconv.Itoa(typeParams.defaultAttributeId),
+			strconv.Itoa(typeParams.defaultSortAttributeId),
+			strconv.Itoa(typeParams.isDefaultSortAsc),
 			strconv.Itoa(typeParams.IsCiAttach),
 			strconv.Itoa(typeParams.IsAttributeAttach),
-			typeParams.Tag,
-			strconv.Itoa(typeParams.IsTabEnabled),
-			strconv.Itoa(typeParams.IsEventEnabled),
+			typeParams.tag,
+			strconv.Itoa(typeParams.isTabEnabled),
+			strconv.Itoa(typeParams.isEventEnabled),
 			strconv.Itoa(typeParams.IsActive),
-			strconv.Itoa(typeParams.UserId),
+			strconv.Itoa(typeParams.userId),
 		}
 
 		params := map[string]string{
@@ -328,10 +263,6 @@ func (c *Client) CreateCiType(typeParams *ciTypeParams) (typeId int, err error) 
 			err = utilError.FunctionError(err.Error())
 			log.Error("Error: ", err)
 			return
-		}
-
-		if response.Success != true {
-			return 0, errors.New("error: " + response.Message)
 		}
 
 		switch len(response.Data) {
