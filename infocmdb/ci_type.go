@@ -247,6 +247,22 @@ func (c *Client) TypeIsActive(active bool) func(*ciTypeParams) {
 	}
 }
 
+func (c *Client) TypeIsAttributeAttach(attach bool) func(*ciTypeParams) {
+	return func(obj *ciTypeParams) {
+		if attach == true {
+			obj.IsActive = 1
+		}
+	}
+}
+
+func (c *Client) TypeIsCiAttach(attach bool) func(*ciTypeParams) {
+	return func(obj *ciTypeParams) {
+		if attach == true {
+			obj.IsActive = 1
+		}
+	}
+}
+
 func (c *Client) CreateCiType(typeParams *ciTypeParams) (typeId int, err error) {
 
 	if err = c.v2.Login(); err != nil {
