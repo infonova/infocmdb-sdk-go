@@ -204,9 +204,12 @@ func (c *Client) CreateCiType(typeParams *CiTypeParams) (typeId int, err error) 
 		return
 	}
 
-	typeIdExists, _ := c.GetCiTypeIdByCiTypeName(typeParams.Name)
+	existingTypeId, err := c.GetCiTypeIdByCiTypeName(typeParams.Name)
+	if err != nil && strings.Contains(err.Error(), "query returned no result") == false {
+		return 0, err
+	}
 
-	if typeIdExists == 0 {
+	if existingTypeId == 0 {
 
 		columns := []string{
 			"name",
@@ -275,7 +278,7 @@ func (c *Client) CreateCiType(typeParams *CiTypeParams) (typeId int, err error) 
 		}
 
 	} else {
-		return typeIdExists, nil
+		return existingTypeId, nil
 	}
 
 	return
