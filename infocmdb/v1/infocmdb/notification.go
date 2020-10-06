@@ -11,6 +11,8 @@ import (
 )
 
 type NotifyParams struct {
+	From             string
+	FromName         string
 	Recipients       []string
 	RecipientsCC     []string
 	RecipientsBCC    []string
@@ -58,6 +60,14 @@ func (i *Cmdb) SendNotification(notifyName string, params NotifyParams) (resp No
 	}
 
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	if params.From != "" {
+		req.Header.Add("From", params.From)
+	}
+
+	if params.FromName != "" {
+		req.Header.Add("FromName", params.FromName)
+	}
 
 	allRecipients := strings.Join(params.Recipients, ";")
 
