@@ -1,7 +1,9 @@
 package infocmdb
 
 import (
+	"reflect"
 	"strconv"
+	"strings"
 
 	utilCache "github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
@@ -30,7 +32,7 @@ type getCiAttributes struct {
 func (c *Client) GetCiAttributes(ciId int) (ciAttributes CiAttributes, err error) {
 	ciIdToAttributesMap, err := c.GetMapOfCiAttributes([]int{ciId})
 	if err != nil {
-	    return
+		return
 	}
 
 	ciAttributes = ciIdToAttributesMap[ciId]
@@ -39,7 +41,7 @@ func (c *Client) GetCiAttributes(ciId int) (ciAttributes CiAttributes, err error
 
 func (c *Client) GetMapOfCiAttributes(ciIds []int) (ciIdToAttributesMap map[int]CiAttributes, err error) {
 	ciIdToAttributesMap = map[int]CiAttributes{}
-	
+
 	if len(ciIds) == 0 {
 		return
 	}
@@ -335,4 +337,389 @@ func (c *Client) GetCiAttributeValueCi(ciId int, attributeName string) (value st
 
 func (c *Client) UpdateCiAttribute(ci int, ua []v2.UpdateCiAttribute) (err error) {
 	return c.v2.UpdateCiAttribute(ci, ua)
+}
+
+type GetAttributeGroupIdValue struct {
+	Data []struct {
+		GroupId int `json:"id,string"`
+	} `json:"data"`
+}
+
+func (c *Client) GetAttributeGroupIdByName(attributeGroupName string) (attGroupId int, err error) {
+	if err = c.v2.Login(); err != nil {
+		return
+	}
+
+	params := map[string]string{
+		"argv1": attributeGroupName,
+	}
+
+	response := GetAttributeGroupIdValue{}
+	err = c.v2.Query("int_getAttributeGroupIdByAttributeGroupName", &response, params)
+	if err != nil {
+		err = utilError.FunctionError(err.Error())
+		log.Error("Error: ", err)
+		return
+	}
+
+	switch len(response.Data) {
+	case 0:
+		err = utilError.FunctionError(attributeGroupName + " - " + v2.ErrNoResult.Error())
+	case 1:
+		attGroupId = response.Data[0].GroupId
+	default:
+		err = utilError.FunctionError(attributeGroupName + " - " + v2.ErrTooManyResults.Error())
+	}
+
+	return
+}
+
+type respCreateAttributeGroup struct {
+	Success bool         `json:"success"`
+	Message string       `json:"message"`
+	Data    []responseId `json:"data"`
+}
+
+type AttributeGroupParams struct {
+	Name                   string
+	Description            string
+	Note                   string
+	OrderNumber            int
+	ParentAttributeGroupId int
+	IsDuplicateAllow       int
+	IsActive               int
+	userId                 int
+}
+
+func (c *Client) NewAttributeGroupParams() (params *AttributeGroupParams) {
+	params = &AttributeGroupParams{
+		Name:                   "",
+		Description:            "",
+		Note:                   "",
+		OrderNumber:            0,
+		ParentAttributeGroupId: 0,
+		IsDuplicateAllow:       0,
+		IsActive:               1,
+		userId:                 0,
+	}
+	return
+}
+
+func (c *Client) CreateAttributeGroup(attributeGroupParams *AttributeGroupParams) (attributeGroupId int, err error) {
+
+	if err = c.v2.Login(); err != nil {
+		return
+	}
+
+	existingAttributeGroup, err := c.GetAttributeGroupIdByName(attributeGroupParams.Name)
+	if err != nil && strings.Contains(err.Error(), "query returned no result") == false {
+		return 0, err
+	}
+
+	if existingAttributeGroup == 0 {
+
+		columns := []string{
+			"name",
+			"description",
+			"note",
+			"order_number",
+			"parent_attribute_group_id",
+			"is_duplicate_allow",
+			"is_active",
+			"user_id",
+		}
+
+		values := []string{
+			attributeGroupParams.Name,
+			attributeGroupParams.Description,
+			attributeGroupParams.Note,
+			strconv.Itoa(attributeGroupParams.OrderNumber),
+			strconv.Itoa(attributeGroupParams.ParentAttributeGroupId),
+			strconv.Itoa(attributeGroupParams.IsDuplicateAllow),
+			strconv.Itoa(attributeGroupParams.IsActive),
+			strconv.Itoa(attributeGroupParams.userId),
+		}
+
+		params := map[string]string{
+			"argv1": "`" + strings.Join(columns, "`, `") + "`",
+			"argv2": "'" + strings.Join(values, "', '") + "'",
+		}
+
+		response := respCreateAttributeGroup{}
+		err = c.v2.Query("int_createAttributeGroup", &response, params)
+		if err != nil {
+			err = utilError.FunctionError(err.Error())
+			log.Error("Error: ", err)
+			return
+		}
+
+		switch len(response.Data) {
+		case 0:
+			err = utilError.FunctionError(attributeGroupParams.Name + " - " + v2.ErrNoResult.Error())
+		case 1:
+			attributeGroupId = response.Data[0].Id
+		default:
+			err = utilError.FunctionError(attributeGroupParams.Name + " - " + v2.ErrTooManyResults.Error())
+		}
+
+	} else {
+		return existingAttributeGroup, nil
+	}
+
+	return
+}
+
+type respCreateAttribute struct {
+	Success bool         `json:"success"`
+	Message string       `json:"message"`
+	Data    []responseId `json:"data"`
+}
+
+type AttributeParams struct {
+	Name                string
+	Description         string
+	Note                string
+	Hint                string
+	AttributeTypeId     int
+	AttributeGroupId    int
+	OrderNumber         int
+	Column              int
+	IsUnique            int
+	IsNumeric           int
+	IsBold              int
+	IsEvent             int
+	IsUniqueCheck       int
+	IsAutocomplete      int
+	IsMultiselect       int
+	IsProjectRestricted int
+	Regex               string
+	ScriptName          string
+	InputMaxlength      int
+	TextareaCols        int
+	TextareaRows        int
+	IsActive            int
+	Historicize         int
+	userId              int
+}
+
+func (c *Client) NewAttributeParams() (params *AttributeParams) {
+	params = &AttributeParams{
+		Name:                "",
+		Description:         "",
+		Note:                "",
+		Hint:                "",
+		AttributeTypeId:     1,
+		AttributeGroupId:    0,
+		OrderNumber:         0,
+		Column:              1,
+		IsUnique:            0,
+		IsNumeric:           0,
+		IsBold:              0,
+		IsEvent:             0,
+		IsUniqueCheck:       0,
+		IsAutocomplete:      0,
+		IsMultiselect:       0,
+		IsProjectRestricted: 0,
+		Regex:               "",
+		ScriptName:          "",
+		InputMaxlength:      0,
+		TextareaCols:        0,
+		TextareaRows:        0,
+		IsActive:            1,
+		Historicize:         1,
+		userId:              0,
+	}
+	return
+}
+
+func (c *Client) CreateAttribute(attributeParams *AttributeParams) (attributeId int, err error) {
+
+	if err = c.v2.Login(); err != nil {
+		return
+	}
+
+	existingAttributeId, err := c.GetAttributeIdByAttributeName(attributeParams.Name)
+	if err != nil && strings.Contains(err.Error(), "query returned no result") == false {
+		return 0, err
+	}
+
+	if existingAttributeId == 0 {
+
+		columns := []string{
+			"name",
+			"description",
+			"note",
+			"hint",
+			"attribute_type_id",
+			"attribute_group_id",
+			"order_number",
+			"column",
+			"is_unique",
+			"is_numeric",
+			"is_bold",
+			"is_event",
+			"is_unique_check",
+			"is_autocomplete",
+			"is_multiselect",
+			"is_project_restricted",
+			"regex",
+			"script_name",
+			"input_maxlength",
+			"textarea_cols",
+			"textarea_rows",
+			"is_active",
+			"user_id",
+			"historicize",
+		}
+
+		values := []string{
+			attributeParams.Name,
+			attributeParams.Description,
+			attributeParams.Note,
+			attributeParams.Hint,
+			strconv.Itoa(attributeParams.AttributeTypeId),
+			strconv.Itoa(attributeParams.AttributeGroupId),
+			strconv.Itoa(attributeParams.OrderNumber),
+			strconv.Itoa(attributeParams.Column),
+			strconv.Itoa(attributeParams.IsUnique),
+			strconv.Itoa(attributeParams.IsNumeric),
+			strconv.Itoa(attributeParams.IsBold),
+			strconv.Itoa(attributeParams.IsEvent),
+			strconv.Itoa(attributeParams.IsUniqueCheck),
+			strconv.Itoa(attributeParams.IsAutocomplete),
+			strconv.Itoa(attributeParams.IsMultiselect),
+			strconv.Itoa(attributeParams.IsProjectRestricted),
+			attributeParams.Regex,
+			attributeParams.ScriptName,
+			strconv.Itoa(attributeParams.InputMaxlength),
+			strconv.Itoa(attributeParams.TextareaCols),
+			strconv.Itoa(attributeParams.TextareaRows),
+			strconv.Itoa(attributeParams.IsActive),
+			strconv.Itoa(attributeParams.userId),
+			strconv.Itoa(attributeParams.Historicize),
+		}
+
+		params := map[string]string{
+			"argv1": "`" + strings.Join(columns, "`, `") + "`",
+			"argv2": "'" + strings.Join(values, "', '") + "'",
+		}
+
+		response := respCreateAttribute{}
+		err = c.v2.Query("int_createAttribute", &response, params)
+		if err != nil {
+			err = utilError.FunctionError(err.Error())
+			log.Error("Error: ", err)
+			return
+		}
+
+		switch len(response.Data) {
+		case 0:
+			err = utilError.FunctionError(attributeParams.Name + " - " + v2.ErrNoResult.Error())
+		case 1:
+			attributeId = response.Data[0].Id
+		default:
+			err = utilError.FunctionError(attributeParams.Name + " - " + v2.ErrTooManyResults.Error())
+		}
+
+	} else {
+		return existingAttributeId, nil
+	}
+
+	return
+}
+
+type GetRoleIdValue struct {
+	Data []struct {
+		RoleId int `json:"id,string"`
+	} `json:"data"`
+}
+
+func (c *Client) GetRoleIdByName(roleName string) (roleId int, err error) {
+	if err = c.v2.Login(); err != nil {
+		return
+	}
+
+	params := map[string]string{
+		"argv1": roleName,
+	}
+
+	response := GetRoleIdValue{}
+	err = c.v2.Query("int_getRoleIdByRoleName", &response, params)
+	if err != nil {
+		err = utilError.FunctionError(err.Error())
+		log.Error("Error: ", err)
+		return
+	}
+
+	switch len(response.Data) {
+	case 0:
+		err = utilError.FunctionError(roleName + " - " + v2.ErrNoResult.Error())
+	case 1:
+		roleId = response.Data[0].RoleId
+	default:
+		err = utilError.FunctionError(roleName + " - " + v2.ErrTooManyResults.Error())
+	}
+
+	return
+}
+
+func (c *Client) SetAttributeRole(attributeNameOrId interface{}, roleNameOrId interface{}, permission string) (err error) {
+
+	var attributeID int
+	var roleID int
+	var permissionRead int
+	var permissionWrite int
+
+	if reflect.TypeOf(attributeNameOrId).String() == "string" {
+		attributeID, err = c.GetAttributeIdByAttributeName(attributeNameOrId.(string))
+		if err != nil {
+			return err
+		}
+	} else {
+		attributeID = attributeNameOrId.(int)
+	}
+
+	if reflect.TypeOf(roleNameOrId).String() == "string" {
+		roleID, err = c.GetRoleIdByName(roleNameOrId.(string))
+		if err != nil {
+			return err
+		}
+	} else {
+		roleID = roleNameOrId.(int)
+	}
+
+	switch permission {
+	case "x":
+		permissionRead = 0
+		permissionWrite = 0
+	case "r":
+		permissionRead = 1
+		permissionWrite = 0
+	case "w":
+		permissionRead = 1
+		permissionWrite = 1
+	case "r/w":
+		permissionRead = 1
+		permissionWrite = 1
+	default:
+		permissionRead = 0
+		permissionWrite = 0
+	}
+
+	params := map[string]string{
+		"argv1": strconv.Itoa(attributeID),
+		"argv2": strconv.Itoa(roleID),
+		"argv3": strconv.Itoa(permissionRead),
+		"argv4": strconv.Itoa(permissionWrite),
+	}
+
+	var resp interface{}
+	err = c.v2.Query("int_setAttributeRole", &resp, params)
+	if err != nil {
+		err = utilError.FunctionError(err.Error())
+		log.Error("Error: ", err)
+		return
+	}
+
+	return
 }
