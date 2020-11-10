@@ -23,7 +23,7 @@ type WorkflowParams struct {
 	CiRelationId        int    `json:"ciRelationId"`
 	CiProjectId         int    `json:"ciProjectId"`
 	FileImportHistoryId int    `json:"fileImportHistoryId"`
-	UserId              int    `json:"user_id,string"`
+	UserId              int    `json:"user_id"`
 }
 
 type WorkflowParamsHelper struct {
@@ -36,7 +36,7 @@ type WorkflowParamsHelper struct {
 	CiRelationId        int        `json:"ciRelationId"`
 	CiProjectId         int        `json:"ciProjectId"`
 	FileImportHistoryId int        `json:"fileImportHistoryId"`
-	UserId              int        `json:"user_id,string"`
+	UserId              IntWrapper `json:"user_id"`
 }
 
 type IntWrapper int
@@ -112,7 +112,7 @@ func parseParams() (params WorkflowParams, err error) {
 	params.CiRelationId = parsedParams.CiRelationId
 	params.CiProjectId = parsedParams.CiProjectId
 	params.FileImportHistoryId = parsedParams.FileImportHistoryId
-	params.UserId = parsedParams.UserId
+	params.UserId = int(parsedParams.UserId)
 	return
 }
 
@@ -149,7 +149,7 @@ func (c *Client) GetWorkflowUserId() (userid int, err error) {
 		return
 	}
 
-	userid = parsedParams.UserId
+	userid = int(parsedParams.UserId)
 
 	return userid, nil
 
