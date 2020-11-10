@@ -1,7 +1,7 @@
 package infocmdb
 
 import (
-	"reflect"
+	"errors"
 	"strconv"
 	"strings"
 
@@ -339,135 +339,47 @@ func (c *Client) UpdateCiAttribute(ci int, ua []v2.UpdateCiAttribute) (err error
 	return c.v2.UpdateCiAttribute(ci, ua)
 }
 
-type GetAttributeGroupIdValue struct {
-	Data []struct {
-		GroupId int `json:"id,string"`
-	} `json:"data"`
-}
+type AttributeType int
 
-func (c *Client) GetAttributeGroupIdByName(attributeGroupName string) (attGroupId int, err error) {
-	if err = c.v2.Login(); err != nil {
-		return
-	}
+const (
+	AT_INPUT AttributeType = iota + 1
+	AT_TEXTAREA
+	AT_TEXTEDIT
+	AT_SELECTFIELD
+	AT_CHECKBOX
+	AT_RADIO
+	AT_DATE
+	AT_DATETIME
+	AT_ZAHLUNGSMITTEL
+	AT_PASSWORD
+	AT_LINK
+	AT_ATTACHMENT
+	AT_SCRIPT
+	AT_EXECUTEABLE
+	AT_QUERY
+	AT_CITYPE
+	AT_INFO
+	AT_QUERYPERSIST
+	AT_CITYPEPERSIST
+	AT_FILTER
+	AT_SELECTQUERY
+	AT_SELECTPOPUP
+)
 
-	params := map[string]string{
-		"argv1": attributeGroupName,
-	}
+type Columns int
 
-	response := GetAttributeGroupIdValue{}
-	err = c.v2.Query("int_getAttributeGroupIdByAttributeGroupName", &response, params)
-	if err != nil {
-		err = utilError.FunctionError(err.Error())
-		log.Error("Error: ", err)
-		return
-	}
+const (
+	C_ONE Columns = iota + 1
+	C_TWO
+)
 
-	switch len(response.Data) {
-	case 0:
-		err = utilError.FunctionError(attributeGroupName + " - " + v2.ErrNoResult.Error())
-	case 1:
-		attGroupId = response.Data[0].GroupId
-	default:
-		err = utilError.FunctionError(attributeGroupName + " - " + v2.ErrTooManyResults.Error())
-	}
+type Multiselect int
 
-	return
-}
-
-type respCreateAttributeGroup struct {
-	Success bool         `json:"success"`
-	Message string       `json:"message"`
-	Data    []responseId `json:"data"`
-}
-
-type AttributeGroupParams struct {
-	Name                   string
-	Description            string
-	Note                   string
-	OrderNumber            int
-	ParentAttributeGroupId int
-	IsDuplicateAllow       int
-	IsActive               int
-	userId                 int
-}
-
-func (c *Client) NewAttributeGroupParams() (params *AttributeGroupParams) {
-	params = &AttributeGroupParams{
-		Name:                   "",
-		Description:            "",
-		Note:                   "",
-		OrderNumber:            0,
-		ParentAttributeGroupId: 0,
-		IsDuplicateAllow:       0,
-		IsActive:               1,
-		userId:                 0,
-	}
-	return
-}
-
-func (c *Client) CreateAttributeGroup(attributeGroupParams *AttributeGroupParams) (attributeGroupId int, err error) {
-
-	if err = c.v2.Login(); err != nil {
-		return
-	}
-
-	existingAttributeGroup, err := c.GetAttributeGroupIdByName(attributeGroupParams.Name)
-	if err != nil && strings.Contains(err.Error(), "query returned no result") == false {
-		return 0, err
-	}
-
-	if existingAttributeGroup == 0 {
-
-		columns := []string{
-			"name",
-			"description",
-			"note",
-			"order_number",
-			"parent_attribute_group_id",
-			"is_duplicate_allow",
-			"is_active",
-			"user_id",
-		}
-
-		values := []string{
-			attributeGroupParams.Name,
-			attributeGroupParams.Description,
-			attributeGroupParams.Note,
-			strconv.Itoa(attributeGroupParams.OrderNumber),
-			strconv.Itoa(attributeGroupParams.ParentAttributeGroupId),
-			strconv.Itoa(attributeGroupParams.IsDuplicateAllow),
-			strconv.Itoa(attributeGroupParams.IsActive),
-			strconv.Itoa(attributeGroupParams.userId),
-		}
-
-		params := map[string]string{
-			"argv1": "`" + strings.Join(columns, "`, `") + "`",
-			"argv2": "'" + strings.Join(values, "', '") + "'",
-		}
-
-		response := respCreateAttributeGroup{}
-		err = c.v2.Query("int_createAttributeGroup", &response, params)
-		if err != nil {
-			err = utilError.FunctionError(err.Error())
-			log.Error("Error: ", err)
-			return
-		}
-
-		switch len(response.Data) {
-		case 0:
-			err = utilError.FunctionError(attributeGroupParams.Name + " - " + v2.ErrNoResult.Error())
-		case 1:
-			attributeGroupId = response.Data[0].Id
-		default:
-			err = utilError.FunctionError(attributeGroupParams.Name + " - " + v2.ErrTooManyResults.Error())
-		}
-
-	} else {
-		return existingAttributeGroup, nil
-	}
-
-	return
-}
+const (
+	MS_ZERO Multiselect = iota
+	MS_ONE
+	MS_TWO
+)
 
 type respCreateAttribute struct {
 	Success bool         `json:"success"`
@@ -480,54 +392,36 @@ type AttributeParams struct {
 	Description         string
 	Note                string
 	Hint                string
-	AttributeTypeId     int
-	AttributeGroupId    int
+	AttributeType       AttributeType
+	AttributeGroupName  string
 	OrderNumber         int
-	Column              int
-	IsUnique            int
-	IsNumeric           int
-	IsBold              int
-	IsEvent             int
-	IsUniqueCheck       int
-	IsAutocomplete      int
-	IsMultiselect       int
-	IsProjectRestricted int
+	Column              Columns //values in db enum('1','2')
+	IsUnique            bool
+	IsNumeric           bool
+	IsBold              bool
+	IsEvent             bool
+	IsUniqueCheck       bool
+	IsAutocomplete      bool
+	IsMultiselect       Multiselect //values in db enum('0','1','2')
+	IsProjectRestricted bool
 	Regex               string
 	ScriptName          string
 	InputMaxlength      int
 	TextareaCols        int
 	TextareaRows        int
-	IsActive            int
-	Historicize         int
-	userId              int
+	IsActive            bool
+	Historicize         bool
+	UserId              int
 }
 
 func (c *Client) NewAttributeParams() (params *AttributeParams) {
 	params = &AttributeParams{
-		Name:                "",
-		Description:         "",
-		Note:                "",
-		Hint:                "",
-		AttributeTypeId:     1,
-		AttributeGroupId:    0,
-		OrderNumber:         0,
-		Column:              1,
-		IsUnique:            0,
-		IsNumeric:           0,
-		IsBold:              0,
-		IsEvent:             0,
-		IsUniqueCheck:       0,
-		IsAutocomplete:      0,
-		IsMultiselect:       0,
-		IsProjectRestricted: 0,
-		Regex:               "",
-		ScriptName:          "",
-		InputMaxlength:      0,
-		TextareaCols:        0,
-		TextareaRows:        0,
-		IsActive:            1,
-		Historicize:         1,
-		userId:              0,
+		AttributeType: 0,
+		Column:        C_ONE,
+		IsMultiselect: MS_ZERO,
+		IsActive:      false,
+		Historicize:   true,
+		UserId:        0,
 	}
 	return
 }
@@ -572,31 +466,40 @@ func (c *Client) CreateAttribute(attributeParams *AttributeParams) (attributeId 
 			"historicize",
 		}
 
+		AttributeGroupId, err := c.GetAttributeGroupIdByName(attributeParams.AttributeGroupName)
+		if err != nil {
+			return 0, err
+		}
+
+		if attributeParams.UserId == 0 {
+			attributeParams.UserId, err = c.GetWorkflowUserId()
+		}
+
 		values := []string{
 			attributeParams.Name,
 			attributeParams.Description,
 			attributeParams.Note,
 			attributeParams.Hint,
-			strconv.Itoa(attributeParams.AttributeTypeId),
-			strconv.Itoa(attributeParams.AttributeGroupId),
+			strconv.Itoa(int(attributeParams.AttributeType)),
+			strconv.Itoa(AttributeGroupId),
 			strconv.Itoa(attributeParams.OrderNumber),
-			strconv.Itoa(attributeParams.Column),
-			strconv.Itoa(attributeParams.IsUnique),
-			strconv.Itoa(attributeParams.IsNumeric),
-			strconv.Itoa(attributeParams.IsBold),
-			strconv.Itoa(attributeParams.IsEvent),
-			strconv.Itoa(attributeParams.IsUniqueCheck),
-			strconv.Itoa(attributeParams.IsAutocomplete),
-			strconv.Itoa(attributeParams.IsMultiselect),
-			strconv.Itoa(attributeParams.IsProjectRestricted),
+			strconv.Itoa(int(attributeParams.Column)),
+			boolToString[attributeParams.IsUnique],
+			boolToString[attributeParams.IsNumeric],
+			boolToString[attributeParams.IsBold],
+			boolToString[attributeParams.IsEvent],
+			boolToString[attributeParams.IsUniqueCheck],
+			boolToString[attributeParams.IsAutocomplete],
+			strconv.Itoa(int(attributeParams.IsMultiselect)),
+			boolToString[attributeParams.IsProjectRestricted],
 			attributeParams.Regex,
 			attributeParams.ScriptName,
 			strconv.Itoa(attributeParams.InputMaxlength),
 			strconv.Itoa(attributeParams.TextareaCols),
 			strconv.Itoa(attributeParams.TextareaRows),
-			strconv.Itoa(attributeParams.IsActive),
-			strconv.Itoa(attributeParams.userId),
-			strconv.Itoa(attributeParams.Historicize),
+			boolToString[attributeParams.IsActive],
+			strconv.Itoa(attributeParams.UserId),
+			boolToString[attributeParams.Historicize],
 		}
 
 		params := map[string]string{
@@ -609,7 +512,7 @@ func (c *Client) CreateAttribute(attributeParams *AttributeParams) (attributeId 
 		if err != nil {
 			err = utilError.FunctionError(err.Error())
 			log.Error("Error: ", err)
-			return
+			return 0, err
 		}
 
 		switch len(response.Data) {
@@ -628,7 +531,7 @@ func (c *Client) CreateAttribute(attributeParams *AttributeParams) (attributeId 
 	return
 }
 
-type GetRoleIdValue struct {
+type getRoleIdValue struct {
 	Data []struct {
 		RoleId int `json:"id,string"`
 	} `json:"data"`
@@ -643,12 +546,12 @@ func (c *Client) GetRoleIdByName(roleName string) (roleId int, err error) {
 		"argv1": roleName,
 	}
 
-	response := GetRoleIdValue{}
+	response := getRoleIdValue{}
 	err = c.v2.Query("int_getRoleIdByRoleName", &response, params)
 	if err != nil {
 		err = utilError.FunctionError(err.Error())
 		log.Error("Error: ", err)
-		return
+		return 0, err
 	}
 
 	switch len(response.Data) {
@@ -663,29 +566,21 @@ func (c *Client) GetRoleIdByName(roleName string) (roleId int, err error) {
 	return
 }
 
-func (c *Client) SetAttributeRole(attributeNameOrId interface{}, roleNameOrId interface{}, permission string) (err error) {
+func (c *Client) SetAttributeRole(attributeName string, roleName string, permission string) (err error) {
 
 	var attributeID int
 	var roleID int
 	var permissionRead int
 	var permissionWrite int
 
-	if reflect.TypeOf(attributeNameOrId).String() == "string" {
-		attributeID, err = c.GetAttributeIdByAttributeName(attributeNameOrId.(string))
-		if err != nil {
-			return err
-		}
-	} else {
-		attributeID = attributeNameOrId.(int)
+	attributeID, err = c.GetAttributeIdByAttributeName(attributeName)
+	if err != nil {
+		return err
 	}
 
-	if reflect.TypeOf(roleNameOrId).String() == "string" {
-		roleID, err = c.GetRoleIdByName(roleNameOrId.(string))
-		if err != nil {
-			return err
-		}
-	} else {
-		roleID = roleNameOrId.(int)
+	roleID, err = c.GetRoleIdByName(roleName)
+	if err != nil {
+		return err
 	}
 
 	switch permission {
@@ -702,8 +597,7 @@ func (c *Client) SetAttributeRole(attributeNameOrId interface{}, roleNameOrId in
 		permissionRead = 1
 		permissionWrite = 1
 	default:
-		permissionRead = 0
-		permissionWrite = 0
+		return errors.New("The entered permission string is wrong: " + permission + ". You must use x,r,w or r/w.")
 	}
 
 	params := map[string]string{

@@ -14,27 +14,29 @@ import (
 // These are usually passed encoded as a json string as first process argument.
 // These are supplied to the `WorkflowFunc` of `workflow.Run`.
 type WorkflowParams struct {
-	Apikey              string 	`json:"apikey"`
-	TriggerType         string 	`json:"triggerType"`
-	WorkflowItemId      int		`json:"workflow_item_id"`
-	WorkflowInstanceId  int    	`json:"workflow_instance_id"`
-	CiId                int		`json:"ciid"`
-	CiAttributeId       int    	`json:"ciAttributeId"`
-	CiRelationId        int   	`json:"ciRelationId"`
-	CiProjectId         int    	`json:"ciProjectId"`
-	FileImportHistoryId int    	`json:"fileImportHistoryId"`
+	Apikey              string `json:"apikey"`
+	TriggerType         string `json:"triggerType"`
+	WorkflowItemId      int    `json:"workflow_item_id"`
+	WorkflowInstanceId  int    `json:"workflow_instance_id"`
+	CiId                int    `json:"ciid"`
+	CiAttributeId       int    `json:"ciAttributeId"`
+	CiRelationId        int    `json:"ciRelationId"`
+	CiProjectId         int    `json:"ciProjectId"`
+	FileImportHistoryId int    `json:"fileImportHistoryId"`
+	UserId              int    `json:"user_id,string"`
 }
 
 type WorkflowParamsHelper struct {
-	Apikey              string 			`json:"apikey"`
-	TriggerType         string 			`json:"triggerType"`
-	WorkflowItemId      int    			`json:"workflow_item_id"`
-	WorkflowInstanceId  int    			`json:"workflow_instance_id"`
-	CiId                IntWrapper		`json:"ciid"`
-	CiAttributeId       IntWrapper    	`json:"ciAttributeId"`
-	CiRelationId        int    			`json:"ciRelationId"`
-	CiProjectId         int    			`json:"ciProjectId"`
-	FileImportHistoryId int    			`json:"fileImportHistoryId"`
+	Apikey              string     `json:"apikey"`
+	TriggerType         string     `json:"triggerType"`
+	WorkflowItemId      int        `json:"workflow_item_id"`
+	WorkflowInstanceId  int        `json:"workflow_instance_id"`
+	CiId                IntWrapper `json:"ciid"`
+	CiAttributeId       IntWrapper `json:"ciAttributeId"`
+	CiRelationId        int        `json:"ciRelationId"`
+	CiProjectId         int        `json:"ciProjectId"`
+	FileImportHistoryId int        `json:"fileImportHistoryId"`
+	UserId              int        `json:"user_id,string"`
 }
 
 type IntWrapper int
@@ -110,6 +112,7 @@ func parseParams() (params WorkflowParams, err error) {
 	params.CiRelationId = parsedParams.CiRelationId
 	params.CiProjectId = parsedParams.CiProjectId
 	params.FileImportHistoryId = parsedParams.FileImportHistoryId
+	params.UserId = parsedParams.UserId
 	return
 }
 
@@ -131,4 +134,23 @@ func (iw *IntWrapper) UnmarshalJSON(b []byte) error {
 
 func (c *Client) GetWorkflowContext(workflowInstanceId int) (workflowContext *v2.WorkflowContext, err error) {
 	return c.v2.GetWorkflowContext(workflowInstanceId)
+}
+
+func (c *Client) GetWorkflowUserId() (userid int, err error) {
+
+	if len(os.Args) < 2 {
+		return 0, errors.New("missing json encoded WorkflowParams as first program argument")
+	}
+
+	var parsedParams WorkflowParamsHelper
+	jsonParam := os.Args[1]
+	err = json.Unmarshal([]byte(jsonParam), &parsedParams)
+	if err != nil {
+		return
+	}
+
+	userid = parsedParams.UserId
+
+	return userid, nil
+
 }
