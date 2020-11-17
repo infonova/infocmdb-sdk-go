@@ -135,22 +135,3 @@ func (iw *IntWrapper) UnmarshalJSON(b []byte) error {
 func (c *Client) GetWorkflowContext(workflowInstanceId int) (workflowContext *v2.WorkflowContext, err error) {
 	return c.v2.GetWorkflowContext(workflowInstanceId)
 }
-
-func (c *Client) GetWorkflowUserId() (userid int, err error) {
-
-	if len(os.Args) < 2 {
-		return 0, errors.New("missing json encoded WorkflowParams as first program argument")
-	}
-
-	var parsedParams WorkflowParamsHelper
-	jsonParam := os.Args[1]
-	err = json.Unmarshal([]byte(jsonParam), &parsedParams)
-	if err != nil {
-		return
-	}
-
-	userid = int(parsedParams.UserId)
-
-	return userid, nil
-
-}

@@ -466,13 +466,9 @@ func (c *Client) CreateAttribute(attributeParams *AttributeParams) (attributeId 
 			"historicize",
 		}
 
-		AttributeGroupId, err := c.GetAttributeGroupIdByName(attributeParams.AttributeGroupName)
+		attributeGroupId, err := c.GetAttributeGroupIdByName(attributeParams.AttributeGroupName)
 		if err != nil {
 			return 0, err
-		}
-
-		if attributeParams.UserId == 0 {
-			attributeParams.UserId, err = c.GetWorkflowUserId()
 		}
 
 		values := []string{
@@ -481,25 +477,25 @@ func (c *Client) CreateAttribute(attributeParams *AttributeParams) (attributeId 
 			attributeParams.Note,
 			attributeParams.Hint,
 			strconv.Itoa(int(attributeParams.AttributeType)),
-			strconv.Itoa(AttributeGroupId),
+			strconv.Itoa(attributeGroupId),
 			strconv.Itoa(attributeParams.OrderNumber),
 			strconv.Itoa(int(attributeParams.Column)),
-			boolToString[attributeParams.IsUnique],
-			boolToString[attributeParams.IsNumeric],
-			boolToString[attributeParams.IsBold],
-			boolToString[attributeParams.IsEvent],
-			boolToString[attributeParams.IsUniqueCheck],
-			boolToString[attributeParams.IsAutocomplete],
+			convertBoolToString[attributeParams.IsUnique],
+			convertBoolToString[attributeParams.IsNumeric],
+			convertBoolToString[attributeParams.IsBold],
+			convertBoolToString[attributeParams.IsEvent],
+			convertBoolToString[attributeParams.IsUniqueCheck],
+			convertBoolToString[attributeParams.IsAutocomplete],
 			strconv.Itoa(int(attributeParams.IsMultiselect)),
-			boolToString[attributeParams.IsProjectRestricted],
+			convertBoolToString[attributeParams.IsProjectRestricted],
 			attributeParams.Regex,
 			attributeParams.ScriptName,
 			strconv.Itoa(attributeParams.InputMaxlength),
 			strconv.Itoa(attributeParams.TextareaCols),
 			strconv.Itoa(attributeParams.TextareaRows),
-			boolToString[attributeParams.IsActive],
+			convertBoolToString[attributeParams.IsActive],
 			strconv.Itoa(attributeParams.UserId),
-			boolToString[attributeParams.Historicize],
+			convertBoolToString[attributeParams.Historicize],
 		}
 
 		params := map[string]string{

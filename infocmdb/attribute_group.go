@@ -4,13 +4,14 @@ import (
 	"strconv"
 	"strings"
 
+	utilCache "github.com/patrickmn/go-cache"
 	log "github.com/sirupsen/logrus"
 
 	v2 "github.com/infonova/infocmdb-sdk-go/infocmdb/v2/infocmdb"
 	utilError "github.com/infonova/infocmdb-sdk-go/util/error"
 )
 
-var boolToString = map[bool]string{false: "0", true: "1"}
+var convertBoolToString = map[bool]string{false: "0", true: "1"}
 
 type getAttributeGroupIdValue struct {
 	Data []struct {
@@ -21,6 +22,12 @@ type getAttributeGroupIdValue struct {
 func (c *Client) GetAttributeGroupIdByName(attributeGroupName string) (attGroupId int, err error) {
 	if err = c.v2.Login(); err != nil {
 		return
+	}
+
+	cacheKey := "GetAttributeGroupIdByName" + attributeGroupName
+	cached, found := c.v1.Cache.Get(cacheKey)
+	if found {
+		return cached.(int), nil
 	}
 
 	params := map[string]string{
@@ -40,6 +47,7 @@ func (c *Client) GetAttributeGroupIdByName(attributeGroupName string) (attGroupI
 		err = utilError.FunctionError(attributeGroupName + " - " + v2.ErrNoResult.Error())
 	case 1:
 		attGroupId = response.Data[0].GroupId
+		c.v1.Cache.Set(cacheKey, attGroupId, utilCache.DefaultExpiration)
 	default:
 		err = utilError.FunctionError(attributeGroupName + " - " + v2.ErrTooManyResults.Error())
 	}
@@ -95,13 +103,9 @@ func (c *Client) CreateAttributeGroup(attributeGroupParams *AttributeGroupParams
 			"user_id",
 		}
 
-		ParentAttributeGroupId, err := c.GetAttributeGroupIdByName(attributeGroupParams.ParentAttributeGroupName)
+		parentAttributeGroupId, err := c.GetAttributeGroupIdByName(attributeGroupParams.ParentAttributeGroupName)
 		if err != nil {
 			return 0, err
-		}
-
-		if attributeGroupParams.UserId == 0 {
-			attributeGroupParams.UserId, err = c.GetWorkflowUserId()
 		}
 
 		values := []string{
@@ -109,9 +113,9 @@ func (c *Client) CreateAttributeGroup(attributeGroupParams *AttributeGroupParams
 			attributeGroupParams.Description,
 			attributeGroupParams.Note,
 			strconv.Itoa(attributeGroupParams.OrderNumber),
-			strconv.Itoa(ParentAttributeGroupId),
-			boolToString[attributeGroupParams.IsDuplicateAllow],
-			boolToString[attributeGroupParams.IsActive],
+			strconv.Itoa(parentAttributeGroupId),
+			convertBoolToString[attributeGroupParams.IsDuplicateAllow],
+			convertBoolToString[attributeGroupParams.IsActive],
 			strconv.Itoa(attributeGroupParams.UserId),
 		}
 
