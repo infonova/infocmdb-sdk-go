@@ -24,7 +24,7 @@ func (c *Client) GetAttributeGroupIdByName(attributeGroupName string) (attGroupI
 		return
 	}
 
-	cacheKey := "GetAttributeGroupIdByName" + attributeGroupName
+	cacheKey := "GetAttributeGroupIdByName_" + attributeGroupName
 	cached, found := c.v1.Cache.Get(cacheKey)
 	if found {
 		return cached.(int), nil
