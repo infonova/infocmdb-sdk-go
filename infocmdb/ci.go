@@ -280,7 +280,7 @@ func (c *Client) CreateCi(ciTypeID int, icon string, historyID int) (r CreateCi,
 func (c *Client) GetCiIdByAttributeValue(name string, value string, valueType v2.AttributeValueType) (ciId int, err error) {
 	ciIds, err := c.GetListOfCiIdsByAttributeValue(name, value, valueType)
 	if err != nil {
-	    return
+		return
 	}
 
 	switch len(ciIds) {
@@ -290,6 +290,35 @@ func (c *Client) GetCiIdByAttributeValue(name string, value string, valueType v2
 		ciId = ciIds[0]
 	default:
 		err = utilError.FunctionError(name + " - " + v2.ErrTooManyResults.Error())
+	}
+
+	return
+}
+
+type deleteCiResponse struct{}
+
+func (c *Client) DeleteCi(ciId int, userId int, message string) (err error) {
+
+	if message == "" {
+		message = "ci deleted"
+	}
+
+	if userId == 0 {
+		return errors.New("missing userId")
+	}
+
+	params := map[string]string{
+		"argv1": strconv.Itoa(ciId),
+		"argv2": strconv.Itoa(userId),
+		"argv3": message,
+	}
+
+	jsonRet := deleteCiResponse{}
+	err = c.v2.Query("int_deleteCi", &jsonRet, params)
+	if err != nil {
+		err = utilError.FunctionError(err.Error())
+		log.Error("Error: ", err)
+		return err
 	}
 
 	return
