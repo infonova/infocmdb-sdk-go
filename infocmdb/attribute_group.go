@@ -141,8 +141,11 @@ func (c *Client) CreateAttributeGroup(attributeGroupParams *AttributeGroupParams
 			err = utilError.FunctionError(attributeGroupParams.Name + " - " + v2.ErrTooManyResults.Error())
 		}
 
+		return attributeGroupId, err
+
 	} else {
-		return existingAttributeGroup, nil
+
+		return existingAttributeGroup, err
 	}
 
 	return

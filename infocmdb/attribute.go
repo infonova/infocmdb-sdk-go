@@ -520,8 +520,11 @@ func (c *Client) CreateAttribute(attributeParams *AttributeParams) (attributeId 
 			err = utilError.FunctionError(attributeParams.Name + " - " + v2.ErrTooManyResults.Error())
 		}
 
+		return attributeId, err
+
 	} else {
-		return existingAttributeId, nil
+
+		return existingAttributeId, err
 	}
 
 	return
