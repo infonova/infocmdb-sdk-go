@@ -80,18 +80,16 @@ func (c *Client) NewAttributeGroupParams() (params *AttributeGroupParams) {
 }
 
 func (c *Client) CreateAttributeGroup(attributeGroupParams *AttributeGroupParams) (attributeGroupId int, err error) {
-
 	if err = c.v2.Login(); err != nil {
 		return
 	}
 
 	existingAttributeGroup, err := c.GetAttributeGroupIdByName(attributeGroupParams.Name)
-	if err != nil && strings.Contains(err.Error(), "query returned no result") == false {
+	if err != nil && !strings.Contains(err.Error(), "query returned no result") {
 		return 0, err
 	}
 
 	if existingAttributeGroup == 0 {
-
 		columns := []string{
 			"name",
 			"description",
@@ -142,11 +140,7 @@ func (c *Client) CreateAttributeGroup(attributeGroupParams *AttributeGroupParams
 		}
 
 		return attributeGroupId, err
-
 	} else {
-
 		return existingAttributeGroup, err
 	}
-
-	return
 }
