@@ -1,6 +1,9 @@
-name: push
-on: [push, pull_request]
-
+name: ci
+on:
+  pull_request:
+  push:
+    branches:
+      - master
 jobs:
   test:
     name: test
