@@ -138,7 +138,7 @@ func (c *Client) SetTypeOfCi(ciId int, ciType string) (err error) {
 		return
 	}
 
-	if response.Success != true {
+	if !response.Success {
 		return errors.New("couldn't change ci type to: " + ciType + " for ciid: " + ciIdString + " ,error: " + response.Message)
 	}
 
@@ -205,7 +205,7 @@ func (c *Client) CreateCiType(typeParams *CiTypeParams) (typeId int, err error) 
 	}
 
 	existingTypeId, err := c.GetCiTypeIdByCiTypeName(typeParams.Name)
-	if err != nil && strings.Contains(err.Error(), "query returned no result") == false {
+	if err != nil && !strings.Contains(err.Error(), "query returned no result") {
 		return 0, err
 	}
 
