@@ -15,7 +15,7 @@ import (
 type CiAttributes = []CiAttribute
 
 type CiAttribute struct {
-	CiID                 int    `json:"ci_id,string,string"`
+	CiID                 int    `json:"ci_id,string"`
 	CiAttributeID        int    `json:"ci_attribute_id,string"`
 	AttributeID          int    `json:"attribute_id,string"`
 	AttributeName        string `json:"attribute_name"`
@@ -302,6 +302,10 @@ func (c *Client) GetCiAttributeValueDefault(ciId int, attributeName string) (val
 	}
 
 	id, err = strconv.Atoi(result.Data[0].ID)
+	if err != nil {
+		err = utilError.FunctionError(err.Error())
+		return
+	}
 
 	valueInt, err := strconv.Atoi(result.Data[0].Value)
 	if err != nil {
@@ -427,18 +431,16 @@ func (c *Client) NewAttributeParams() (params *AttributeParams) {
 }
 
 func (c *Client) CreateAttribute(attributeParams *AttributeParams) (attributeId int, err error) {
-
 	if err = c.v2.Login(); err != nil {
 		return
 	}
 
 	existingAttributeId, err := c.GetAttributeIdByAttributeName(attributeParams.Name)
-	if err != nil && strings.Contains(err.Error(), "query returned no result") == false {
+	if err != nil && !strings.Contains(err.Error(), "query returned no result") {
 		return 0, err
 	}
 
 	if existingAttributeId == 0 {
-
 		columns := []string{
 			"name",
 			"description",
@@ -521,13 +523,9 @@ func (c *Client) CreateAttribute(attributeParams *AttributeParams) (attributeId 
 		}
 
 		return attributeId, err
-
 	} else {
-
 		return existingAttributeId, err
 	}
-
-	return
 }
 
 type getRoleIdValue struct {
