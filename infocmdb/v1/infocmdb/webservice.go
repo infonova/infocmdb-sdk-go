@@ -94,7 +94,7 @@ func (i *Cmdb) CallWebservice(method string, service string, serviceName string,
 	params.Set("apikey", i.Config.ApiKey)
 	reqURL := ""
 	httpClient := &http.Client{}
-	resp := &http.Response{}
+	var resp *http.Response
 
 	switch method {
 	case http.MethodPost:
