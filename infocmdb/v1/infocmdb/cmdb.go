@@ -35,19 +35,19 @@ type CiRelationDirection string
 
 const (
 	CI_RELATION_DIRECTION_ALL             CiRelationDirection = "all"
-	CI_RELATION_DIRECTION_DIRECTED_FROM                       = "directed_from"
-	CI_RELATION_DIRECTION_DIRECTED_TO                         = "directed_to"
-	CI_RELATION_DIRECTION_BIDIRECTIONAL                       = "bidirectional"
-	CI_RELATION_DIRECTION_OMNIDIRECTIONAL                     = "omnidirectional"
+	CI_RELATION_DIRECTION_DIRECTED_FROM   CiRelationDirection = "directed_from"
+	CI_RELATION_DIRECTION_DIRECTED_TO     CiRelationDirection = "directed_to"
+	CI_RELATION_DIRECTION_BIDIRECTIONAL   CiRelationDirection = "bidirectional"
+	CI_RELATION_DIRECTION_OMNIDIRECTIONAL CiRelationDirection = "omnidirectional"
 )
 
 type AttributeValueType string
 
 const (
 	ATTRIBUTE_VALUE_TYPE_TEXT    AttributeValueType = "value_text"
-	ATTRIBUTE_VALUE_TYPE_DATE                       = "value_date"
-	ATTRIBUTE_VALUE_TYPE_DEFAULT                    = "value_default"
-	ATTRIBUTE_VALUE_TYPE_CI                         = "value_ci"
+	ATTRIBUTE_VALUE_TYPE_DATE    AttributeValueType = "value_date"
+	ATTRIBUTE_VALUE_TYPE_DEFAULT AttributeValueType = "value_default"
+	ATTRIBUTE_VALUE_TYPE_CI      AttributeValueType = "value_ci"
 )
 
 // New returns a new Cmdb Client to access the V1 Api
@@ -59,7 +59,6 @@ func New() (i *Cmdb) {
 
 func (i *Cmdb) LoadConfig(config Config) {
 	i.Config = config
-	return
 }
 
 func (i *Cmdb) LoadConfigFile(path string) (err error) {
