@@ -1,14 +1,13 @@
 package testing
 
 import (
-	"bytes"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"os"
+
+	"gopkg.in/yaml.v2"
 
 	log "github.com/sirupsen/logrus"
 
@@ -40,11 +39,27 @@ func New() *Testing {
 			log.Fatalf("failed to load env: %v", err)
 		}
 	}
-	t.SetupMocking()
+
+	t.setupMocking()
+
+	testingURL := os.Getenv("WORKFLOW_TEST_URL")
+	if t.mocking {
+		mockServer := t.newMockServer()
+		t.mockingServer = mockServer
+		testingURL = mockServer.URL
+	}
+
+	if testingURL == "" {
+		log.Fatal("WORKFLOW_TEST_URL must be provided or Mocking enabled(WORKFLOW_TEST_MOCKING=true)")
+	}
+
+	log.Debugf("Testing-URL: %s", testingURL)
+	t.url = testingURL
+
 	return &t
 }
 
-func (t *Testing) SetupMocking() *Testing {
+func (t *Testing) setupMocking() {
 	t.mockings = make(map[string]mockingResponse)
 
 	t.AddMocking(Mocking{
@@ -149,22 +164,10 @@ func (t *Testing) SetupMocking() *Testing {
 		RequestString: `PUT##/apiV2/query/execute/int_getAttributeDefaultOptionId##{"query":{"params":{"argv1":"438","argv2":"IN PROGRESS"}}}`,
 		ReturnString:  `{"status":"OK","data":[{"id":"1329"}]}`,
 	})
-
-	return t
 }
 
-func (t *Testing) GetUrl() (testingURL string) {
-	testingURL = os.Getenv("WORKFLOW_TEST_URL")
-	if t.mocking {
-		return t.newMockServer().URL
-	}
-
-	if testingURL == "" {
-		log.Fatal("WORKFLOW_TEST_URL must be provided or Mocking enabled(WORKFLOW_TEST_MOCKING=true)")
-	}
-
-	log.Debugf("Testing-URL: %s", testingURL)
-	return
+func (t *Testing) GetUrl() string {
+	return t.url
 }
 
 type Mocking struct {
@@ -197,7 +200,6 @@ func (t *Testing) newMockServer() *httptest.Server {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		backendUrl := os.Getenv("WORKFLOW_TEST_URL") + r.URL.String()
 		mockString := fmt.Sprintf("%s##%s##%s", r.Method, r.URL.String(), string(body))
 
 		if m, ok := t.mockings[mockString]; ok {
@@ -217,37 +219,6 @@ func (t *Testing) newMockServer() *httptest.Server {
 		} else {
 			log.Fatalf("Didn't Mock:\n''''''\n%s\n''''''\n", mockString)
 		}
-		// you can reassign the body if you need to parse it as multipart
-		r.Body = ioutil.NopCloser(bytes.NewReader(body))
-		body, _ = ioutil.ReadAll(r.Body)
-		values, _ := url.ParseQuery(string(body))
-
-		log.Fatalf("Method: %s, Url: %s, Data: %s\n", r.Method, backendUrl, body)
-		log.Fatalf("%v\n", values)
-
-		req, err := http.NewRequest(r.Method, backendUrl, bytes.NewBufferString(values.Encode()))
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadGateway)
-			return
-		}
-
-		req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-		httpClient := &http.Client{}
-		resp, err := httpClient.Do(req)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadGateway)
-			return
-		}
-		defer resp.Body.Close()
-
-		w.WriteHeader(resp.StatusCode)
-		respBody, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadGateway)
-			return
-		}
-		log.Fatalf("Mocking:\n''''''\n%s\n''''''\n", string(respBody))
-		w.Write(respBody)
 	}))
 }
 
