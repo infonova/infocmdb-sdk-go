@@ -9,10 +9,10 @@ type CiRelationDirection string
 
 const (
 	CI_RELATION_DIRECTION_ALL             CiRelationDirection = "all"
-	CI_RELATION_DIRECTION_DIRECTED_FROM                       = "directed_from"
-	CI_RELATION_DIRECTION_DIRECTED_TO                         = "directed_to"
-	CI_RELATION_DIRECTION_BIDIRECTIONAL                       = "bidirectional"
-	CI_RELATION_DIRECTION_OMNIDIRECTIONAL                     = "omnidirectional"
+	CI_RELATION_DIRECTION_DIRECTED_FROM   CiRelationDirection = "directed_from"
+	CI_RELATION_DIRECTION_DIRECTED_TO     CiRelationDirection = "directed_to"
+	CI_RELATION_DIRECTION_BIDIRECTIONAL   CiRelationDirection = "bidirectional"
+	CI_RELATION_DIRECTION_OMNIDIRECTIONAL CiRelationDirection = "omnidirectional"
 )
 
 func NewCiRelationDirection(directionId int) (direction CiRelationDirection, err error) {
