@@ -21,6 +21,10 @@ func (c *Client) CreateCiRelation(ciId1 int, ciId2 int, ciRelationTypeName strin
 	}
 
 	directionId, err := direction.GetId()
+	if err != nil {
+		err = utilError.FunctionError(err.Error())
+		return
+	}
 
 	counter, err := c.GetCiRelationCount(ciId1, ciId2, ciRelationTypeName)
 	if err != nil {
@@ -96,7 +100,7 @@ func (c *Client) AttributeBasedRelation(sourceCiId int, attributeName string, ci
 				return
 			}
 		} else if value != "" {
-			currentCiValues = regexp.MustCompile(",\\s?").Split(value, -1)
+			currentCiValues = regexp.MustCompile(`,\s?`).Split(value, -1)
 		}
 	}
 
@@ -125,8 +129,8 @@ func (c *Client) CiBasedRelation(srcCiId int, destCiId []int, ciRelationTypeName
 			}
 		}
 
-		if add == true {
-			if swapCiColumns == true {
+		if add {
+			if swapCiColumns {
 				err = c.CreateCiRelation(valueCiId, srcCiId, ciRelationTypeName, v2.CI_RELATION_DIRECTION_OMNIDIRECTIONAL)
 			} else {
 				err = c.CreateCiRelation(srcCiId, valueCiId, ciRelationTypeName, v2.CI_RELATION_DIRECTION_OMNIDIRECTIONAL)
@@ -149,7 +153,7 @@ func (c *Client) CiBasedRelation(srcCiId int, destCiId []int, ciRelationTypeName
 			}
 		}
 
-		if remove == true {
+		if remove {
 			err = c.DeleteCiRelation(srcCiId, relationCiId, ciRelationTypeName)
 			if err != nil {
 				return

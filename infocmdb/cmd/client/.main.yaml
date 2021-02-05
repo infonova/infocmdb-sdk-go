@@ -1,7 +1,0 @@
-version: 1.0
-
-api:
-  url: test
-  username: admin
-  password: nonadmin
-#  token: nongiven

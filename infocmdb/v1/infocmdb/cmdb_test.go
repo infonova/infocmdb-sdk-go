@@ -10,8 +10,7 @@ import (
 	utilTesting "github.com/infonova/infocmdb-sdk-go/util/testing"
 )
 
-func ExampleWebservice_Webservice() {
-
+func ExampleCmdb_Webservice_int_getListOfCiIdsOfCiType() {
 	cmdb := Cmdb{}
 	utilTesting.New().SetValidConfig(&cmdb.Config)
 
@@ -34,7 +33,7 @@ func ExampleWebservice_Webservice() {
 	// Return: {"status":"OK","data":[{"ciid":"1"},{"ciid":"2"}]}
 }
 
-func ExampleInfoCmdbGoLib_LoadConfig_Fail() {
+func ExampleCmdb_LoadConfigFile_fail() {
 	i := Cmdb{}
 	err := i.LoadConfigFile("/test_missing.yml")
 	if err != nil {
@@ -48,8 +47,7 @@ func ExampleInfoCmdbGoLib_LoadConfig_Fail() {
 
 }
 
-func ExampleCmdbWebClient_Login() {
-
+func ExampleCmdb_Login() {
 	cmdb := Cmdb{}
 	utilTesting.New().SetValidConfig(&cmdb.Config)
 
@@ -64,8 +62,7 @@ func ExampleCmdbWebClient_Login() {
 	// Output:
 	// Login ok, ApiKey(len): 30
 }
-func ExampleCmdbWebClient_LoginWithApiKey() {
-
+func ExampleCmdb_Login_with_ApiKey() {
 	cmdb := Cmdb{}
 	utilTesting.New().SetValidConfig(&cmdb.Config)
 
@@ -81,8 +78,7 @@ func ExampleCmdbWebClient_LoginWithApiKey() {
 	// Login ok, ApiKey(len): 30
 }
 
-func ExampleCmdbWebClient_Post() {
-
+func ExampleCmdb_CallWebservice_post_query() {
 	cmdb := Cmdb{}
 	utilTesting.New().SetValidConfig(&cmdb.Config)
 

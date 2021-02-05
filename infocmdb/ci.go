@@ -133,7 +133,7 @@ func (c *Client) GetListOfCiIdsOfCiTypeName(ciTypeName string) (ciIds CiIds, err
 
 	ciTypeId, err := c.GetCiTypeIdByCiTypeName(ciTypeName)
 	if err != nil {
-		err = errors.New(fmt.Sprintf("Failed to resolve id for ciTypeName '%s': %s", ciTypeName, err.Error()))
+		err = fmt.Errorf("failed to resolve id for ciTypeName '%s': %s", ciTypeName, err.Error())
 		return
 	}
 

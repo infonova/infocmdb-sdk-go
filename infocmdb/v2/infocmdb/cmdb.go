@@ -45,24 +45,23 @@ type AttributeValueType string
 
 const (
 	ATTRIBUTE_VALUE_TYPE_TEXT    AttributeValueType = "value_text"
-	ATTRIBUTE_VALUE_TYPE_DATE                       = "value_date"
-	ATTRIBUTE_VALUE_TYPE_DEFAULT                    = "value_default"
-	ATTRIBUTE_VALUE_TYPE_CI                         = "value_ci"
+	ATTRIBUTE_VALUE_TYPE_DATE    AttributeValueType = "value_date"
+	ATTRIBUTE_VALUE_TYPE_DEFAULT AttributeValueType = "value_default"
+	ATTRIBUTE_VALUE_TYPE_CI      AttributeValueType = "value_ci"
 )
 
 type UpdateMode string
 
 const (
 	UPDATE_MODE_INSERT UpdateMode = "insert"
-	UPDATE_MODE_UPDATE            = "update"
-	UPDATE_MODE_DELETE            = "delete"
-	UPDATE_MODE_SET               = "set"
+	UPDATE_MODE_UPDATE UpdateMode = "update"
+	UPDATE_MODE_DELETE UpdateMode = "delete"
+	UPDATE_MODE_SET    UpdateMode = "set"
 )
 
 func (cmdb *Cmdb) LoadConfig(config Config) {
 	cmdb.Config = config
 	cmdb.Client = client.New(config.Url)
-	return
 }
 
 func (cmdb *Cmdb) LoadConfigFile(path string) (err error) {
