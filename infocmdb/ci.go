@@ -277,6 +277,51 @@ func (c *Client) CreateCi(ciTypeID int, icon string, historyID int) (r CreateCi,
 	return
 }
 
+func (c *Client) CreateCiByCiTypeName(ciTypeName string, ciProjectNames []string, icon string, historyID int) (r CreateCi, err error) {
+	if err = c.v2.Login(); err != nil {
+		return
+	}
+
+	ciTypeID, err := c.GetCiTypeIdByCiTypeName(ciTypeName)
+	if err != nil{
+		return
+	}
+
+	params := map[string]string{
+		"argv1": strconv.Itoa(ciTypeID),
+		"argv2": icon,
+		"argv3": strconv.Itoa(historyID),
+	}
+
+	jsonRet := createCiResponse{}
+	err = c.v2.Query("int_createCi", &jsonRet, params)
+	if err != nil {
+		err = utilError.FunctionError(err.Error())
+		log.Error("Error: ", err)
+		return r, err
+	}
+
+	switch len(jsonRet.Data) {
+	case 0:
+		err = utilError.FunctionError(strconv.Itoa(ciTypeID) + " - " + v2.ErrNoResult.Error())
+	case 1:
+		r = jsonRet.Data[0].CreateCi
+	default:
+		err = utilError.FunctionError(strconv.Itoa(ciTypeID) + " - " + v2.ErrTooManyResults.Error())
+	}
+
+
+	for _, ciProjectName := range ciProjectNames {
+		err = c.AddCiProjectMappingWithProjectName(r.ID, ciProjectName, 0)
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
+
+
 func (c *Client) GetCiIdByAttributeValue(name string, value string, valueType v2.AttributeValueType) (ciId int, err error) {
 	ciIds, err := c.GetListOfCiIdsByAttributeValue(name, value, valueType)
 	if err != nil {

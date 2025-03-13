@@ -74,3 +74,29 @@ func (c *Client) AddCiProjectMapping(ciID int, projectID int, historyID int) (er
 
 	return
 }
+
+
+func (c *Client) AddCiProjectMappingWithProjectName(ciID int, projectName string, historyID int) (err error) {
+	if err = c.v2.Login(); err != nil {
+		return
+	}
+
+	projectID, err := c.GetProjectIdByProjectName(projectName)
+	if err != nil{
+		return
+	}
+
+	params := map[string]string{
+		"argv1": strconv.Itoa(ciID),
+		"argv2": strconv.Itoa(projectID),
+		"argv3": strconv.Itoa(historyID),
+	}
+
+	jsonRet := addCiProjectMappingResponse{}
+	err = c.v2.Query("int_addCiProjectMapping", &jsonRet, params)
+	if err != nil {
+		log.Error("Error: ", err)
+	}
+
+	return
+}
